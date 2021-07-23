@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='saint-lightning',
+    name='lit_saint',
     version='0.0.1',
     description='Pytorch Lightning version of SAINT Model',
     author='Luca Actis Grosso',
