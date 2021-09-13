@@ -7,6 +7,7 @@ from torch import nn, einsum
 
 
 class Residual(nn.Module):
+    """Define a residual block given a Pytorch Module, used for the skip connection"""
     def __init__(self, fn):
         super().__init__()
         self.fn = fn
@@ -16,6 +17,7 @@ class Residual(nn.Module):
 
 
 class PreNorm(nn.Module):
+    """Apply Layer Normalization before a Module"""
     def __init__(self, dim, fn):
         super().__init__()
         self.fn = fn
@@ -26,8 +28,11 @@ class PreNorm(nn.Module):
 
 
 class GEGLU(nn.Module):
+    """Gated GELU, it splits a tensor in two slices based on the last dimension, and then multiply the
+       first half and the gelu of the second half
+    """
     def forward(self, x):
-        x, gates = x.chunk(2, dim = -1)
+        x, gates = x.chunk(2, dim=-1)
         return x * f.gelu(gates)
 
 
@@ -58,7 +63,7 @@ class Attention(nn.Module):
         self.heads = heads
         self.scale = dim_head ** -0.5
 
-        self.to_qkv = nn.Linear(dim, inner_dim * 3, bias = False)
+        self.to_qkv = nn.Linear(dim, inner_dim * 3, bias=False)
         self.to_out = nn.Linear(inner_dim, dim)
 
         self.dropout = nn.Dropout(dropout)

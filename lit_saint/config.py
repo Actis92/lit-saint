@@ -62,23 +62,4 @@ class SaintConfig:
     place: PlaceHolders
 
 
-defaults = [
-]
-@dataclass
-class TransformConfig:
-    __class_fullname__: str
-    bbox_params: Dict
-    transforms: List[Any] = field(default_factory=lambda: [])
-
-@dataclass
-class TransformsConfig:
-    train: Dict = field(default_factory=lambda: {"transform":TransformConfig})
-    val: Dict = field(default_factory=lambda: {"transform":TransformConfig})
-    predict: Dict = field(default_factory=lambda: {"transform":TransformConfig})
-    test: Dict = field(default_factory=lambda: {"transform": TransformConfig})
-
-@dataclass
-class Config:
-    transforms: TransformsConfig
-
 
