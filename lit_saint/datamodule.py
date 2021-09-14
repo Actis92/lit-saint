@@ -1,6 +1,7 @@
 from pytorch_lightning import LightningDataModule
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader
 
 from lit_saint.dataset import SaintDataset
@@ -15,11 +16,14 @@ class SaintDatamodule(LightningDataModule):
         self.categorical_columns = []
         self.categorical_dims = []
         self.num_continuos = 0
+        self.numerical_columns = []
         self.target_categorical = False
         self.target_index = None
         self.pretraining = pretraining
+        self.scaler = StandardScaler()
         self.prep(df, split_column)
         self._split_data(df=df, split_column=split_column)
+        self.scaler_continuos_columns(df=df, split_column=split_column)
 
     def prep(self, df, split_column):
         for i, col in enumerate(df.columns):
@@ -33,10 +37,15 @@ class SaintDatamodule(LightningDataModule):
                     self.target_categorical = True
                     self.target_index = i
             else:
+                self.numerical_columns.append(i)
                 if col == self.target:
                     self.target_index = i
         # -1 to remove the split column
         self.num_continuos = df.shape[1] - len(self.categorical_columns) - 1
+
+    def scaler_continuos_columns(self, df, split_column):
+        df_train = df.loc[df[split_column] == "train"].iloc[:, self.numerical_columns].values
+        self.scaler.fit(df_train)
 
     def _split_data(self, df, split_column):
         self.train = df.loc[df[split_column] == "train"]
@@ -54,7 +63,8 @@ class SaintDatamodule(LightningDataModule):
             is_pretraining=self.pretraining,
             cat_cols=self.categorical_columns,
             target_categorical=self.target_categorical,
-            target_index=self.target_index
+            target_index=self.target_index,
+            scaler = self.scaler
         )
         return DataLoader(
             dataset,
@@ -69,7 +79,8 @@ class SaintDatamodule(LightningDataModule):
             is_pretraining=self.pretraining,
             cat_cols=self.categorical_columns,
             target_categorical=self.target_categorical,
-            target_index=self.target_index
+            target_index=self.target_index,
+            scaler=self.scaler
         )
         return DataLoader(
             dataset,
@@ -85,7 +96,8 @@ class SaintDatamodule(LightningDataModule):
                 is_pretraining=self.pretraining,
                 cat_cols=self.categorical_columns,
                 target_categorical=self.target_categorical,
-                target_index=self.target_index
+                target_index=self.target_index,
+                scaler=self.scaler
             )
             return DataLoader(
                 dataset,
