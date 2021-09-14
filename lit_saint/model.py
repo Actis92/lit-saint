@@ -121,40 +121,12 @@ class SAINT(LightningModule):
         if self.pretraining:
             loss = 0
             embed_categ, embed_cont = self._embed_data(x_categ, x_cont)
-            if self.opt.pretrain.aug.get('cutmix'):
-                x_categ_noised, x_cont_noised = add_noise(x_categ, x_cont, self.opt.pretrain.aug.cutmix.noise_lambda)
-                embed_categ_noised, embed_cont_noised = self._embed_data(x_categ_noised, x_cont_noised)
-            else:
-                embed_categ_noised, embed_cont_noised = embed_categ, embed_cont
-
-            if self.opt.pretrain.aug.get("mixup"):
-                embed_categ_noised, embed_cont_noised = mixup_data(embed_categ_noised, embed_cont_noised, lam=self.opt.pretrain.aug.mixup.lam)
-
-            if self.opt.pretrain.task.get("contrastive"):
-                aug_features_1, aug_features_2 = self._contrastive(embed_categ, embed_cont,
-                                                                   embed_categ_noised, embed_cont_noised,
-                                                                   self.opt.pretrain.task.contrastive.projhead_style)
-                # @ is the matrix multiplication operator
-                logits_per_aug1 = aug_features_1 @ aug_features_2.t() / self.opt.pretrain.task.contrastive.nce_temp
-                logits_per_aug2 = aug_features_2 @ aug_features_1.t() / self.opt.pretrain.task.contrastive.nce_temp
-                targets = torch.arange(logits_per_aug1.size(0))
-                loss_1 = f.cross_entropy(logits_per_aug1, targets)
-                loss_2 = f.cross_entropy(logits_per_aug2, targets)
-                loss += self.opt.pretrain.task.contrastive.lam * (loss_1 + loss_2) / 2
-            elif self.opt.pretrain.task.get("contrastive_sim"):
-                aug_features_1, aug_features_2 = self._contrastive(embed_categ, embed_cont,
-                                                                   embed_categ_noised, embed_cont_noised)
-                c1 = aug_features_1 @ aug_features_2.t()
-                loss += self.opt.pretrain.task.contrastive_sim.weight * torch.diagonal(-1 * c1).add_(1).pow_(2).sum()
+            embed_categ_noised, embed_cont_noised = self._pretraining_augmentation(x_categ, x_cont,
+                                                                                   embed_categ, embed_cont)
+            loss += self._pretraining_contrastive(embed_categ, embed_cont,
+                                                  embed_categ_noised, embed_cont_noised)
             if self.opt.pretrain.task.get("denoising"):
-                cat_outs, con_outs = self(embed_categ_noised, embed_cont_noised)
-                con_outs = torch.cat(con_outs, dim=1)
-                loss_continuos_columns = f.mse_loss(con_outs, x_cont)
-                loss_categorical_columns = 0
-                for j in range(self.num_categories - 1):
-                    loss_categorical_columns += f.cross_entropy(cat_outs[j], x_categ[:, j])
-                loss += self.opt.pretrain.task.denoising.weight_cross_entropy * loss_categorical_columns + \
-                        self.opt.pretrain.task.denoising.weight_mse * loss_continuos_columns
+                loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
             self.log("loss", loss)
             return loss
         else:
@@ -179,6 +151,46 @@ class SAINT(LightningModule):
         else:
             print('Not using projection head')
         return aug_features_1, aug_features_2
+
+    def _pretraining_augmentation(self, x_categ, x_cont, embed_categ, embed_cont):
+        if self.opt.pretrain.aug.get('cutmix'):
+            x_categ_noised, x_cont_noised = add_noise(x_categ, x_cont, self.opt.pretrain.aug.cutmix.noise_lambda)
+            embed_categ_noised, embed_cont_noised = self._embed_data(x_categ_noised, x_cont_noised)
+        else:
+            embed_categ_noised, embed_cont_noised = embed_categ, embed_cont
+
+        if self.opt.pretrain.aug.get("mixup"):
+            embed_categ_noised, embed_cont_noised = mixup_data(embed_categ_noised, embed_cont_noised,
+                                                               lam=self.opt.pretrain.aug.mixup.lam)
+        return embed_categ_noised, embed_cont_noised
+
+    def _pretraining_denoising(self, x_categ, x_cont, embed_categ_noised, embed_cont_noised):
+        cat_outs, con_outs = self(embed_categ_noised, embed_cont_noised)
+        con_outs = torch.cat(con_outs, dim=1)
+        loss_continuos_columns = f.mse_loss(con_outs, x_cont)
+        loss_categorical_columns = 0
+        for j in range(self.num_categories - 1):
+            loss_categorical_columns += f.cross_entropy(cat_outs[j], x_categ[:, j])
+        return self.opt.pretrain.task.denoising.weight_cross_entropy * loss_categorical_columns + \
+                self.opt.pretrain.task.denoising.weight_mse * loss_continuos_columns
+
+    def _pretraining_contrastive(self, embed_categ, embed_cont, embed_categ_noised, embed_cont_noised):
+        if self.opt.pretrain.task.get("contrastive"):
+            aug_features_1, aug_features_2 = self._contrastive(embed_categ, embed_cont,
+                                                               embed_categ_noised, embed_cont_noised,
+                                                               self.opt.pretrain.task.contrastive.projhead_style)
+            # @ is the matrix multiplication operator
+            logits_per_aug1 = aug_features_1 @ aug_features_2.t() / self.opt.pretrain.task.contrastive.nce_temp
+            logits_per_aug2 = aug_features_2 @ aug_features_1.t() / self.opt.pretrain.task.contrastive.nce_temp
+            targets = torch.arange(logits_per_aug1.size(0))
+            loss_1 = f.cross_entropy(logits_per_aug1, targets)
+            loss_2 = f.cross_entropy(logits_per_aug2, targets)
+            return self.opt.pretrain.task.contrastive.lam * (loss_1 + loss_2) / 2
+        elif self.opt.pretrain.task.get("contrastive_sim"):
+            aug_features_1, aug_features_2 = self._contrastive(embed_categ, embed_cont,
+                                                               embed_categ_noised, embed_cont_noised)
+            c1 = aug_features_1 @ aug_features_2.t()
+            return self.opt.pretrain.task.contrastive_sim.weight * torch.diagonal(-1 * c1).add_(1).pow_(2).sum()
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=0.02)
