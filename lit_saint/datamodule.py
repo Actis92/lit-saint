@@ -15,10 +15,8 @@ class SaintDatamodule(LightningDataModule):
         self.batch_size = batch_size
         self.categorical_columns = []
         self.categorical_dims = []
-        self.num_continuos = 0
         self.numerical_columns = []
         self.target_categorical = False
-        self.target_index = None
         self.pretraining = pretraining
         self.scaler = StandardScaler()
         self.prep(df, split_column)
@@ -34,16 +32,14 @@ class SaintDatamodule(LightningDataModule):
                 if col != split_column:
                     l_enc = LabelEncoder()
                     df[col] = l_enc.fit_transform(df[col].values)
-                    self.categorical_columns.append(i)
+                    if col == self.target:
+                        self.target_categorical = True
+                    else:
+                        self.categorical_columns.append(i)
                     self.categorical_dims.append(len(l_enc.classes_))
-                if col == self.target:
-                    self.target_categorical = True
-                    self.target_index = i
             else:
-                self.numerical_columns.append(i)
-                if col == self.target:
-                    self.target_index = i
-        self.num_continuos = len(self.numerical_columns)
+                if col != self.target:
+                    self.numerical_columns.append(i)
 
     def scaler_continuos_columns(self, df: pd.DataFrame, split_column: str):
         """Fit a StandardScaler for each continuos columns on the training set"""
@@ -67,7 +63,7 @@ class SaintDatamodule(LightningDataModule):
             is_pretraining=self.pretraining,
             cat_cols=self.categorical_columns,
             target_categorical=self.target_categorical,
-            target_index=self.target_index,
+            con_cols=self.numerical_columns,
             scaler = self.scaler
         )
         return DataLoader(
@@ -83,7 +79,7 @@ class SaintDatamodule(LightningDataModule):
             is_pretraining=self.pretraining,
             cat_cols=self.categorical_columns,
             target_categorical=self.target_categorical,
-            target_index=self.target_index,
+            con_cols=self.numerical_columns,
             scaler=self.scaler
         )
         return DataLoader(
@@ -100,7 +96,7 @@ class SaintDatamodule(LightningDataModule):
                 is_pretraining=self.pretraining,
                 cat_cols=self.categorical_columns,
                 target_categorical=self.target_categorical,
-                target_index=self.target_index,
+                con_cols=self.numerical_columns,
                 scaler=self.scaler
             )
             return DataLoader(

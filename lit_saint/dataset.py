@@ -3,12 +3,7 @@ from torch.utils.data import Dataset
 
 
 class SaintDataset(Dataset):
-    def __init__(self, data, target, is_pretraining, cat_cols, target_categorical, target_index, scaler):
-        con_cols = list(set(np.arange(data.shape[1])) - set(cat_cols))
-        if target_categorical:
-            cat_cols.remove(target_index)
-        else:
-            con_cols.remove(target_index)
+    def __init__(self, data, target, is_pretraining, cat_cols, target_categorical, con_cols, scaler):
         self.is_pretraining = is_pretraining
         self.target_categorical = target_categorical
         self.X1 = data.iloc[:, cat_cols].values.astype(np.int64)  # categorical columns
