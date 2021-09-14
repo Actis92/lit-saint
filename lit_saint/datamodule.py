@@ -25,7 +25,10 @@ class SaintDatamodule(LightningDataModule):
         self._split_data(df=df, split_column=split_column)
         self.scaler_continuos_columns(df=df, split_column=split_column)
 
-    def prep(self, df, split_column):
+    def prep(self, df: pd.DataFrame, split_column: str):
+        """It find the indexes for each categorical and continuos columns, and for each categorical it
+            applies Label Encoding in order to convert them in integers and save the number of classes for each
+            categorical column"""
         for i, col in enumerate(df.columns):
             if df[col].dtypes.name in ["object", "category"]:
                 if col != split_column:
@@ -40,14 +43,15 @@ class SaintDatamodule(LightningDataModule):
                 self.numerical_columns.append(i)
                 if col == self.target:
                     self.target_index = i
-        # -1 to remove the split column
-        self.num_continuos = df.shape[1] - len(self.categorical_columns) - 1
+        self.num_continuos = len(self.numerical_columns)
 
-    def scaler_continuos_columns(self, df, split_column):
+    def scaler_continuos_columns(self, df: pd.DataFrame, split_column: str):
+        """Fit a StandardScaler for each continuos columns on the training set"""
         df_train = df.loc[df[split_column] == "train"].iloc[:, self.numerical_columns].values
         self.scaler.fit(df_train)
 
-    def _split_data(self, df, split_column):
+    def _split_data(self, df: pd.DataFrame, split_column: str):
+        """Split the Dataframe in train, validation and test, and drop the split column"""
         self.train = df.loc[df[split_column] == "train"]
         self.validation = df.loc[df[split_column] == "validation"]
         self.test = df.loc[df[split_column] == "test"]
