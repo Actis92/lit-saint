@@ -134,7 +134,7 @@ class SAINT(LightningModule):
             x_categ_enc, x_cont_enc = self._embed_data_mask(x_categ, x_cont, cat_mask, con_mask)
 
             if self.opt.pretrain.aug.get("mixup"):
-                x_categ_enc_2, x_cont_enc_2 = mixup_data(x_categ_enc_2, x_cont_enc_2, lam=self.opt.aug.mixup.lam)
+                x_categ_enc_2, x_cont_enc_2 = mixup_data(x_categ_enc_2, x_cont_enc_2, lam=self.opt.pretrain.aug.mixup.lam)
 
             if self.opt.pretrain.task.get("contrastive"):
                 aug_features_1 = self.transformer(x_categ_enc, x_cont_enc)
@@ -151,7 +151,7 @@ class SAINT(LightningModule):
                     print('Not using projection head')
                 logits_per_aug1 = aug_features_1 @ aug_features_2.t() / self.opt.pretrain.task.contrastive.nce_temp
                 logits_per_aug2 = aug_features_2 @ aug_features_1.t() / self.opt.pretrain.task.contrastive.nce_temp
-                targets = torch.arange(logits_per_aug1.size(0)).to(logits_per_aug1.device)
+                targets = torch.arange(logits_per_aug1.size(0))
                 loss_1 = f.cross_entropy(logits_per_aug1, targets)
                 loss_2 = f.cross_entropy(logits_per_aug2, targets)
                 loss = self.opt.pretrain.task.contrastive.lam * (loss_1 + loss_2) / 2
