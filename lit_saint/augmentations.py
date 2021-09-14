@@ -1,29 +1,35 @@
+from typing import Tuple
+
 import torch
 import numpy as np
 
 
-def mixup_data(x1, x2, lam=1.0, y=None):
-    """Returns mixed inputs, pairs of targets"""
+def mixup_data(x1: torch.Tensor, x2: torch.Tensor, lam: float = 1.0) -> Tuple[torch.Tensor, torch.Tensor]:
+    """It apply mixup augmentation, making a weighted average between a tensor
+        and some random element of the tensor
+    """
     batch_size = x1.size()[0]
     index = torch.randperm(batch_size)
 
-    mixed_x1 = lam * x1 + (1 - lam) * x1[index, :]
-    mixed_x2 = lam * x2 + (1 - lam) * x2[index, :]
-    if y is not None:
-        y_a, y_b = y, y[index]
-        return mixed_x1, mixed_x2, y_a, y_b
+    mixed_x1: torch.Tensor = lam * x1 + (1 - lam) * x1[index, :]
+    mixed_x2: torch.Tensor = lam * x2 + (1 - lam) * x2[index, :]
 
     return mixed_x1, mixed_x2
 
 
-def add_noise(x_categ, x_cont, noise_lambda=0.1):
-    lam = noise_lambda
-    batch_size = x_categ.size()[0]
+def add_noise(x1: torch.Tensor, x2: torch.Tensor, noise_lambda: float = 0.1) -> Tuple[torch.Tensor, torch.Tensor]:
+    """It apply cutmix augmentation to 2 tensors, replace some element of the tensors with some random element"""
+    batch_size = x1.size()[0]
     index = torch.randperm(batch_size)
-    cat_corr = torch.from_numpy(np.random.choice(2, x_categ.shape, p=[lam, 1 - lam]))
-    con_corr = torch.from_numpy(np.random.choice(2, x_cont.shape, p=[lam, 1 - lam]))
-    x1, x2 = x_categ[index, :], x_cont[index, :]
-    x_categ_corr, x_cont_corr = x_categ.clone().detach(), x_cont.clone().detach()
-    x_categ_corr[cat_corr == 0] = x1[cat_corr == 0]
-    x_cont_corr[con_corr == 0] = x2[con_corr == 0]
-    return x_categ_corr, x_cont_corr
+    x1_noised = _add_noise_single_tensor(x1, index, noise_lambda)
+    x2_noised = _add_noise_single_tensor(x2, index, noise_lambda)
+    return x1_noised, x2_noised
+
+
+def _add_noise_single_tensor(x: torch.Tensor, index: torch.Tensor, noise_lambda: float = 0.1) -> torch.Tensor:
+    """Define how apply cutmix to a tensor"""
+    x_binary_mask = torch.from_numpy(np.random.choice(2, size=x.shape, p=[noise_lambda, 1 - noise_lambda]))
+    x_random = x[index, :]
+    x_noised = x.clone().detach()
+    x_noised[x_binary_mask == 0] = x_random[x_binary_mask == 0]
+    return x_noised
