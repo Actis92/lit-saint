@@ -1,0 +1,14 @@
+defaults:
+  - base_config
+place:
+  place_1: 0.1
+pretrain:
+  aug:
+    cutmix:
+      noise_lambda: 0.1
+  task:
+    contrastive_sim:
+      weight: 0.1
+    denoising:
+      weight_cross_entropy: 0.5
+      weight_mse:  "${place.place_1}"
