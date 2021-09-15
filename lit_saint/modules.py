@@ -36,20 +36,6 @@ class GEGLU(nn.Module):
         return x * f.gelu(gates)
 
 
-class FeedForward(nn.Module):
-    def __init__(self, dim, mult=4, dropout=0.):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(dim, dim * mult * 2),
-            GEGLU(),
-            nn.Dropout(dropout),
-            nn.Linear(dim * mult, dim)
-        )
-
-    def forward(self, x) -> Any:
-        return self.net(x)
-
-
 class Attention(nn.Module):
     def __init__(
         self,
@@ -73,7 +59,7 @@ class Attention(nn.Module):
         q, k, v = self.to_qkv(x).chunk(3, dim = -1)
         q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h = h), (q, k, v))
         sim = einsum('b h i d, b h j d -> b h i j', q, k) * self.scale
-        attn = sim.softmax(dim = -1)
+        attn = sim.softmax(dim=-1)
         out = einsum('b h i j, b h j d -> b h i d', attn, v)
         out = rearrange(out, 'b h n d -> b n (h d)', h = h)
         return self.to_out(out)
@@ -91,11 +77,11 @@ class RowColTransformer(nn.Module):
             if self.style == 'colrow':
                 self.layers.append(nn.ModuleList([
                     PreNorm(dim, Residual(f)),
-                    PreNorm(dim, Residual(FeedForward(dim, dropout=ff_dropout)))
+                    PreNorm(dim, Residual(SimpleMLP(dim, dim*4, dim, GEGLU(), dropout=ff_dropout)))
                 ]))
             self.layers.append(nn.ModuleList([
                 PreNorm(dim*nfeats, Residual(Attention(dim, heads=heads, dim_head=64, dropout=attn_dropout))),
-                PreNorm(dim*nfeats, Residual(FeedForward(dim*nfeats, dropout=ff_dropout))),
+                PreNorm(dim*nfeats, Residual(SimpleMLP(dim*nfeats, dim*nfeats*4, dim*nfeats, GEGLU(), dropout=ff_dropout))),
             ]))
 
     def forward(self, x, x_cont=None):
@@ -127,7 +113,8 @@ class Transformer(nn.Module):
         for _ in range(depth):
             self.layers.append(nn.ModuleList([
                 PreNorm(dim, Residual(Attention(dim, heads=heads, dim_head=16, dropout=attn_dropout))),
-                PreNorm(dim, Residual(FeedForward(dim, dropout=ff_dropout))),
+                PreNorm(dim, Residual(SimpleMLP(dim, dim*4, dim, GEGLU(), dropout=ff_dropout)
+                    )),
             ]))
 
     def forward(self, x, x_cont=None):
@@ -139,33 +126,16 @@ class Transformer(nn.Module):
         return x
 
 
-# mlp
-class MLP(nn.Module):
-    def __init__(self, dims, act=None):
-        super().__init__()
-        dims_pairs = list(zip(dims[:-1], dims[1:]))
-        layers = []
-        for ind, (dim_in, dim_out) in enumerate(dims_pairs):
-            linear = nn.Linear(dim_in, dim_out)
-            layers.append(linear)
-
-            if ind >= (len(dims) - 1):
-                continue
-            if act is not None:
-                layers.append(act)
-
-        self.mlp = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return self.mlp(x)
-
-
 class SimpleMLP(nn.Module):
-    def __init__(self, dim_in, dim_internal, dim_out):
+    def __init__(self, dim_in, dim_internal, dim_out, activation_module: nn.Module = nn.ReLU(), dropout=0.):
         super().__init__()
+        mult = 1
+        if activation_module._get_name() == 'GEGLU':
+            mult = 2
         self.layers = nn.Sequential(
-            nn.Linear(dim_in, dim_internal),
-            nn.ReLU(),
+            nn.Linear(dim_in, dim_internal * mult),
+            activation_module,
+            nn.Dropout(dropout),
             nn.Linear(dim_internal, dim_out)
         )
 
