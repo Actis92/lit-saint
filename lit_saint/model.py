@@ -45,6 +45,7 @@ class SAINT(LightningModule):
         self._define_transformer(attentiontype, dim, nfeats, depth, heads, attn_dropout, ff_dropout)
         self._define_mlp(dim, categories)
         self._projection_head()
+        self.mlpfory = SimpleMLP(dim, 1000, 2)
 
     def _define_transformer(self, attentiontype, dim, nfeats, depth, heads, attn_dropout, ff_dropout):
         if attentiontype == 'col':

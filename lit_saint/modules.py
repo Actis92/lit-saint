@@ -40,9 +40,9 @@ class Attention(nn.Module):
     def __init__(
         self,
         dim,
-        heads = 8,
-        dim_head = 16,
-        dropout = 0.
+        heads=8,
+        dim_head=16,
+        dropout=0.
     ):
         super().__init__()
         inner_dim = dim_head * heads
@@ -56,12 +56,12 @@ class Attention(nn.Module):
 
     def forward(self, x):
         h = self.heads
-        q, k, v = self.to_qkv(x).chunk(3, dim = -1)
-        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h = h), (q, k, v))
+        q, k, v = self.to_qkv(x).chunk(3, dim=-1)
+        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h=h), (q, k, v))
         sim = einsum('b h i d, b h j d -> b h i j', q, k) * self.scale
         attn = sim.softmax(dim=-1)
         out = einsum('b h i j, b h j d -> b h i d', attn, v)
-        out = rearrange(out, 'b h n d -> b n (h d)', h = h)
+        out = rearrange(out, 'b h n d -> b n (h d)', h=h)
         return self.to_out(out)
 
 
