@@ -1,3 +1,5 @@
+from typing import List
+
 import torch
 import torch.nn.functional as f
 from pytorch_lightning.core import LightningModule
@@ -10,81 +12,71 @@ from lit_saint.augmentations import add_noise, mixup_data
 
 
 class SAINT(LightningModule):
+    """
+    :param categories: List with the number of unique values for each categorical column
+    :param num_continuos: number of continuos columns
+    :param embedding_size: embedding dimension
+    :param attentiontype: type of attention that can be used. possible values: col, row, colrow
+    """
     def __init__(
             self,
-            categories,
-            num_continuous,
-            dim,
-            depth,
-            heads,
-            opt: SaintConfig,
+            categories: List[int],
+            num_continuous: int,
+            config: SaintConfig,
             pretraining: bool = False,
-            num_special_tokens=0,
-            attn_dropout=0.,
-            ff_dropout=0.,
-            cont_embeddings='MLP',
-            attentiontype='col'
     ):
         super().__init__()
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
         # categories related calculations
-        self.opt = opt
+        self.config = config
         self.pretraining = pretraining
         self.num_categories = len(categories)
         self.num_unique_categories = sum(categories)
-
-        self.num_special_tokens = num_special_tokens
-        self.total_tokens = self.num_unique_categories + num_special_tokens
+        self.total_tokens = self.num_unique_categories
         self.num_continuous = num_continuous
-        self.dim = dim
-        self.attentiontype = attentiontype
-        self.cont_embeddings = cont_embeddings
-
-        nfeats = self.num_categories + num_continuous * int(cont_embeddings in ["MLP", 'pos_singleMLP'])
+        nfeats = self.num_categories + num_continuous
         self._define_masking()
-        self._define_transformer(attentiontype, dim, nfeats, depth, heads, attn_dropout, ff_dropout)
-        self._define_mlp(dim, categories)
+        self._define_transformer(nfeats)
+        self._define_mlp(categories)
         self._projection_head()
-        self.mlpfory = SimpleMLP(dim, 1000, 2)
+        self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, 2)
 
-    def _define_transformer(self, attentiontype, dim, nfeats, depth, heads, attn_dropout, ff_dropout):
-        if attentiontype == 'col':
+    def _define_transformer(self, nfeats):
+        if self.config.network.attention_type == 'col':
             self.transformer = Transformer(
-                dim=dim,
-                depth=depth,
-                heads=heads,
-                attn_dropout=attn_dropout,
-                ff_dropout=ff_dropout
+                dim=self.config.network.embedding_size,
+                depth=self.config.network.depth,
+                heads=self.config.network.heads,
+                attn_dropout=self.config.network.attn_dropout,
+                ff_dropout=self.config.network.ff_dropout
             )
-        elif attentiontype in ['row', 'colrow']:
+        elif self.config.network.attention_type in ['row', 'colrow']:
             self.transformer = RowColTransformer(
                 num_tokens=self.total_tokens,
-                dim=dim,
+                dim=self.config.network.embedding_size,
                 nfeats=nfeats,
-                depth=depth,
-                heads=heads,
-                attn_dropout=attn_dropout,
-                ff_dropout=ff_dropout,
-                style=attentiontype
+                depth=self.config.network.depth,
+                heads=self.config.network.heads,
+                attn_dropout=self.config.network.attn_dropout,
+                ff_dropout=self.config.network.ff_dropout,
+                style=self.config.network.attention_type
             )
 
     def _define_masking(self):
-        if self.cont_embeddings == 'MLP':
-            self.simple_MLP = nn.ModuleList([SimpleMLP(1, 100, self.dim) for _ in range(self.num_continuous)])
-        elif self.cont_embeddings == 'pos_singleMLP':
-            self.simple_MLP = nn.ModuleList([SimpleMLP(1, 100, self.dim) for _ in range(1)])
-        self.embeds = nn.Embedding(self.total_tokens, self.dim)
-        self.mask_embeds_cat = nn.Embedding(self.num_categories * 2, self.dim)
-        self.mask_embeds_cont = nn.Embedding(self.num_continuous * 2, self.dim)
+        self.simple_MLP = nn.ModuleList([SimpleMLP(1, 100, self.config.network.embedding_size)
+                                         for _ in range(self.num_continuous)])
+        self.embeds = nn.Embedding(self.total_tokens, self.config.network.embedding_size)
+        self.mask_embeds_cat = nn.Embedding(self.num_categories * 2, self.config.network.embedding_size)
+        self.mask_embeds_cont = nn.Embedding(self.num_continuous * 2, self.config.network.embedding_size)
         cat_mask_offset = f.pad(torch.Tensor(self.num_categories).fill_(2).type(torch.int8), (1, 0), value=0)
         self.cat_mask_offset = cat_mask_offset.cumsum(dim=-1)[:-1]
 
         con_mask_offset = f.pad(torch.Tensor(self.num_continuous).fill_(2).type(torch.int8), (1, 0), value=0)
         self.con_mask_offset = con_mask_offset.cumsum(dim=-1)[:-1]
 
-    def _define_mlp(self, dim, categories):
-        self.mlp1 = SepMLP(dim=dim, len_feats=self.num_categories, categories=categories)
-        self.mlp2 = SepMLP(dim=dim, len_feats=self.num_continuous,
+    def _define_mlp(self, categories):
+        self.mlp1 = SepMLP(dim=self.config.network.embedding_size, len_feats=self.num_categories, categories=categories)
+        self.mlp2 = SepMLP(dim=self.config.network.embedding_size, len_feats=self.num_continuous,
                            categories=np.ones(self.num_continuous).astype(int))
 
     def _embed_data(self, x_categ, x_cont):
@@ -92,24 +84,20 @@ class SAINT(LightningModule):
         x_categ_enc = self.embeds(x_categ)
         n1, n2 = x_cont.shape
         _, n3 = x_categ.shape
-        if self.cont_embeddings == 'MLP':
-            x_cont_enc = torch.empty(n1, n2, self.dim)
-            for i in range(self.num_continuous):
-                x_cont_enc[:, i, :] = self.simple_MLP[i](x_cont[:, i])
-        else:
-            raise Exception('This case should not work!')
-
+        x_cont_enc = torch.empty(n1, n2, self.config.network.embedding_size)
+        for i in range(self.num_continuous):
+            x_cont_enc[:, i, :] = self.simple_MLP[i](x_cont[:, i])
         x_cont_enc = x_cont_enc
 
         return x_categ_enc, x_cont_enc
 
     def _projection_head(self):
-        self.pt_mlp = SimpleMLP(self.dim * (self.num_continuous + self.num_categories),
-                                  6 * self.dim * (self.num_continuous + self.num_categories) // 5,
-                                  self.dim * (self.num_continuous + self.num_categories) // 2)
-        self.pt_mlp2 = SimpleMLP(self.dim * (self.num_continuous + self.num_categories),
-                                  6 * self.dim * (self.num_continuous + self.num_categories) // 5,
-                                  self.dim * (self.num_continuous + self.num_categories) // 2)
+        self.pt_mlp = SimpleMLP(self.config.network.embedding_size * (self.num_continuous + self.num_categories),
+                                  6 * self.config.network.embedding_size * (self.num_continuous + self.num_categories) // 5,
+                                  self.config.network.embedding_size * (self.num_continuous + self.num_categories) // 2)
+        self.pt_mlp2 = SimpleMLP(self.config.network.embedding_size * (self.num_continuous + self.num_categories),
+                                  6 * self.config.network.embedding_size * (self.num_continuous + self.num_categories) // 5,
+                                  self.config.network.embedding_size * (self.num_continuous + self.num_categories) // 2)
 
     def forward(self, x_categ, x_cont):
         x = self.transformer(x_categ, x_cont)
@@ -126,7 +114,7 @@ class SAINT(LightningModule):
                                                                                    embed_categ, embed_cont)
             loss += self._pretraining_contrastive(embed_categ, embed_cont,
                                                   embed_categ_noised, embed_cont_noised)
-            if self.opt.pretrain.task.get("denoising"):
+            if self.config.pretrain.task.get("denoising"):
                 loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
             self.log("loss", loss)
             return loss
@@ -154,15 +142,15 @@ class SAINT(LightningModule):
         return aug_features_1, aug_features_2
 
     def _pretraining_augmentation(self, x_categ, x_cont, embed_categ, embed_cont):
-        if self.opt.pretrain.aug.get('cutmix'):
-            x_categ_noised, x_cont_noised = add_noise(x_categ, x_cont, self.opt.pretrain.aug.cutmix.noise_lambda)
+        if self.config.pretrain.aug.get('cutmix'):
+            x_categ_noised, x_cont_noised = add_noise(x_categ, x_cont, self.config.pretrain.aug.cutmix.noise_lambda)
             embed_categ_noised, embed_cont_noised = self._embed_data(x_categ_noised, x_cont_noised)
         else:
             embed_categ_noised, embed_cont_noised = embed_categ, embed_cont
 
-        if self.opt.pretrain.aug.get("mixup"):
+        if self.config.pretrain.aug.get("mixup"):
             embed_categ_noised, embed_cont_noised = mixup_data(embed_categ_noised, embed_cont_noised,
-                                                               lam=self.opt.pretrain.aug.mixup.lam)
+                                                               lam=self.config.pretrain.aug.mixup.lam)
         return embed_categ_noised, embed_cont_noised
 
     def _pretraining_denoising(self, x_categ, x_cont, embed_categ_noised, embed_cont_noised):
@@ -172,26 +160,26 @@ class SAINT(LightningModule):
         loss_categorical_columns = 0
         for j in range(self.num_categories - 1):
             loss_categorical_columns += f.cross_entropy(cat_outs[j], x_categ[:, j])
-        return self.opt.pretrain.task.denoising.weight_cross_entropy * loss_categorical_columns + \
-                self.opt.pretrain.task.denoising.weight_mse * loss_continuos_columns
+        return self.config.pretrain.task.denoising.weight_cross_entropy * loss_categorical_columns + \
+                self.config.pretrain.task.denoising.weight_mse * loss_continuos_columns
 
     def _pretraining_contrastive(self, embed_categ, embed_cont, embed_categ_noised, embed_cont_noised):
-        if self.opt.pretrain.task.get("contrastive"):
+        if self.config.pretrain.task.get("contrastive"):
             aug_features_1, aug_features_2 = self._contrastive(embed_categ, embed_cont,
                                                                embed_categ_noised, embed_cont_noised,
-                                                               self.opt.pretrain.task.contrastive.projhead_style)
+                                                               self.config.pretrain.task.contrastive.projhead_style)
             # @ is the matrix multiplication operator
-            logits_per_aug1 = aug_features_1 @ aug_features_2.t() / self.opt.pretrain.task.contrastive.nce_temp
-            logits_per_aug2 = aug_features_2 @ aug_features_1.t() / self.opt.pretrain.task.contrastive.nce_temp
+            logits_per_aug1 = aug_features_1 @ aug_features_2.t() / self.config.pretrain.task.contrastive.nce_temp
+            logits_per_aug2 = aug_features_2 @ aug_features_1.t() / self.config.pretrain.task.contrastive.nce_temp
             targets = torch.arange(logits_per_aug1.size(0))
             loss_1 = f.cross_entropy(logits_per_aug1, targets)
             loss_2 = f.cross_entropy(logits_per_aug2, targets)
-            return self.opt.pretrain.task.contrastive.lam * (loss_1 + loss_2) / 2
-        elif self.opt.pretrain.task.get("contrastive_sim"):
+            return self.config.pretrain.task.contrastive.lam * (loss_1 + loss_2) / 2
+        elif self.config.pretrain.task.get("contrastive_sim"):
             aug_features_1, aug_features_2 = self._contrastive(embed_categ, embed_cont,
                                                                embed_categ_noised, embed_cont_noised)
             c1 = aug_features_1 @ aug_features_2.t()
-            return self.opt.pretrain.task.contrastive_sim.weight * torch.diagonal(-1 * c1).add_(1).pow_(2).sum()
+            return self.config.pretrain.task.contrastive_sim.weight * torch.diagonal(-1 * c1).add_(1).pow_(2).sum()
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=0.02)

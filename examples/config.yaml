@@ -1,7 +1,12 @@
 defaults:
   - base_config
-place:
-  place_1: 0.1
+network:
+  embedding_size: 10
+  depth: 3
+  heads: 1
+  attn_dropout: .0
+  ff_dropout: .0
+  attention_type:  'col'
 pretrain:
   aug:
     cutmix:
@@ -11,4 +16,4 @@ pretrain:
       weight: 0.1
     denoising:
       weight_cross_entropy: 0.5
-      weight_mse:  "${place.place_1}"
+      weight_mse:  0.1

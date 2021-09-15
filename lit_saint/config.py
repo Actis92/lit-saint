@@ -1,12 +1,12 @@
-from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
+from dataclasses import dataclass
+from typing import Optional
 
 from omegaconf import DictConfig
 
 
 @dataclass
 class PlaceHolders:
-    place_1 : float
+    place_1: float
 
 @dataclass
 class CutMixConfig:
@@ -57,7 +57,18 @@ class PreTrainConfig:
 
 
 @dataclass
+class NetworkConfig:
+    embedding_size: int
+    depth: int
+    heads: int
+    attn_dropout: float
+    ff_dropout: float
+    attention_type: str
+
+
+@dataclass
 class SaintConfig:
+    network: NetworkConfig
     pretrain: PreTrainConfig
     place: PlaceHolders
 

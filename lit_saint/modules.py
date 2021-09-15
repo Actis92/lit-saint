@@ -8,11 +8,11 @@ from torch import nn, einsum
 
 class Residual(nn.Module):
     """Define a residual block given a Pytorch Module, used for the skip connection"""
-    def __init__(self, fn):
+    def __init__(self, fn: nn.Module):
         super().__init__()
         self.fn = fn
 
-    def forward(self, x, *args, **kwargs) -> Any:
+    def forward(self, x, *args, **kwargs) -> torch.Tensor:
         return self.fn(x, *args, **kwargs) + x
 
 
@@ -76,7 +76,7 @@ class RowColTransformer(nn.Module):
         for _ in range(depth):
             if self.style == 'colrow':
                 self.layers.append(nn.ModuleList([
-                    PreNorm(dim, Residual(f)),
+                    PreNorm(dim, Residual(Attention(dim, heads=heads, dim_head=64, dropout=attn_dropout))),
                     PreNorm(dim, Residual(SimpleMLP(dim, dim*4, dim, GEGLU(), dropout=ff_dropout)))
                 ]))
             self.layers.append(nn.ModuleList([
