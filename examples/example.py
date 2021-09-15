@@ -22,7 +22,7 @@ def read_config(cfg: SaintConfig) -> None:
     df = pd.read_csv(get_original_cwd() + "/data/adult.csv")
     df["split"] = "train"
     df["split"].iloc[2000:] = "validation"
-    data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split", pretraining=True)
+    data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split")
     model = SAINT(categories=data_module.categorical_dims, num_continuous=len(data_module.numerical_columns),
                   config=cfg, pretraining=True)
 

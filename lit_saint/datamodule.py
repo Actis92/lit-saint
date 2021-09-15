@@ -8,8 +8,7 @@ from lit_saint.dataset import SaintDataset
 
 
 class SaintDatamodule(LightningDataModule):
-    def __init__(self, df: pd.DataFrame, target: str, split_column: str, batch_size: int = 256,
-                 pretraining: bool = False):
+    def __init__(self, df: pd.DataFrame, target: str, split_column: str, batch_size: int = 256):
         super().__init__()
         self.target = target
         self.batch_size = batch_size
@@ -17,7 +16,6 @@ class SaintDatamodule(LightningDataModule):
         self.categorical_dims = []
         self.numerical_columns = []
         self.target_categorical = False
-        self.pretraining = pretraining
         self.scaler = StandardScaler()
         self.prep(df, split_column)
         self._split_data(df=df, split_column=split_column)
@@ -60,7 +58,6 @@ class SaintDatamodule(LightningDataModule):
         dataset = SaintDataset(
             data=self.train,
             target=self.target,
-            is_pretraining=self.pretraining,
             cat_cols=self.categorical_columns,
             target_categorical=self.target_categorical,
             con_cols=self.numerical_columns,
@@ -76,7 +73,6 @@ class SaintDatamodule(LightningDataModule):
         dataset = SaintDataset(
             data=self.validation,
             target=self.target,
-            is_pretraining=self.pretraining,
             cat_cols=self.categorical_columns,
             target_categorical=self.target_categorical,
             con_cols=self.numerical_columns,
@@ -93,7 +89,6 @@ class SaintDatamodule(LightningDataModule):
             dataset = SaintDataset(
                 data=self.test,
                 target=self.target,
-                is_pretraining=self.pretraining,
                 cat_cols=self.categorical_columns,
                 target_categorical=self.target_categorical,
                 con_cols=self.numerical_columns,
