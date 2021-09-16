@@ -1,9 +1,9 @@
-from typing import List
+from typing import List, Tuple
 
 import torch
 import torch.nn.functional as f
 from pytorch_lightning.core import LightningModule
-from torch import nn
+from torch import nn, Tensor
 import numpy as np
 
 from lit_saint.config import SaintConfig
@@ -32,16 +32,22 @@ class SAINT(LightningModule):
         self.pretraining = pretraining
         self.num_categories = len(categories)
         self.num_unique_categories = sum(categories)
-        self.total_tokens = self.num_unique_categories
         self.num_continuous = num_continuous
-        nfeats = self.num_categories + num_continuous
-        self._define_masking()
-        self._define_transformer(nfeats)
+        self.num_columns = self.num_continuous + self.num_categories
+        # define offset in order to have unique value for each category
+        cat_mask_offset = f.pad(torch.tensor(categories), (1, 0), value=0)
+        self.cat_mask_offset = cat_mask_offset.cumsum(dim=-1)[:-1]
+        self._define_network_components(categories)
+
+    def _define_network_components(self, categories):
+        self._define_embedding_layers()
+        self._define_transformer()
         self._define_mlp(categories)
-        self._projection_head()
+        self._define_projection_head()
         self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, 2)
 
-    def _define_transformer(self, nfeats):
+    def _define_transformer(self):
+        """Instatiate the type of Transformed that will be used in SAINT"""
         if self.config.network.attention_type == 'col':
             self.transformer = Transformer(
                 dim=self.config.network.embedding_size,
@@ -52,9 +58,9 @@ class SAINT(LightningModule):
             )
         elif self.config.network.attention_type in ['row', 'colrow']:
             self.transformer = RowColTransformer(
-                num_tokens=self.total_tokens,
+                num_tokens=self.num_unique_categories,
                 dim=self.config.network.embedding_size,
-                nfeats=nfeats,
+                nfeats=self.num_categories + self.num_continuous,
                 depth=self.config.network.depth,
                 heads=self.config.network.heads,
                 attn_dropout=self.config.network.attn_dropout,
@@ -62,53 +68,46 @@ class SAINT(LightningModule):
                 style=self.config.network.attention_type
             )
 
-    def _define_masking(self):
-        self.simple_MLP = nn.ModuleList([SimpleMLP(1, 100, self.config.network.embedding_size)
-                                         for _ in range(self.num_continuous)])
-        self.embeds = nn.Embedding(self.total_tokens, self.config.network.embedding_size)
-        self.mask_embeds_cat = nn.Embedding(self.num_categories * 2, self.config.network.embedding_size)
-        self.mask_embeds_cont = nn.Embedding(self.num_continuous * 2, self.config.network.embedding_size)
-        cat_mask_offset = f.pad(torch.Tensor(self.num_categories).fill_(2).type(torch.int8), (1, 0), value=0)
-        self.cat_mask_offset = cat_mask_offset.cumsum(dim=-1)[:-1]
+    def _define_embedding_layers(self) -> None:
+        """Instatiate embedding layers"""
+        # embed continuos variables using one different MLP for each column
+        self.embedding_continuos = nn.ModuleList([SimpleMLP(1, 100, self.config.network.embedding_size)
+                                                  for _ in range(self.num_continuous)])
+        # embedding layer categorical columns
+        self.embedding_categorical = nn.Embedding(self.num_unique_categories, self.config.network.embedding_size)
 
-        con_mask_offset = f.pad(torch.Tensor(self.num_continuous).fill_(2).type(torch.int8), (1, 0), value=0)
-        self.con_mask_offset = con_mask_offset.cumsum(dim=-1)[:-1]
+    def _define_mlp(self, categories: List[int]) -> None:
+        """Define MLP used for the inference"""
+        self.mlp1 = SepMLP(dim=self.config.network.embedding_size, dim_out_for_each_feat=categories)
+        self.mlp2 = SepMLP(dim=self.config.network.embedding_size,
+                           dim_out_for_each_feat=list(np.ones(self.num_continuous).astype(int)))
 
-    def _define_mlp(self, categories):
-        self.mlp1 = SepMLP(dim=self.config.network.embedding_size, len_feats=self.num_categories, categories=categories)
-        self.mlp2 = SepMLP(dim=self.config.network.embedding_size, len_feats=self.num_continuous,
-                           categories=np.ones(self.num_continuous).astype(int))
+    def _define_projection_head(self) -> None:
+        """Define projection heads for contrastive learning"""
+        self.pt_mlp = SimpleMLP(self.config.network.embedding_size * self.num_columns,
+                                  6 * self.config.network.embedding_size * self.num_columns // 5,
+                                  self.config.network.embedding_size * self.num_columns // 2)
+        self.pt_mlp2 = SimpleMLP(self.config.network.embedding_size * self.num_columns,
+                                  6 * self.config.network.embedding_size * self.num_columns // 5,
+                                  self.config.network.embedding_size * self.num_columns // 2)
 
-    def _embed_data(self, x_categ, x_cont):
+    def _embed_data(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[Tensor, Tensor]:
+        """Converts categorical and continuos values in embeddings"""
         x_categ = x_categ + self.cat_mask_offset.type_as(x_categ)
-        x_categ_enc = self.embeds(x_categ)
+        x_categ_enc = self.embedding_categorical(x_categ)
         n1, n2 = x_cont.shape
         _, n3 = x_categ.shape
         x_cont_enc = torch.empty(n1, n2, self.config.network.embedding_size)
         for i in range(self.num_continuous):
-            x_cont_enc[:, i, :] = self.simple_MLP[i](x_cont[:, i])
+            x_cont_enc[:, i, :] = self.embedding_continuos[i](x_cont[:, i])
         x_cont_enc = x_cont_enc
 
         return x_categ_enc, x_cont_enc
 
-    def _projection_head(self):
-        self.pt_mlp = SimpleMLP(self.config.network.embedding_size * (self.num_continuous + self.num_categories),
-                                  6 * self.config.network.embedding_size * (self.num_continuous + self.num_categories) // 5,
-                                  self.config.network.embedding_size * (self.num_continuous + self.num_categories) // 2)
-        self.pt_mlp2 = SimpleMLP(self.config.network.embedding_size * (self.num_continuous + self.num_categories),
-                                  6 * self.config.network.embedding_size * (self.num_continuous + self.num_categories) // 5,
-                                  self.config.network.embedding_size * (self.num_continuous + self.num_categories) // 2)
-
-    def forward(self, x_categ, x_cont):
-        x = self.transformer(x_categ, x_cont)
-        cat_outs = self.mlp1(x[:, :self.num_categories, :])
-        con_outs = self.mlp2(x[:, self.num_categories:, :])
-        return cat_outs, con_outs
-
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
         x_categ, x_cont = batch
         if self.pretraining:
-            loss = 0
+            loss = Tensor([0])
             embed_categ, embed_cont = self._embed_data(x_categ, x_cont)
             embed_categ_noised, embed_cont_noised = self._pretraining_augmentation(x_categ, x_cont,
                                                                                    embed_categ, embed_cont)
@@ -121,27 +120,30 @@ class SAINT(LightningModule):
         else:
             x_categ_enc, x_cont_enc = self._embed_data(x_categ, x_cont)
             reps = self.transformer(x_categ_enc, x_cont_enc)
-            # select only the representations corresponding to y and apply mlp on it in the next step to get the predictions.
+            # select only the representations corresponding to y and apply mlp on it
+            # in the next step to get the predictions.
             y_reps = reps[:, self.num_categories - 1, :]
             y_outs = self.mlpfory(y_reps)
             return f.cross_entropy(y_outs, x_categ[:, self.num_categories - 1])
 
-    def _contrastive(self, embed_categ, embed_cont, embed_categ_noised, embed_cont_noised, projhead_style="different"):
-        aug_features_1 = self.transformer(embed_categ, embed_cont)
-        aug_features_2 = self.transformer(embed_categ_noised, embed_cont_noised)
-        aug_features_1 = (aug_features_1 / aug_features_1.norm(dim=-1, keepdim=True)).flatten(1, 2)
-        aug_features_2 = (aug_features_2 / aug_features_2.norm(dim=-1, keepdim=True)).flatten(1, 2)
+    def _contrastive(self, embed_categ: Tensor, embed_cont: Tensor, embed_categ_noised: Tensor,
+                     embed_cont_noised: Tensor, projhead_style: str = "different") -> Tuple[Tensor, Tensor]:
+        embed_tranformed = self.transformer(embed_categ, embed_cont)
+        embed_transformed_noised = self.transformer(embed_categ_noised, embed_cont_noised)
+        embed_tranformed = (embed_tranformed / embed_tranformed.norm(dim=-1, keepdim=True)).flatten(1, 2)
+        embed_transformed_noised = (embed_transformed_noised / embed_transformed_noised.norm(dim=-1, keepdim=True)).flatten(1, 2)
         if projhead_style == 'different':
-            aug_features_1 = self.pt_mlp(aug_features_1)
-            aug_features_2 = self.pt_mlp2(aug_features_2)
+            embed_tranformed = self.pt_mlp(embed_tranformed)
+            embed_transformed_noised = self.pt_mlp2(embed_transformed_noised)
         elif projhead_style == 'same':
-            aug_features_1 = self.pt_mlp(aug_features_1)
-            aug_features_2 = self.pt_mlp(aug_features_2)
+            embed_tranformed = self.pt_mlp(embed_tranformed)
+            embed_transformed_noised = self.pt_mlp(embed_transformed_noised)
         else:
             print('Not using projection head')
-        return aug_features_1, aug_features_2
+        return embed_tranformed, embed_transformed_noised
 
-    def _pretraining_augmentation(self, x_categ, x_cont, embed_categ, embed_cont):
+    def _pretraining_augmentation(self, x_categ: Tensor, x_cont: Tensor, embed_categ: Tensor,
+                                  embed_cont: Tensor) -> Tuple[Tensor, Tensor]:
         if self.config.pretrain.aug.get('cutmix'):
             x_categ_noised, x_cont_noised = add_noise(x_categ, x_cont, self.config.pretrain.aug.cutmix.noise_lambda)
             embed_categ_noised, embed_cont_noised = self._embed_data(x_categ_noised, x_cont_noised)
@@ -153,33 +155,47 @@ class SAINT(LightningModule):
                                                                lam=self.config.pretrain.aug.mixup.lam)
         return embed_categ_noised, embed_cont_noised
 
-    def _pretraining_denoising(self, x_categ, x_cont, embed_categ_noised, embed_cont_noised):
-        cat_outs, con_outs = self(embed_categ_noised, embed_cont_noised)
-        con_outs = torch.cat(con_outs, dim=1)
-        loss_continuos_columns = f.mse_loss(con_outs, x_cont)
+    def _pretraining_denoising(self, x_categ: Tensor, x_cont: Tensor, embed_categ_noised: Tensor,
+                               embed_cont_noised: Tensor) -> Tensor:
+        output_categorical, output_continuos = self(embed_categ_noised, embed_cont_noised)
+        output_continuos = torch.cat(output_continuos, dim=1)
+        loss_continuos_columns = f.mse_loss(output_continuos, x_cont)
         loss_categorical_columns = 0
+        # for each categorical column we compute the cross_entropy where in x_categ
+        # there is the index of the categorical value obtained using the Label Encoding
         for j in range(self.num_categories - 1):
-            loss_categorical_columns += f.cross_entropy(cat_outs[j], x_categ[:, j])
+            loss_categorical_columns += f.cross_entropy(output_categorical[j], x_categ[:, j])
         return self.config.pretrain.task.denoising.weight_cross_entropy * loss_categorical_columns + \
                 self.config.pretrain.task.denoising.weight_mse * loss_continuos_columns
 
-    def _pretraining_contrastive(self, embed_categ, embed_cont, embed_categ_noised, embed_cont_noised):
+    def _pretraining_contrastive(self, embed_categ: Tensor, embed_cont: Tensor, embed_categ_noised: Tensor,
+                                 embed_cont_noised: Tensor) -> Tensor:
         if self.config.pretrain.task.get("contrastive"):
-            aug_features_1, aug_features_2 = self._contrastive(embed_categ, embed_cont,
+            embed_tranformed, embed_transformed_noised = self._contrastive(embed_categ, embed_cont,
                                                                embed_categ_noised, embed_cont_noised,
                                                                self.config.pretrain.task.contrastive.projhead_style)
             # @ is the matrix multiplication operator
-            logits_per_aug1 = aug_features_1 @ aug_features_2.t() / self.config.pretrain.task.contrastive.nce_temp
-            logits_per_aug2 = aug_features_2 @ aug_features_1.t() / self.config.pretrain.task.contrastive.nce_temp
-            targets = torch.arange(logits_per_aug1.size(0))
-            loss_1 = f.cross_entropy(logits_per_aug1, targets)
-            loss_2 = f.cross_entropy(logits_per_aug2, targets)
+            logits_1 = embed_tranformed @ embed_transformed_noised.t() / self.config.pretrain.task.contrastive.nce_temp
+            logits_2 = embed_transformed_noised @ embed_tranformed.t() / self.config.pretrain.task.contrastive.nce_temp
+            # targets it's a list of numbers from zero to size of the tensor, in order to make that
+            # z0 and z0' are similar, but z0 is different from the other indexes
+            targets = torch.arange(logits_1.size(0))
+            loss_1 = f.cross_entropy(logits_1, targets)
+            loss_2 = f.cross_entropy(logits_2, targets)
             return self.config.pretrain.task.contrastive.lam * (loss_1 + loss_2) / 2
         elif self.config.pretrain.task.get("contrastive_sim"):
-            aug_features_1, aug_features_2 = self._contrastive(embed_categ, embed_cont,
+            # it apply the concept of simsiam we want that the embedding minimize the cosine similarity
+            # the idea is that we want on the diagonal all 1, it means they are equal /because normalized)
+            embed_tranformed, embed_transformed_noised = self._contrastive(embed_categ, embed_cont,
                                                                embed_categ_noised, embed_cont_noised)
-            c1 = aug_features_1 @ aug_features_2.t()
+            c1 = embed_tranformed @ embed_transformed_noised.t()
             return self.config.pretrain.task.contrastive_sim.weight * torch.diagonal(-1 * c1).add_(1).pow_(2).sum()
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=0.02)
+
+    def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[List[Tensor], List[Tensor]]:
+        x = self.transformer(x_categ, x_cont)
+        cat_outs = self.mlp1(x[:, :self.num_categories, :])
+        con_outs = self.mlp2(x[:, self.num_categories:, :])
+        return cat_outs, con_outs

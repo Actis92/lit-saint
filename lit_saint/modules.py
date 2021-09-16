@@ -1,9 +1,9 @@
-from typing import Any
+from typing import Any, List
 
 import torch
 import torch.nn.functional as f
 from einops import rearrange
-from torch import nn, einsum
+from torch import nn, einsum, Tensor
 
 
 class Residual(nn.Module):
@@ -12,18 +12,18 @@ class Residual(nn.Module):
         super().__init__()
         self.fn = fn
 
-    def forward(self, x, *args, **kwargs) -> torch.Tensor:
+    def forward(self, x, *args, **kwargs) -> Tensor:
         return self.fn(x, *args, **kwargs) + x
 
 
 class PreNorm(nn.Module):
     """Apply Layer Normalization before a Module"""
-    def __init__(self, dim, fn):
+    def __init__(self, dim, fn: nn.Module):
         super().__init__()
         self.fn = fn
         self.norm = nn.LayerNorm(dim)
 
-    def forward(self, x, *args, **kwargs) -> Any:
+    def forward(self, x: Tensor, *args, **kwargs) -> Tensor:
         return self.fn(self.norm(x), *args, **kwargs)
 
 
@@ -31,7 +31,7 @@ class GEGLU(nn.Module):
     """Gated GELU, it splits a tensor in two slices based on the last dimension, and then multiply the
        first half and the gelu of the second half
     """
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         x, gates = x.chunk(2, dim=-1)
         return x * f.gelu(gates)
 
@@ -39,10 +39,10 @@ class GEGLU(nn.Module):
 class Attention(nn.Module):
     def __init__(
         self,
-        dim,
-        heads=8,
-        dim_head=16,
-        dropout=0.
+        dim: int,
+        heads: int = 8,
+        dim_head: int = 16,
+        dropout: float = 0.
     ):
         super().__init__()
         inner_dim = dim_head * heads
@@ -54,7 +54,7 @@ class Attention(nn.Module):
 
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         h = self.heads
         q, k, v = self.to_qkv(x).chunk(3, dim=-1)
         q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h=h), (q, k, v))
@@ -66,8 +66,8 @@ class Attention(nn.Module):
 
 
 class RowColTransformer(nn.Module):
-    def __init__(self, num_tokens, dim, nfeats, depth, heads, attn_dropout, ff_dropout,
-                 style='col'):
+    def __init__(self, num_tokens: int, dim: int, nfeats: int, depth: int, heads: int,
+                 attn_dropout: float, ff_dropout: float, style: str = 'col'):
         super().__init__()
         self.embeds = nn.Embedding(num_tokens, dim)
         self.layers = nn.ModuleList([])
@@ -107,17 +107,16 @@ class RowColTransformer(nn.Module):
 
 # transformer
 class Transformer(nn.Module):
-    def __init__(self, dim, depth, heads, attn_dropout, ff_dropout):
+    def __init__(self, dim: int, depth: int, heads: int, attn_dropout: float, ff_dropout: float):
         super().__init__()
         self.layers = nn.ModuleList([])
         for _ in range(depth):
             self.layers.append(nn.ModuleList([
                 PreNorm(dim, Residual(Attention(dim, heads=heads, dim_head=16, dropout=attn_dropout))),
-                PreNorm(dim, Residual(SimpleMLP(dim, dim*4, dim, GEGLU(), dropout=ff_dropout)
-                    )),
+                PreNorm(dim, Residual(SimpleMLP(dim, dim*4, dim, GEGLU(), dropout=ff_dropout))),
             ]))
 
-    def forward(self, x, x_cont=None):
+    def forward(self, x: Tensor, x_cont: Tensor = None) -> Tensor:
         if x_cont is not None:
             x = torch.cat((x, x_cont), dim=1)
         for attn, ff in self.layers:
@@ -127,7 +126,8 @@ class Transformer(nn.Module):
 
 
 class SimpleMLP(nn.Module):
-    def __init__(self, dim_in, dim_internal, dim_out, activation_module: nn.Module = nn.ReLU(), dropout=0.):
+    def __init__(self, dim_in: int, dim_internal: int, dim_out: int,
+                 activation_module: nn.Module = nn.ReLU(), dropout: float = 0.):
         super().__init__()
         mult = 1
         if activation_module._get_name() == 'GEGLU':
@@ -139,7 +139,7 @@ class SimpleMLP(nn.Module):
             nn.Linear(dim_internal, dim_out)
         )
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         if len(x.shape) == 1:
             x = x.view(x.size(0), -1)
         x = self.layers(x)
@@ -147,14 +147,14 @@ class SimpleMLP(nn.Module):
 
 
 class SepMLP(nn.Module):
-    def __init__(self, dim, len_feats, categories):
+    def __init__(self, dim: int, dim_out_for_each_feat: List[int]):
         super().__init__()
-        self.len_feats = len_feats
+        self.len_feats = len(dim_out_for_each_feat)
         self.layers = nn.ModuleList([])
-        for i in range(len_feats):
-            self.layers.append(SimpleMLP(dim_in=dim, dim_internal=5 * dim, dim_out=categories[i]))
+        for i in range(self.len_feats):
+            self.layers.append(SimpleMLP(dim_in=dim, dim_internal=5 * dim, dim_out=dim_out_for_each_feat[i]))
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> List[Tensor]:
         y_pred = list([])
         for i in range(self.len_feats):
             x_i = x[:, i, :]
