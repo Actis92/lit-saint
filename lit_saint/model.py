@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import torch
 import torch.nn.functional as f
@@ -104,28 +104,6 @@ class SAINT(LightningModule):
 
         return x_categ_enc, x_cont_enc
 
-    def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
-        x_categ, x_cont = batch
-        if self.pretraining:
-            loss = Tensor([0])
-            embed_categ, embed_cont = self._embed_data(x_categ, x_cont)
-            embed_categ_noised, embed_cont_noised = self._pretraining_augmentation(x_categ, x_cont,
-                                                                                   embed_categ, embed_cont)
-            loss += self._pretraining_contrastive(embed_categ, embed_cont,
-                                                  embed_categ_noised, embed_cont_noised)
-            if self.config.pretrain.task.get("denoising"):
-                loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
-            self.log("loss", loss)
-            return loss
-        else:
-            x_categ_enc, x_cont_enc = self._embed_data(x_categ, x_cont)
-            reps = self.transformer(x_categ_enc, x_cont_enc)
-            # select only the representations corresponding to y and apply mlp on it
-            # in the next step to get the predictions.
-            y_reps = reps[:, self.num_categories - 1, :]
-            y_outs = self.mlpfory(y_reps)
-            return f.cross_entropy(y_outs, x_categ[:, self.num_categories - 1])
-
     def _contrastive(self, embed_categ: Tensor, embed_cont: Tensor, embed_categ_noised: Tensor,
                      embed_cont_noised: Tensor, projhead_style: str = "different") -> Tuple[Tensor, Tensor]:
         embed_tranformed = self.transformer(embed_categ, embed_cont)
@@ -157,7 +135,9 @@ class SAINT(LightningModule):
 
     def _pretraining_denoising(self, x_categ: Tensor, x_cont: Tensor, embed_categ_noised: Tensor,
                                embed_cont_noised: Tensor) -> Tensor:
-        output_categorical, output_continuos = self(embed_categ_noised, embed_cont_noised)
+        embed_transformed_noised = self.transformer(embed_categ_noised, embed_cont_noised)
+        output_categorical = self.mlp1(embed_transformed_noised[:, :self.num_categories, :])
+        output_continuos = self.mlp2(embed_transformed_noised[:, self.num_categories:, :])
         output_continuos = torch.cat(output_continuos, dim=1)
         loss_continuos_columns = f.mse_loss(output_continuos, x_cont)
         loss_categorical_columns = 0
@@ -194,8 +174,61 @@ class SAINT(LightningModule):
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=0.02)
 
-    def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[List[Tensor], List[Tensor]]:
-        x = self.transformer(x_categ, x_cont)
-        cat_outs = self.mlp1(x[:, :self.num_categories, :])
-        con_outs = self.mlp2(x[:, self.num_categories:, :])
-        return cat_outs, con_outs
+    def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
+        x_categ_enc, x_cont_enc = self._embed_data(x_categ, x_cont)
+        reps = self.transformer(x_categ_enc, x_cont_enc)
+        # select only the representations corresponding to y and apply mlp on it
+        # in the next step to get the predictions.
+        y_reps = reps[:, self.num_categories - 1, :]
+        y_outs = self.mlpfory(y_reps)
+        return y_outs
+
+    def pretraining_step(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
+        loss = Tensor([0])
+        embed_categ, embed_cont = self._embed_data(x_categ, x_cont)
+        embed_categ_noised, embed_cont_noised = self._pretraining_augmentation(x_categ, x_cont,
+                                                                               embed_categ, embed_cont)
+        loss += self._pretraining_contrastive(embed_categ, embed_cont,
+                                              embed_categ_noised, embed_cont_noised)
+        if self.config.pretrain.task.get("denoising"):
+            loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
+        return loss
+
+    def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
+        x_categ, x_cont = batch
+        loss = Tensor([0])
+        if self.pretraining:
+            loss += self.pretraining_step(x_categ, x_cont)
+        else:
+            y_pred = self(x_categ, x_cont)
+            loss += f.cross_entropy(y_pred, x_categ[:, self.num_categories - 1])
+        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x_categ, x_cont = batch
+        loss = Tensor([0])
+        if self.pretraining:
+            loss += self.pretraining_step(x_categ, x_cont)
+        else:
+            y_pred = self(x_categ, x_cont)
+            loss += f.cross_entropy(y_pred, x_categ[:, self.num_categories - 1])
+        self.log("validation_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        return loss
+
+    def test_step(self, batch, batch_idx):
+        x_categ, x_cont = batch
+        loss = Tensor([0])
+        if self.pretraining:
+            loss += self.pretraining_step(x_categ, x_cont)
+        else:
+            y_pred = self(x_categ, x_cont)
+            loss += f.cross_entropy(y_pred, x_categ[:, self.num_categories - 1])
+        self.log("validation_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        return loss
+
+    def predict_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int, dataloader_idx: Optional[int] = None) -> Tensor:
+        x_categ, x_cont = batch
+        y_pred = self(x_categ, x_cont)
+        return y_pred.argmax(1)
+

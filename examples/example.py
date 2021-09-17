@@ -21,16 +21,18 @@ cs.store(name="base_config", node=SaintConfig)
 def read_config(cfg: SaintConfig) -> None:
     df = pd.read_csv(get_original_cwd() + "/data/adult.csv")
     df["split"] = "train"
-    df["split"].iloc[2000:] = "validation"
+    df["split"].iloc[2000:3000] = "validation"
+    df["split"].iloc[3000:] = "test"
     data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split")
     model = SAINT(categories=data_module.categorical_dims, num_continuous=len(data_module.numerical_columns),
                   config=cfg, pretraining=True)
 
-    pretrainer = Trainer(max_epochs=18, log_every_n_steps=5)
+    pretrainer = Trainer(max_epochs=3)
     pretrainer.fit(model, data_module)
     model.pretraining = False
-    trainer = Trainer(max_epochs=20, log_every_n_steps=5)
+    trainer = Trainer(max_epochs=3)
     trainer.fit(model, data_module)
+    trainer.predict(model, data_module.test_dataloader())
 
 
 if __name__ == "__main__":
