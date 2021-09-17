@@ -4,7 +4,6 @@ network:
   embedding_size: 10
   depth: 3
   heads: 1
-  attn_dropout: .0
   ff_dropout: .0
   attention_type:  'col'
 pretrain:
@@ -12,8 +11,10 @@ pretrain:
     cutmix:
       noise_lambda: 0.1
   task:
-    contrastive_sim:
-      weight: 0.1
+    contrastive:
+      lam: 0.1
+      projhead_style: 'same'
+      nce_temp: 0.5
     denoising:
       weight_cross_entropy: 0.5
       weight_mse:  0.1
