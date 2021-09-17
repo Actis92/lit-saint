@@ -94,6 +94,7 @@ class SAINT(LightningModule):
     def _embed_data(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[Tensor, Tensor]:
         """Converts categorical and continuos values in embeddings"""
         x_categ = x_categ + self.cat_mask_offset.type_as(x_categ)
+        x_categ[:, -1] = torch.zeros(x_categ.shape[0])
         x_categ_enc = self.embedding_categorical(x_categ)
         n1, n2 = x_cont.shape
         _, n3 = x_categ.shape
