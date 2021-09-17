@@ -7,7 +7,7 @@ from torch import nn, Tensor
 import numpy as np
 
 from lit_saint.config import SaintConfig
-from lit_saint.modules import SimpleMLP, Transformer, RowColTransformer, SepMLP
+from lit_saint.modules import SimpleMLP, RowColTransformer, SepMLP
 from lit_saint.augmentations import add_noise, mixup_data
 
 
@@ -48,25 +48,14 @@ class SAINT(LightningModule):
 
     def _define_transformer(self):
         """Instatiate the type of Transformed that will be used in SAINT"""
-        if self.config.network.attention_type == 'col':
-            self.transformer = Transformer(
-                dim=self.config.network.embedding_size,
-                depth=self.config.network.depth,
-                heads=self.config.network.heads,
-                attn_dropout=self.config.network.attn_dropout,
-                ff_dropout=self.config.network.ff_dropout
-            )
-        elif self.config.network.attention_type in ['row', 'colrow']:
-            self.transformer = RowColTransformer(
-                num_tokens=self.num_unique_categories,
-                dim=self.config.network.embedding_size,
-                nfeats=self.num_categories + self.num_continuous,
-                depth=self.config.network.depth,
-                heads=self.config.network.heads,
-                attn_dropout=self.config.network.attn_dropout,
-                ff_dropout=self.config.network.ff_dropout,
-                style=self.config.network.attention_type
-            )
+        self.transformer = RowColTransformer(
+            dim=self.config.network.embedding_size,
+            nfeats=self.num_categories + self.num_continuous,
+            depth=self.config.network.depth,
+            heads=self.config.network.heads,
+            ff_dropout=self.config.network.ff_dropout,
+            style=self.config.network.attention_type
+        )
 
     def _define_embedding_layers(self) -> None:
         """Instatiate embedding layers"""
@@ -94,6 +83,7 @@ class SAINT(LightningModule):
     def _embed_data(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[Tensor, Tensor]:
         """Converts categorical and continuos values in embeddings"""
         x_categ = x_categ + self.cat_mask_offset.type_as(x_categ)
+        # mask the target
         x_categ[:, -1] = torch.zeros(x_categ.shape[0])
         x_categ_enc = self.embedding_categorical(x_categ)
         n1, n2 = x_cont.shape
@@ -141,13 +131,13 @@ class SAINT(LightningModule):
         output_continuos = self.mlp2(embed_transformed_noised[:, self.num_categories:, :])
         output_continuos = torch.cat(output_continuos, dim=1)
         loss_continuos_columns = f.mse_loss(output_continuos, x_cont)
-        loss_categorical_columns = 0
+        loss_categorical_columns = Tensor([0])
         # for each categorical column we compute the cross_entropy where in x_categ
         # there is the index of the categorical value obtained using the Label Encoding
         for j in range(self.num_categories - 1):
             loss_categorical_columns += f.cross_entropy(output_categorical[j], x_categ[:, j])
-        return self.config.pretrain.task.denoising.weight_cross_entropy * loss_categorical_columns + \
-                self.config.pretrain.task.denoising.weight_mse * loss_continuos_columns
+        return torch.mul(self.config.pretrain.task.denoising.weight_cross_entropy, loss_categorical_columns) +\
+               torch.mul(self.config.pretrain.task.denoising.weight_mse, loss_continuos_columns)
 
     def _pretraining_contrastive(self, embed_categ: Tensor, embed_cont: Tensor, embed_categ_noised: Tensor,
                                  embed_cont_noised: Tensor) -> Tensor:
