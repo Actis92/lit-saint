@@ -81,17 +81,17 @@ class RowColTransformer(nn.Module):
     """
     def __init__(self, dim: int, nfeats: int, depth: int, heads: int, ff_dropout: float, style: str = 'col'):
         super().__init__()
-        self.layers = nn.ModuleList([])
+        self.layers = nn.ModuleList([nn.ModuleList([]) for _ in range(depth)])
         self.style = style
-        for _ in range(depth):
+        for i in range(depth):
             if "col" in self.style:
-                self.layers.append(nn.ModuleList([
+                self.layers[i].extend(nn.ModuleList([
                     PreNorm(dim, Residual(Attention(dim, heads=heads, dim_head=64))),
                     PreNorm(dim, Residual(SimpleMLP(dim, dim*4, dim, GEGLU(), dropout=ff_dropout)))
                 ]))
             if "row" in self.style:
-                self.layers.append(nn.ModuleList([
-                    PreNorm(dim*nfeats, Residual(Attention(dim, heads=heads, dim_head=64))),
+                self.layers[i].extend(nn.ModuleList([
+                    PreNorm(dim*nfeats, Residual(Attention(dim*nfeats, heads=heads, dim_head=64))),
                     PreNorm(dim*nfeats, Residual(SimpleMLP(dim*nfeats, dim*nfeats*4, dim*nfeats, GEGLU(),
                                                            dropout=ff_dropout))),
                 ]))
