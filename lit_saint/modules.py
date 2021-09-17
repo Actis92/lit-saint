@@ -96,28 +96,35 @@ class RowColTransformer(nn.Module):
                                                            dropout=ff_dropout))),
                 ]))
 
+    @staticmethod
+    def forward_col(x: Tensor, attn: nn.Module, ff: nn.Module) -> Tensor:
+        x = attn(x)
+        x = ff(x)
+        return x
+
+    @staticmethod
+    def forward_row(x: Tensor, attn: nn.Module, ff: nn.Module) -> Tensor:
+        n = x.shape[1]
+        # doing this arrange we have a batch of dimension 1 so we make attention between samples
+        x = rearrange(x, 'b n d -> 1 b (n d)')
+        x = attn(x)
+        x = ff(x)
+        x = rearrange(x, '1 b (n d) -> b n d', n=n)
+        return x
+
     def forward(self, x: Tensor, x_cont: Tensor) -> Tensor:
         if x_cont is not None:
             x = torch.cat((x, x_cont), dim=1)
-        _, n, _ = x.shape
         if self.style == 'colrow':
-            for attn1, ff1, attn2, ff2 in self.layers:
-                x = attn1(x)
-                x = ff1(x)
-                x = rearrange(x, 'b n d -> 1 b (n d)')
-                x = attn2(x)
-                x = ff2(x)
-                x = rearrange(x, '1 b (n d) -> b n d', n=n)
+            for attn_col, ff_col, attn_row, ff_row in self.layers:
+                x = self.forward_col(x, attn_col, ff_col)
+                x = self.forward_row(x, attn_row, ff_row)
         elif self.style == 'row':
-            for attn1, ff1 in self.layers:
-                x = rearrange(x, 'b n d -> 1 b (n d)')
-                x = attn1(x)
-                x = ff1(x)
-                x = rearrange(x, '1 b (n d) -> b n d', n=n)
+            for attn, ff in self.layers:
+                x = self.forward_row(x, attn, ff)
         else:
-            for attn1, ff1 in self.layers:
-                x = attn1(x)
-                x = ff1(x)
+            for attn, ff in self.layers:
+                x = self.forward_col(x, attn, ff)
         return x
 
 
