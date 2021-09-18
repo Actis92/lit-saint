@@ -1,4 +1,4 @@
-from lit_saint.augmentations import get_random_index
+from lit_saint.augmentations import get_random_index, mixup, cutmix
 import numpy as np
 import torch
 
@@ -6,6 +6,25 @@ import torch
 def test_get_random_index():
     torch.manual_seed(0)
     x = torch.Tensor([1, 2, 3])
-    expected_result = torch.from_numpy(np.array([2, 0, 1]))
-    result = get_random_index(x)
-    torch.testing.assert_equal(result, expected_result)
+    expected = torch.from_numpy(np.array([2, 0, 1]))
+    actual = get_random_index(x)
+    torch.testing.assert_equal(actual, expected)
+
+
+def test_mixup():
+    x = torch.Tensor([[1, 1], [2, 2], [3, 3]])
+    lam = 0.5
+    random_index = torch.from_numpy(np.array([2, 0, 1]))
+    expected = torch.Tensor([[2.0, 2.0], [1.5, 1.5], [2.5, 2.5]])
+    actual = mixup(x=x, random_index=random_index, lam=lam)
+    torch.testing.assert_equal(actual, expected)
+
+
+def test_cutmix():
+    np.random.seed(0)
+    x = torch.Tensor([[1, 1], [2, 2], [3, 3]])
+    lam = 0.5
+    random_index = torch.from_numpy(np.array([2, 0, 1]))
+    expected = torch.Tensor([[1.0, 1.0], [2.0, 2.0], [2.0, 3.0]])
+    actual = cutmix(x=x, random_index=random_index, noise_lambda=lam)
+    torch.testing.assert_equal(actual, expected)
