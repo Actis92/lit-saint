@@ -8,7 +8,7 @@ import numpy as np
 
 from lit_saint.config import SaintConfig
 from lit_saint.modules import SimpleMLP, RowColTransformer, SepMLP
-from lit_saint.augmentations import add_noise, mixup_data
+from lit_saint.augmentations import cutmix, mixup, get_random_index
 
 
 class SAINT(LightningModule):
@@ -114,14 +114,17 @@ class SAINT(LightningModule):
     def _pretraining_augmentation(self, x_categ: Tensor, x_cont: Tensor, embed_categ: Tensor,
                                   embed_cont: Tensor) -> Tuple[Tensor, Tensor]:
         if self.config.pretrain.aug.get('cutmix'):
-            x_categ_noised, x_cont_noised = add_noise(x_categ, x_cont, self.config.pretrain.aug.cutmix.noise_lambda)
+            random_index = get_random_index(x_categ)
+            x_categ_noised = cutmix(x_categ, random_index, self.config.pretrain.aug.cutmix.noise_lambda)
+            x_cont_noised = cutmix(x_cont, random_index, self.config.pretrain.aug.cutmix.noise_lambda)
             embed_categ_noised, embed_cont_noised = self._embed_data(x_categ_noised, x_cont_noised)
         else:
             embed_categ_noised, embed_cont_noised = embed_categ, embed_cont
 
         if self.config.pretrain.aug.get("mixup"):
-            embed_categ_noised, embed_cont_noised = mixup_data(embed_categ_noised, embed_cont_noised,
-                                                               lam=self.config.pretrain.aug.mixup.lam)
+            random_index = get_random_index(embed_categ_noised)
+            embed_categ_noised = mixup(embed_categ_noised, random_index, lam=self.config.pretrain.aug.mixup.lam)
+            embed_cont_noised = mixup(embed_cont_noised, random_index, lam=self.config.pretrain.aug.mixup.lam)
         return embed_categ_noised, embed_cont_noised
 
     def _pretraining_denoising(self, x_categ: Tensor, x_cont: Tensor, embed_categ_noised: Tensor,
