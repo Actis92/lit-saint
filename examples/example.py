@@ -10,7 +10,7 @@ import hydra
 from hydra.utils import get_original_cwd
 from pytorch_lightning import Trainer
 
-from lit_saint import SAINT, SaintConfig, SaintDatamodule
+from src.lit_saint import SAINT, SaintConfig, SaintDatamodule
 
 cs = ConfigStore.instance()
 # Registering the Config class with the name 'config'.

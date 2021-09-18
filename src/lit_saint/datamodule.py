@@ -4,7 +4,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader
 
-from lit_saint.dataset import SaintDataset
+from src.lit_saint.dataset import SaintDataset
 
 
 class SaintDatamodule(LightningDataModule):

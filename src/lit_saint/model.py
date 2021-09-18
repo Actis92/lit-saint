@@ -6,9 +6,9 @@ from pytorch_lightning.core import LightningModule
 from torch import nn, Tensor
 import numpy as np
 
-from lit_saint.config import SaintConfig
-from lit_saint.modules import SimpleMLP, RowColTransformer, SepMLP
-from lit_saint.augmentations import cutmix, mixup, get_random_index
+from src.lit_saint.config import SaintConfig
+from src.lit_saint.modules import SimpleMLP, RowColTransformer, SepMLP
+from src.lit_saint.augmentations import cutmix, mixup, get_random_index
 
 
 class SAINT(LightningModule):

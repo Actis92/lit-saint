@@ -1,4 +1,4 @@
-from lit_saint.augmentations import get_random_index, mixup, cutmix
+from src.lit_saint.augmentations import get_random_index, mixup, cutmix
 import numpy as np
 import torch
 
