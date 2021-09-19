@@ -13,13 +13,13 @@ class SaintDataset(Dataset):
 
     :param data: Dataframe containing the data to use for the batches
     :param target: Name of the target column
-    :param cat_cols: List of names of categorical columns
+    :param cat_cols: List of indices of categorical columns
     :param target_categorical: If True the target is categorical, so it is a classification problem
-    :param con_cols: List of names of continuous columns
+    :param con_cols: List of indices of continuous columns
     :param scaler: a scikit learn scaler used to transform the continuous columns
     """
-    def __init__(self, data: pd.DataFrame, target: str, cat_cols: List[str],
-                 target_categorical: bool, con_cols: List[str], scaler: TransformerMixin):
+    def __init__(self, data: pd.DataFrame, target: str, cat_cols: List[int],
+                 target_categorical: bool, con_cols: List[int], scaler: TransformerMixin):
         self.target_categorical = target_categorical
         self.X_categorical: Tensor = torch.from_numpy(data.iloc[:, cat_cols].values.astype(np.int64))
         self.X_continuos = torch.from_numpy(scaler.fit_transform(data.iloc[:, con_cols].values).astype(np.float32))

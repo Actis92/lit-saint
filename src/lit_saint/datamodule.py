@@ -38,6 +38,7 @@ class SaintDatamodule(LightningDataModule):
         :param df: contains the data that need to be processed
         :param split_column: name of column used to split the data
         """
+        dim_target = None
         for i, col in enumerate(df.columns):
             if df[col].dtypes.name in ["object", "category"]:
                 if col != split_column:
@@ -45,12 +46,15 @@ class SaintDatamodule(LightningDataModule):
                     df[col] = l_enc.fit_transform(df[col].values)
                     if col == self.target:
                         self.target_categorical = True
+                        dim_target = len(l_enc.classes_)
                     else:
                         self.categorical_columns.append(i)
-                    self.categorical_dims.append(len(l_enc.classes_))
+                        self.categorical_dims.append(len(l_enc.classes_))
             else:
                 if col != self.target:
                     self.numerical_columns.append(i)
+        if self.target_categorical:
+            self.categorical_dims.append(dim_target)
 
     def scaler_continuous_columns(self, df: pd.DataFrame, split_column: str) -> None:
         """Fit a StandardScaler for each continuos columns on the training set
@@ -67,9 +71,9 @@ class SaintDatamodule(LightningDataModule):
         :param df: contains the data that need to be processed
         :param split_column: name of column used to split the data
         """
-        self.train = df.loc[df[split_column] == "train"]
-        self.validation = df.loc[df[split_column] == "validation"]
-        self.test = df.loc[df[split_column] == "test"]
+        self.train = df.loc[df[split_column] == "train"].reset_index(drop=True)
+        self.validation = df.loc[df[split_column] == "validation"].reset_index(drop=True)
+        self.test = df.loc[df[split_column] == "test"].reset_index(drop=True)
         self.train.drop(split_column, axis=1, inplace=True)
         self.validation.drop(split_column, axis=1, inplace=True)
         self.test.drop(split_column, axis=1, inplace=True)
