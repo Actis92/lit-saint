@@ -5,45 +5,48 @@ from omegaconf import DictConfig
 
 
 @dataclass
-class PlaceHolders:
-    place_1: float
-
-@dataclass
 class CutMixConfig:
-    noise_lambda: float
+    """Define the parameters for CutMix augmentation"""
+    lam: float  #: probability original values will be updated
 
 
 @dataclass
 class MixUpConfig:
-    lam: float
+    """Define the parameters for CutMix augmentation"""
+    lam: float  #: weight used for the linear combination
 
 
 @dataclass
 class ConstrastiveSimConfig:
-    weight: float
+    """Define the parameters for ContrastiveSim pretraining task"""
+    weight: float  #: weight of the loss for this pretraining task
 
 
 @dataclass
 class ConstrastiveConfig:
-    projhead_style: str
-    nce_temp: float
-    lam: float
+    """Define the parameters for Contrastive pretraining task"""
+    projhead_style: str  #: can be same or different and it is used to project embeddings
+    nce_temp: float  #: temperature used for the logits
+    weight: float  #: weight of the loss for this pretraining task
 
 
 @dataclass
 class DenoisingConfig:
-    weight_cross_entropy: float
-    weight_mse: float
+    """Define the parameters for Denoising pretraining task"""
+    weight_cross_entropy: float  #: weight reconstruction loss for categorical features
+    weight_mse: float  #: weight reconstruction loss for continuous features
 
 
 @dataclass
 class AugmentationConfig(DictConfig):
+    """Define the parameters used for the augmentations"""
     cutmix: Optional[CutMixConfig]
     mixup: Optional[MixUpConfig]
 
 
 @dataclass
 class PreTrainTaskConfig(DictConfig):
+    """Define the parameters used for pretraining tasks"""
     contrastive: Optional[ConstrastiveConfig]
     contrastive_sim: Optional[ConstrastiveSimConfig]
     denoising: Optional[DenoisingConfig]
@@ -51,26 +54,26 @@ class PreTrainTaskConfig(DictConfig):
 
 @dataclass
 class PreTrainConfig:
-    place: PlaceHolders
+    """Define parameters for the steps used during the pretraining"""
     aug: AugmentationConfig
     task: PreTrainTaskConfig
 
 
 @dataclass
 class NetworkConfig:
-    embedding_size: int
-    depth: int
-    heads: int
-    attn_dropout: float
-    ff_dropout: float
-    attention_type: str
+    """Define the neural network parameters"""
+    embedding_size: int  #: dimenstion of computed embeddings
+    depth: int  #: number of attention blocks used in the transformer
+    heads: int  #: number of heads used in the transformer
+    ff_dropout: float  #: probability dropout in the feed forward layers
+    attention_type: str  #: type of attention can be the self attention or intersample attention
 
 
 @dataclass
 class SaintConfig:
+    """Define all the parameters used in SAINT"""
     network: NetworkConfig
     pretrain: PreTrainConfig
-    place: PlaceHolders
 
 
 

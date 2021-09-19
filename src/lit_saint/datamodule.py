@@ -4,13 +4,22 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader
 
-from src.lit_saint.dataset import SaintDataset
+from lit_saint.dataset import SaintDataset
 
 
 class SaintDatamodule(LightningDataModule):
+    """It preprocess the data, doing LabelEncoding for the categorical values and fitting a StandardScaler
+    for the numerical columns on the training set. And it splits the data and defines the dataloaders
+    """
     def __init__(self, df: pd.DataFrame, target: str, split_column: str, batch_size: int = 256):
+        """
+        :param df: contains the data that will be used by the dataloaders
+        :param target: name of the target column
+        :param split_column: name of the column used to split the data
+        :param batch_size: dimension of the batches
+        """
         super().__init__()
-        self.target = target
+        self.target: str = target
         self.batch_size = batch_size
         self.categorical_columns = []
         self.categorical_dims = []
@@ -19,12 +28,16 @@ class SaintDatamodule(LightningDataModule):
         self.scaler = StandardScaler()
         self.prep(df, split_column)
         self._split_data(df=df, split_column=split_column)
-        self.scaler_continuos_columns(df=df, split_column=split_column)
+        self.scaler_continuous_columns(df=df, split_column=split_column)
 
-    def prep(self, df: pd.DataFrame, split_column: str):
-        """It find the indexes for each categorical and continuos columns, and for each categorical it
+    def prep(self, df: pd.DataFrame, split_column: str) -> None:
+        """It find the indexes for each categorical and continuous columns, and for each categorical it
             applies Label Encoding in order to convert them in integers and save the number of classes for each
-            categorical column"""
+            categorical column
+
+        :param df: contains the data that need to be processed
+        :param split_column: name of column used to split the data
+        """
         for i, col in enumerate(df.columns):
             if df[col].dtypes.name in ["object", "category"]:
                 if col != split_column:
@@ -39,13 +52,21 @@ class SaintDatamodule(LightningDataModule):
                 if col != self.target:
                     self.numerical_columns.append(i)
 
-    def scaler_continuos_columns(self, df: pd.DataFrame, split_column: str):
-        """Fit a StandardScaler for each continuos columns on the training set"""
+    def scaler_continuous_columns(self, df: pd.DataFrame, split_column: str) -> None:
+        """Fit a StandardScaler for each continuos columns on the training set
+
+        :param df: contains the data that need to be processed
+        :param split_column: name of column used to split the data
+        """
         df_train = df.loc[df[split_column] == "train"].iloc[:, self.numerical_columns].values
         self.scaler.fit(df_train)
 
-    def _split_data(self, df: pd.DataFrame, split_column: str):
-        """Split the Dataframe in train, validation and test, and drop the split column"""
+    def _split_data(self, df: pd.DataFrame, split_column: str) -> None:
+        """Split the Dataframe in train, validation and test, and drop the split column
+
+        :param df: contains the data that need to be processed
+        :param split_column: name of column used to split the data
+        """
         self.train = df.loc[df[split_column] == "train"]
         self.validation = df.loc[df[split_column] == "validation"]
         self.test = df.loc[df[split_column] == "test"]

@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 
 import torch
 import torch.nn.functional as f
@@ -9,6 +9,9 @@ from torch import nn, einsum, Tensor
 class Residual(nn.Module):
     """Define a residual block given a Pytorch Module, used for the skip connection"""
     def __init__(self, fn: nn.Module):
+        """
+        :param fn: pytorch Module that will be used in order to create the skip connection
+        """
         super().__init__()
         self.fn = fn
 
@@ -19,6 +22,10 @@ class Residual(nn.Module):
 class PreNorm(nn.Module):
     """Apply Layer Normalization before a Module"""
     def __init__(self, dim, fn: nn.Module):
+        """
+        :param dim: dimension of embedding in input to the module
+        :param fn: pytorch Module that will be applied after the normalization layer
+        """
         super().__init__()
         self.fn = fn
         self.norm = nn.LayerNorm(dim)
@@ -37,17 +44,13 @@ class GEGLU(nn.Module):
 
 
 class Attention(nn.Module):
-    """Module that implements self attention
-    :param dim: dimension embedding used in input
-    :param heads: number of heads for the Multi Head Attention
-    :param dim_head: output dimension given an head
-    """
-    def __init__(
-        self,
-        dim: int,
-        heads: int = 8,
-        dim_head: int = 16,
-    ):
+    """Module that implements self attention"""
+    def __init__(self, dim: int, heads: int = 8, dim_head: int = 16):
+        """
+        :param dim: dimension embedding used in input
+        :param heads: number of heads for the Multi Head Attention
+        :param dim_head: output dimension given an head
+        """
         super().__init__()
         inner_dim = dim_head * heads
         self.heads = heads
@@ -71,15 +74,16 @@ class Attention(nn.Module):
 
 
 class RowColTransformer(nn.Module):
-    """Module use to define RowColTransformer
-    :param dim: dimension of embedding in input to the module
-    :param nfeats:
-    :param depth: depth of the network, this imply how many times is applied the attention
-    :param heads: number of heads for the Multi Head Attention
-    :param ff_dropout: probability used in the dropout layer of the feed forward layers applied after the attention
-    :param style: can be col, row, or colrow
-    """
+    """Module use to define RowColTransformer"""
     def __init__(self, dim: int, nfeats: int, depth: int, heads: int, ff_dropout: float, style: str = 'col'):
+        """
+        :param dim: dimension of embedding in input to the module
+        :param nfeats: total number of features, needed for the intersample attention
+        :param depth: depth of the network, this imply how many times is applied the attention
+        :param heads: number of heads for the Multi Head Attention
+        :param ff_dropout: probability used in the dropout layer of the feed forward layers applied after the attention
+        :param style: can be col, row, or colrow
+        """
         super().__init__()
         self.layers = nn.ModuleList([nn.ModuleList([]) for _ in range(depth)])
         self.style = style
@@ -132,14 +136,16 @@ class SimpleMLP(nn.Module):
     """Module that implements a MLP that consists of 2 linear layers with an activation layer
     and dropout in between them. In case of GEGLU activation function, there is a multiplier that
     allow to divide the tensor in 2 parts
-    :param dim: dimension of embedding in input to the module
-    :param dim_internal: dimension after the first linear layer
-    :param dim_out: output dimension
-    :param activation_module: module with the activation function to use between the 2 linear layers
-    :param dropout: probability used in the dropout layer
     """
     def __init__(self, dim: int, dim_internal: int, dim_out: int,
                  activation_module: nn.Module = nn.ReLU(), dropout: float = 0.):
+        """
+        :param dim: dimension of embedding in input to the module
+        :param dim_internal: dimension after the first linear layer
+        :param dim_out: output dimension
+        :param activation_module: module with the activation function to use between the 2 linear layers
+        :param dropout: probability used in the dropout layer
+        """
         super().__init__()
         mult = 1
         if activation_module._get_name() == 'GEGLU':
@@ -161,10 +167,12 @@ class SimpleMLP(nn.Module):
 
 class SepMLP(nn.Module):
     """Module that implements a separable MLP, this means that for each feature is used a different SimpleMLP
-    :param dim: dimension of embedding in input to the module
-    :param dim_out_for_each_feat: output dimension for each SimpleMLP
     """
     def __init__(self, dim: int, dim_out_for_each_feat: List[int]):
+        """
+        :param dim: dimension of embedding in input to the module
+        :param dim_out_for_each_feat: output dimension for each SimpleMLP
+        """
         super().__init__()
         self.len_feats = len(dim_out_for_each_feat)
         self.layers = nn.ModuleList([])
