@@ -40,16 +40,16 @@ class DenoisingConfig:
 @dataclass
 class AugmentationConfig(DictConfig):
     """Define the parameters used for the augmentations"""
-    cutmix: Optional[CutMixConfig]
-    mixup: Optional[MixUpConfig]
+    cutmix: Optional[CutMixConfig] = None
+    mixup: Optional[MixUpConfig] = None
 
 
 @dataclass
 class PreTrainTaskConfig(DictConfig):
     """Define the parameters used for pretraining tasks"""
-    contrastive: Optional[ConstrastiveConfig]
-    contrastive_sim: Optional[ConstrastiveSimConfig]
-    denoising: Optional[DenoisingConfig]
+    contrastive: Optional[ConstrastiveConfig] = None
+    contrastive_sim: Optional[ConstrastiveSimConfig] = None
+    denoising: Optional[DenoisingConfig] = None
 
 
 @dataclass
