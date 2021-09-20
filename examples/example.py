@@ -24,7 +24,7 @@ def read_config(cfg: SaintConfig) -> None:
     df["split"].iloc[2000:3000] = "validation"
     df["split"].iloc[3000:] = "test"
     data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split")
-    model = SAINT(categories=data_module.categorical_dims, num_continuous=len(data_module.numerical_columns),
+    model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, pretraining=True)
 
     pretrainer = Trainer(max_epochs=3)

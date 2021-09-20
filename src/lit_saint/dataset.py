@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+from einops import rearrange
 import numpy as np
 import pandas as pd
 from sklearn.base import TransformerMixin
@@ -21,8 +22,14 @@ class SaintDataset(Dataset):
     def __init__(self, data: pd.DataFrame, target: str, cat_cols: List[int],
                  target_categorical: bool, con_cols: List[int], scaler: TransformerMixin):
         self.target_categorical = target_categorical
-        self.X_categorical: Tensor = torch.from_numpy(data.iloc[:, cat_cols].values.astype(np.int64))
-        self.X_continuos = torch.from_numpy(scaler.fit_transform(data.iloc[:, con_cols].values).astype(np.float32))
+        if len(cat_cols) > 0:
+            self.X_categorical: Tensor = torch.from_numpy(data.iloc[:, cat_cols].values.astype(np.int64))
+        else:
+            self.X_categorical: Tensor = rearrange(torch.zeros(data.shape[0], dtype=torch.int64), 'n -> n 1')
+        if len(con_cols) > 0:
+            self.X_continuos = torch.from_numpy(scaler.fit_transform(data.iloc[:, con_cols].values).astype(np.float32))
+        else:
+            self.X_continuos: Tensor = rearrange(torch.zeros(data.shape[0], dtype=torch.float32), 'n -> n 1')
         self.y = torch.from_numpy(data[target].values.reshape(-1, 1))
 
     def __len__(self):

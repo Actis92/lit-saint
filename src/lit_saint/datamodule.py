@@ -39,6 +39,7 @@ class SaintDatamodule(LightningDataModule):
         :param split_column: name of column used to split the data
         """
         dim_target = None
+        col_not_to_use = []
         for i, col in enumerate(df.columns):
             if df[col].dtypes.name in ["object", "category"]:
                 if col != split_column:
@@ -50,11 +51,16 @@ class SaintDatamodule(LightningDataModule):
                     else:
                         self.categorical_columns.append(i)
                         self.categorical_dims.append(len(l_enc.classes_))
-            else:
+            elif df[col].dtypes.name in ["int64", "float64", "int32", "float32"]:
                 if col != self.target:
                     self.numerical_columns.append(i)
+            else:
+                col_not_to_use.append(col)
+        if len(self.categorical_columns) == 0:
+            self.categorical_dims.append(1)
         if self.target_categorical:
             self.categorical_dims.append(dim_target)
+        print("The following cols will not be used because they have a not supported data type: ", col_not_to_use)
 
     def scaler_continuous_columns(self, df: pd.DataFrame, split_column: str) -> None:
         """Fit a StandardScaler for each continuos columns on the training set
@@ -63,7 +69,8 @@ class SaintDatamodule(LightningDataModule):
         :param split_column: name of column used to split the data
         """
         df_train = df.loc[df[split_column] == "train"].iloc[:, self.numerical_columns].values
-        self.scaler.fit(df_train)
+        if len(self.numerical_columns) > 0:
+            self.scaler.fit(df_train)
 
     def _split_data(self, df: pd.DataFrame, split_column: str) -> None:
         """Split the Dataframe in train, validation and test, and drop the split column

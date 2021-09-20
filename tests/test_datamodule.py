@@ -1,3 +1,4 @@
+from datetime import datetime
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
@@ -37,3 +38,59 @@ def test_datamodule_target_continuous():
     assert not data_module.target_categorical
     assert data_module.categorical_dims == [3]
     check_is_fitted(data_module.scaler)
+
+
+def test_wrong_data_types():
+    current_date = datetime.today()
+    df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_bool": [True, True, False, False],
+                       "feat_date": [current_date, current_date, current_date, current_date],
+                       "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    expected_train = pd.DataFrame({"target": [0, 1], "feat_bool": [True, True],
+                                   "feat_date": [current_date, current_date], "feat_categ": [0, 1]})
+    expected_validation = pd.DataFrame({"target": [1], "feat_bool": [False],
+                                        "feat_date": [current_date], "feat_categ": [0]})
+    expected_test = pd.DataFrame({"target": [0], "feat_bool": [False],
+                                  "feat_date": [current_date], "feat_categ": [2]})
+    pd.testing.assert_frame_equal(data_module.train, expected_train)
+    pd.testing.assert_frame_equal(data_module.validation, expected_validation)
+    pd.testing.assert_frame_equal(data_module.test, expected_test)
+    assert data_module.categorical_columns == [3]
+    assert data_module.numerical_columns == []
+    assert data_module.target_categorical
+    assert data_module.categorical_dims == [3, 2]
+
+
+def test_datamodule_no_categorical_columns():
+    df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
+                       "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    expected_train = pd.DataFrame({"target": [0, 1], "feat_cont": [2, 3]})
+    expected_validation = pd.DataFrame({"target": [1], "feat_cont": [1]})
+    expected_test = pd.DataFrame({"target": [0], "feat_cont": [4]})
+    pd.testing.assert_frame_equal(data_module.train, expected_train)
+    pd.testing.assert_frame_equal(data_module.validation, expected_validation)
+    pd.testing.assert_frame_equal(data_module.test, expected_test)
+    assert data_module.categorical_columns == []
+    assert data_module.numerical_columns == [1]
+    assert data_module.target_categorical
+    # the target is always the last column
+    assert data_module.categorical_dims == [1, 2]
+    check_is_fitted(data_module.scaler)
+
+
+def test_datamodule_no_continuous_columns():
+    df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_categ": ["a", "b", "a", "c"],
+                       "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    expected_train = pd.DataFrame({"target": [0, 1], "feat_categ": [0, 1]})
+    expected_validation = pd.DataFrame({"target": [1], "feat_categ": [0]})
+    expected_test = pd.DataFrame({"target": [0], "feat_categ": [2]})
+    pd.testing.assert_frame_equal(data_module.train, expected_train)
+    pd.testing.assert_frame_equal(data_module.validation, expected_validation)
+    pd.testing.assert_frame_equal(data_module.test, expected_test)
+    assert data_module.categorical_columns == [1]
+    assert data_module.numerical_columns == []
+    assert data_module.target_categorical
+    # the target is always the last column
+    assert data_module.categorical_dims == [3, 2]

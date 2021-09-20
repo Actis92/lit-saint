@@ -16,14 +16,14 @@ class SAINT(LightningModule):
     the training, validation and test steps
 
     :param categories: List with the number of unique values for each categorical column
-    :param num_continuous: number of continuos columns
+    :param continuous: List of indices with continuous columns
     :param config: configuration of the model
     :param pretraining: boolean flag, if True it will be executed pretrainig task
     """
     def __init__(
             self,
             categories: List[int],
-            num_continuous: int,
+            continuous: List[int],
             config: SaintConfig,
             pretraining: bool = False,
     ):
@@ -33,7 +33,7 @@ class SAINT(LightningModule):
         self.pretraining = pretraining
         self.num_categories = len(categories)
         self.num_unique_categories = sum(categories)
-        self.num_continuous = num_continuous
+        self.num_continuous = len(continuous) if len(continuous) > 0 else 1
         self.num_columns = self.num_continuous + self.num_categories
         # define offset in order to have unique value for each category
         cat_mask_offset = f.pad(torch.tensor(categories), (1, 0), value=0)
@@ -239,7 +239,7 @@ class SAINT(LightningModule):
             loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
         return loss
 
-    def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
+    def _common_step(self, batch: Tuple[Tensor, Tensor]) -> Tensor:
         x_categ, x_cont = batch
         loss = Tensor([0])
         if self.pretraining:
@@ -247,28 +247,20 @@ class SAINT(LightningModule):
         else:
             y_pred = self(x_categ, x_cont)
             loss += f.cross_entropy(y_pred, x_categ[:, self.num_categories - 1])
+        return loss
+
+    def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
+        loss = self._common_step(batch)
         self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
-        x_categ, x_cont = batch
-        loss = Tensor([0])
-        if self.pretraining:
-            loss += self.pretraining_step(x_categ, x_cont)
-        else:
-            y_pred = self(x_categ, x_cont)
-            loss += f.cross_entropy(y_pred, x_categ[:, self.num_categories - 1])
+        loss = self._common_step(batch)
         self.log("validation_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def test_step(self, batch, batch_idx):
-        x_categ, x_cont = batch
-        loss = Tensor([0])
-        if self.pretraining:
-            loss += self.pretraining_step(x_categ, x_cont)
-        else:
-            y_pred = self(x_categ, x_cont)
-            loss += f.cross_entropy(y_pred, x_categ[:, self.num_categories - 1])
+        loss = self._common_step(batch)
         self.log("validation_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
 

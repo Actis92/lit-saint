@@ -16,7 +16,39 @@ def test_train():
         df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
                            "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
         data_module = SaintDatamodule(df=df, target="target", split_column="split")
-        model = SAINT(categories=data_module.categorical_dims, num_continuous=len(data_module.numerical_columns),
+        model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                      config=saint_cfg, pretraining=True)
+        pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
+        pretrainer.fit(model, data_module)
+        model.pretraining = False
+        trainer = Trainer(max_epochs=1, fast_dev_run=True)
+        trainer.fit(model, data_module)
+
+
+def test_train_no_continuos_columns():
+    with initialize(config_path="."):
+        cfg = compose(config_name="config")
+        saint_cfg = SaintConfig(**cfg)
+        df = pd.DataFrame({"target": ["0", "1", "1", "0"],
+                           "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
+        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                      config=saint_cfg, pretraining=True)
+        pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
+        pretrainer.fit(model, data_module)
+        model.pretraining = False
+        trainer = Trainer(max_epochs=1, fast_dev_run=True)
+        trainer.fit(model, data_module)
+
+
+def test_train_no_categorical_columns():
+    with initialize(config_path="."):
+        cfg = compose(config_name="config")
+        saint_cfg = SaintConfig(**cfg)
+        df = pd.DataFrame({"target": ["0", "1", "1", "0"],
+                           "feat_cont": [2, 3, 1, 4], "split": ["train", "train", "validation", "test"]})
+        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, pretraining=True)
         pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
         pretrainer.fit(model, data_module)
