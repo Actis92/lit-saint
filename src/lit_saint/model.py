@@ -18,7 +18,7 @@ class SAINT(LightningModule):
     :param categories: List with the number of unique values for each categorical column
     :param continuous: List of indices with continuous columns
     :param config: configuration of the model
-    :param pretraining: boolean flag, if True it will be executed pretrainig task
+    :param pretraining: boolean flag, if True it will be executed pretraining task
     """
     def __init__(
             self,
