@@ -1,7 +1,7 @@
 from pytorch_lightning import LightningDataModule
 import pandas as pd
 from sklearn.base import TransformerMixin
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OrdinalEncoder, LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader
 
@@ -51,17 +51,18 @@ class SaintDatamodule(LightningDataModule):
                 if df[col].isna().any():  # the columns contains nan
                     df[col] = df[col].fillna("SAINT_NAN")
                 if col != split_column:
-                    l_enc = LabelEncoder()
-                    df[col] = l_enc.fit_transform(df[col].values)
+                    l_enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
+                    df[col] = l_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
                     self.dict_label_encoder[col] = l_enc
                     if col == self.target:
                         self.target_categorical = True
-                        dim_target = len(l_enc.classes_)
-                        self.target_nan_index = list(l_enc.classes_).index("SAINT_NAN") if 'SAINT_NAN' \
-                                                                                       in l_enc.classes_ else None
+                        dim_target = len(l_enc.categories_[0])
+
+                        self.target_nan_index = list(l_enc.categories_[0]).index("SAINT_NAN") if 'SAINT_NAN' \
+                                                                                       in l_enc.categories_[0] else None
                     else:
                         self.categorical_columns.append(i)
-                        self.categorical_dims.append(len(l_enc.classes_))
+                        self.categorical_dims.append(len(l_enc.categories_[0]) + 1)
             elif df[col].dtypes.name in ["int64", "float64", "int32", "float32"]:
                 if df[col].isna().any():  # the columns contains nan
                     df[col] = df[col].fillna(0)
@@ -103,7 +104,7 @@ class SaintDatamodule(LightningDataModule):
     def train_dataloader(self) -> DataLoader:
         """ Function that loads the train set. """
         df = self.train
-        if not self.pretraining:
+        if not self.pretraining and self.target_nan_index is not None:
             df = df.loc[df[self.target] != self.target_nan_index]
             df[self.target] = df[self.target].apply(lambda x: x if x < self.target_nan_index else x - 1)
         dataset = SaintDataset(
@@ -122,7 +123,7 @@ class SaintDatamodule(LightningDataModule):
     def val_dataloader(self) -> DataLoader:
         """ Function that loads the validation set. """
         df = self.validation
-        if not self.pretraining:
+        if not self.pretraining and self.target_nan_index is not None:
             df = df.loc[df[self.target] != self.target_nan_index]
             df[self.target] = df[self.target].apply(lambda x : x if x < self.target_nan_index else x - 1)
         dataset = SaintDataset(
@@ -142,7 +143,7 @@ class SaintDatamodule(LightningDataModule):
         """ Function that loads the validation set. """
         if self.test is not None:
             df = self.test
-            if not self.pretraining:
+            if not self.pretraining and self.target_nan_index is not None:
                 df = df.loc[df[self.target] != self.target_nan_index]
                 df[self.target] = df[self.target].apply(lambda x: x if x < self.target_nan_index else x - 1)
             dataset = SaintDataset(
@@ -162,12 +163,12 @@ class SaintDatamodule(LightningDataModule):
         for col, label_enc in self.dict_label_encoder.items():
             if df[col].isna().any():  # the columns contains nan
                 df[col] = df[col].fillna("SAINT_NAN")
-            df[col] = label_enc.transform(df[col].values)
+            df[col] = label_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
         self.predict_set = df
 
     def predict_dataloader(self) -> DataLoader:
         df = self.predict_set
-        if not self.pretraining:
+        if not self.pretraining and self.target_nan_index is not None:
             df = df.loc[df[self.target] != self.target_nan_index]
             df[self.target] = df[self.target].apply(lambda x: x if x < self.target_nan_index else x - 1)
         dataset = SaintDataset(
