@@ -21,18 +21,18 @@ How to install
 Network Architecture
 --------------------
 | SAINT is a deep learning approach to solving tabular data problems. It performs attention over both rows and columns, and it includes an enhanced embedding method.
-There are also contrastive self-supervised pre-training method for use when
-labels are scarce
+There are also contrastive self-supervised pre-training methods that can be used when
+labels are scarce.
 
 .. image:: ./pipeline.png
     :alt: saint-image
 
-How Use it
+How to Use it
 ----------
 
 1. Create an yaml file that contains the configuration needed by the application and create an instance of SaintConfig using Hydra
 
-2. Create the Dataframe that will be used for the model. In order to split correctly the data you need to add a new column where you assign the label "train" to the rows of the training set, "validation" for the ones of the validation set and "test" for the test set
+2. Create the Dataframe that will be used for the model. In order to split correctly the data, you need to add a new column where you assign the label "train" to the rows of the training set, "validation" for the ones of the validation set and "test" for the testing one
 
 .. code-block:: python3
 
@@ -45,14 +45,14 @@ How Use it
     model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, pretraining=True)
 
-4. Used the Trainer define by Pytorch lightning to fit the model
+4. Use the Trainer defined by Pytorch lightning to fit the model
 
 .. code-block:: python3
 
     pretrainer = Trainer(max_epochs=10)
-    pretrainer.fit(model, data_module
+    pretrainer.fit(model, data_module)
 
-5. After the pretraining you can train using a supervised objective function
+5. After the pretraining, you can train the model using a supervised objective function
 
 .. code-block:: python3
 
@@ -61,7 +61,7 @@ How Use it
     trainer = Trainer(max_epochs=10)
     trainer.fit(model, data_module)
 
-6. Then you can define on which data make the predictions
+6. Then you can define the data for the prediction step
 
 .. code-block:: python3
 
