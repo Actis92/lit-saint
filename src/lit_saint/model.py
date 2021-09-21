@@ -251,17 +251,17 @@ class SAINT(LightningModule):
 
     def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
         loss = self._common_step(batch)
-        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         loss = self._common_step(batch)
-        self.log("validation_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("validation_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def test_step(self, batch, batch_idx):
         loss = self._common_step(batch)
-        self.log("validation_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def predict_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int, dataloader_idx: Optional[int] = None) -> Tensor:

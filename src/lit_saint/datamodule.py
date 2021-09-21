@@ -1,7 +1,7 @@
 from pytorch_lightning import LightningDataModule
 import pandas as pd
 from sklearn.base import TransformerMixin
-from sklearn.preprocessing import OrdinalEncoder, LabelEncoder
+from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader
 
@@ -12,6 +12,8 @@ class SaintDatamodule(LightningDataModule):
     """It preprocess the data, doing LabelEncoding for the categorical values and fitting a StandardScaler
     for the numerical columns on the training set. And it splits the data and defines the dataloaders
     """
+    NAN_LABEL = "SAINT_NAN"
+
     def __init__(self, df: pd.DataFrame, target: str, split_column: str, batch_size: int = 256,
                  scaler: TransformerMixin = None, pretraining: bool = False):
         """
@@ -49,7 +51,7 @@ class SaintDatamodule(LightningDataModule):
         for i, col in enumerate(df.columns):
             if df[col].dtypes.name in ["object", "category"]:
                 if df[col].isna().any():  # the columns contains nan
-                    df[col] = df[col].fillna("SAINT_NAN")
+                    df[col] = df[col].fillna(self.NAN_LABEL)
                 if col != split_column:
                     l_enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
                     df[col] = l_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
@@ -58,8 +60,8 @@ class SaintDatamodule(LightningDataModule):
                         self.target_categorical = True
                         dim_target = len(l_enc.categories_[0])
 
-                        self.target_nan_index = list(l_enc.categories_[0]).index("SAINT_NAN") if 'SAINT_NAN' \
-                                                                                       in l_enc.categories_[0] else None
+                        self.target_nan_index = list(l_enc.categories_[0]).index(self.NAN_LABEL) \
+                            if self.NAN_LABEL in l_enc.categories_[0] else None
                     else:
                         self.categorical_columns.append(i)
                         self.categorical_dims.append(len(l_enc.categories_[0]) + 1)
@@ -101,76 +103,36 @@ class SaintDatamodule(LightningDataModule):
         self.validation.drop(split_column, axis=1, inplace=True)
         self.test.drop(split_column, axis=1, inplace=True)
 
-    def train_dataloader(self) -> DataLoader:
-        """ Function that loads the train set. """
-        df = self.train
-        if not self.pretraining and self.target_nan_index is not None:
-            df = df.loc[df[self.target] != self.target_nan_index]
-            df[self.target] = df[self.target].apply(lambda x: x if x < self.target_nan_index else x - 1)
-        dataset = SaintDataset(
-            data=df,
-            target=self.target,
-            cat_cols=self.categorical_columns,
-            target_categorical=self.target_categorical,
-            con_cols=self.numerical_columns,
-            scaler=self.scaler
-        )
-        return DataLoader(
-            dataset,
-            self.batch_size
-        )
+    def set_predict_set(self, df) -> None:
+        """Tranform the categorical columns using the OrdinalEncoders fitted before the training and
+        save the dataframe in order to make the predictions
 
-    def val_dataloader(self) -> DataLoader:
-        """ Function that loads the validation set. """
-        df = self.validation
-        if not self.pretraining and self.target_nan_index is not None:
-            df = df.loc[df[self.target] != self.target_nan_index]
-            df[self.target] = df[self.target].apply(lambda x : x if x < self.target_nan_index else x - 1)
-        dataset = SaintDataset(
-            data=df,
-            target=self.target,
-            cat_cols=self.categorical_columns,
-            target_categorical=self.target_categorical,
-            con_cols=self.numerical_columns,
-            scaler=self.scaler
-        )
-        return DataLoader(
-            dataset,
-            self.batch_size
-        )
-
-    def test_dataloader(self) -> DataLoader:
-        """ Function that loads the validation set. """
-        if self.test is not None:
-            df = self.test
-            if not self.pretraining and self.target_nan_index is not None:
-                df = df.loc[df[self.target] != self.target_nan_index]
-                df[self.target] = df[self.target].apply(lambda x: x if x < self.target_nan_index else x - 1)
-            dataset = SaintDataset(
-                data=df,
-                target=self.target,
-                cat_cols=self.categorical_columns,
-                target_categorical=self.target_categorical,
-                con_cols=self.numerical_columns,
-                scaler=self.scaler
-            )
-            return DataLoader(
-                dataset,
-                self.batch_size
-            )
-
-    def set_predict_set(self, df):
+        :param df: The data that will be used to make some predictions
+        """
+        df = df.copy()
         for col, label_enc in self.dict_label_encoder.items():
             if df[col].isna().any():  # the columns contains nan
-                df[col] = df[col].fillna("SAINT_NAN")
+                df[col] = df[col].fillna(self.NAN_LABEL)
             df[col] = label_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
         self.predict_set = df
 
-    def predict_dataloader(self) -> DataLoader:
-        df = self.predict_set
+    def _remove_rows_without_labels(self, df) -> pd.DataFrame:
+        """Remove rows from a dataframe where the label was NaN
+
+        :param df: the dataframe from which remove rows
+        """
+        df = df.loc[df[self.target] != self.target_nan_index]
+        df[self.target] = df[self.target].apply(lambda x: x if x < self.target_nan_index else x - 1)
+        return df
+
+    def _create_dataloader(self, df) -> DataLoader:
+        """ Given a dataframe it return a dataloader and eventually without rows
+        that have nan labels if not pretraining
+
+        :param df: the dataframe that will be used inside the DataLoader
+        """
         if not self.pretraining and self.target_nan_index is not None:
-            df = df.loc[df[self.target] != self.target_nan_index]
-            df[self.target] = df[self.target].apply(lambda x: x if x < self.target_nan_index else x - 1)
+            df = self._remove_rows_without_labels(df)
         dataset = SaintDataset(
             data=df,
             target=self.target,
@@ -183,3 +145,19 @@ class SaintDatamodule(LightningDataModule):
             dataset,
             self.batch_size
         )
+
+    def train_dataloader(self) -> DataLoader:
+        """ Function that loads the train set. """
+        return self._create_dataloader(self.train)
+
+    def val_dataloader(self) -> DataLoader:
+        """ Function that loads the validation set. """
+        return self._create_dataloader(self.validation)
+
+    def test_dataloader(self) -> DataLoader:
+        """ Function that loads the validation set. """
+        return self._create_dataloader(self.test)
+
+    def predict_dataloader(self) -> DataLoader:
+        """ Function that loads the dataset for the prediction. """
+        return self._create_dataloader(self.predict_set)

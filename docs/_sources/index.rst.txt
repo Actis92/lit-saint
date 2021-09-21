@@ -5,13 +5,12 @@
 
 Welcome to SAINT Lightning's documentation!
 ===========================================
+.. include:: ../README.rst
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   readme
-   _generated/modules
    _generated/lit_saint
 
 

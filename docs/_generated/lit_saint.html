@@ -18,7 +18,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="lit_saint" href="modules.html" /> 
+    <link rel="prev" title="Welcome to SAINT Lightning’s documentation!" href="../index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,8 +38,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../readme.html">Saint Lightning</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">lit_saint</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">lit_saint package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.augmentations">lit_saint.augmentations module</a></li>
@@ -67,7 +65,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="modules.html">lit_saint</a> &raquo;</li>
       <li>lit_saint package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/_generated/lit_saint.rst.txt" rel="nofollow"> View page source</a>
@@ -144,17 +141,17 @@ and some random element of the tensor taking random rows</p>
 <span id="lit-saint-config-module"></span><h2>lit_saint.config module<a class="headerlink" href="#module-lit_saint.config" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.AugmentationConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">AugmentationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutmix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#AugmentationConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.AugmentationConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">AugmentationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutmix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#AugmentationConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.AugmentationConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">omegaconf.basecontainer.BaseContainer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">MutableMapping</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>]</p>
 <p>Define the parameters used for the augmentations</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.AugmentationConfig.cutmix">
-<span class="sig-name descname"><span class="pre">cutmix</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.CutMixConfig" title="lit_saint.config.CutMixConfig"><span class="pre">lit_saint.config.CutMixConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lit_saint.config.AugmentationConfig.cutmix" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">cutmix</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.CutMixConfig" title="lit_saint.config.CutMixConfig"><span class="pre">lit_saint.config.CutMixConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#lit_saint.config.AugmentationConfig.cutmix" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.AugmentationConfig.mixup">
-<span class="sig-name descname"><span class="pre">mixup</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.MixUpConfig" title="lit_saint.config.MixUpConfig"><span class="pre">lit_saint.config.MixUpConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lit_saint.config.AugmentationConfig.mixup" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">mixup</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.MixUpConfig" title="lit_saint.config.MixUpConfig"><span class="pre">lit_saint.config.MixUpConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#lit_saint.config.AugmentationConfig.mixup" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -298,22 +295,22 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainTaskConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">PreTrainTaskConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contrastive</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrastive_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">denoising</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#PreTrainTaskConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">PreTrainTaskConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contrastive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrastive_sim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">denoising</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#PreTrainTaskConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">omegaconf.basecontainer.BaseContainer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">MutableMapping</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>]</p>
 <p>Define the parameters used for pretraining tasks</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainTaskConfig.contrastive">
-<span class="sig-name descname"><span class="pre">contrastive</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.ConstrastiveConfig" title="lit_saint.config.ConstrastiveConfig"><span class="pre">lit_saint.config.ConstrastiveConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.contrastive" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">contrastive</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.ConstrastiveConfig" title="lit_saint.config.ConstrastiveConfig"><span class="pre">lit_saint.config.ConstrastiveConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.contrastive" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainTaskConfig.contrastive_sim">
-<span class="sig-name descname"><span class="pre">contrastive_sim</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.ConstrastiveSimConfig" title="lit_saint.config.ConstrastiveSimConfig"><span class="pre">lit_saint.config.ConstrastiveSimConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.contrastive_sim" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">contrastive_sim</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.ConstrastiveSimConfig" title="lit_saint.config.ConstrastiveSimConfig"><span class="pre">lit_saint.config.ConstrastiveSimConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.contrastive_sim" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainTaskConfig.denoising">
-<span class="sig-name descname"><span class="pre">denoising</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.DenoisingConfig" title="lit_saint.config.DenoisingConfig"><span class="pre">lit_saint.config.DenoisingConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.denoising" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">denoising</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.DenoisingConfig" title="lit_saint.config.DenoisingConfig"><span class="pre">lit_saint.config.DenoisingConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.denoising" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -340,7 +337,7 @@ and some random element of the tensor taking random rows</p>
 <span id="lit-saint-datamodule-module"></span><h2>lit_saint.datamodule module<a class="headerlink" href="#module-lit_saint.datamodule" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.datamodule.SaintDatamodule">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.datamodule.</span></span><span class="sig-name descname"><span class="pre">SaintDatamodule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.datamodule.</span></span><span class="sig-name descname"><span class="pre">SaintDatamodule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretraining</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.datamodule.LightningDataModule</span></code></p>
 <p>It preprocess the data, doing LabelEncoding for the categorical values and fitting a StandardScaler
 for the numerical columns on the training set. And it splits the data and defines the dataloaders</p>
@@ -351,9 +348,26 @@ for the numerical columns on the training set. And it splits the data and define
 <li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the target column</p></li>
 <li><p><strong>split_column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the column used to split the data</p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – dimension of the batches</p></li>
+<li><p><strong>pretraining</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag, if False it use only were the target is not NaN</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.datamodule.SaintDatamodule.NAN_LABEL">
+<span class="sig-name descname"><span class="pre">NAN_LABEL</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'SAINT_NAN'</span></em><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule.NAN_LABEL" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.datamodule.SaintDatamodule.predict_dataloader">
+<span class="sig-name descname"><span class="pre">predict_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule.predict_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule.predict_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Function that loads the dataset for the prediction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="lit_saint.datamodule.SaintDatamodule.prep">
 <span class="sig-name descname"><span class="pre">prep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule.prep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule.prep" title="Permalink to this definition"></a></dt>
@@ -385,6 +399,21 @@ categorical column</p>
 <li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – contains the data that need to be processed</p></li>
 <li><p><strong>split_column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of column used to split the data</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.datamodule.SaintDatamodule.set_predict_set">
+<span class="sig-name descname"><span class="pre">set_predict_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule.set_predict_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule.set_predict_set" title="Permalink to this definition"></a></dt>
+<dd><p>Tranform the categorical columns using the OrdinalEncoders fitted before the training and
+save the dataframe in order to make the predictions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> – The data that will be used to make some predictions</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -440,9 +469,9 @@ categorical column</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Dataframe containing the data to use for the batches</p></li>
 <li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the target column</p></li>
-<li><p><strong>cat_cols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of names of categorical columns</p></li>
+<li><p><strong>cat_cols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – List of indices of categorical columns</p></li>
 <li><p><strong>target_categorical</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True the target is categorical, so it is a classification problem</p></li>
-<li><p><strong>con_cols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of names of continuous columns</p></li>
+<li><p><strong>con_cols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – List of indices of continuous columns</p></li>
 <li><p><strong>scaler</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerMixin</span></code>) – a scikit learn scaler used to transform the continuous columns</p></li>
 </ul>
 </dd>
@@ -454,7 +483,7 @@ categorical column</p>
 <span id="lit-saint-model-module"></span><h2>lit_saint.model module<a class="headerlink" href="#module-lit_saint.model" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.model.SAINT">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.model.</span></span><span class="sig-name descname"><span class="pre">SAINT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">categories</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretraining</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.model.</span></span><span class="sig-name descname"><span class="pre">SAINT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">categories</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretraining</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
 <p>Contains the definition of the network and how to execute the pretraining tasks, and how perform
 the training, validation and test steps</p>
@@ -462,9 +491,9 @@ the training, validation and test steps</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>categories</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – List with the number of unique values for each categorical column</p></li>
-<li><p><strong>num_continuous</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of continuos columns</p></li>
+<li><p><strong>continuous</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – List of indices with continuous columns</p></li>
 <li><p><strong>config</strong> (<a class="reference internal" href="#lit_saint.config.SaintConfig" title="lit_saint.config.SaintConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintConfig</span></code></a>) – configuration of the model</p></li>
-<li><p><strong>pretraining</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag, if True it will be executed pretrainig task</p></li>
+<li><p><strong>pretraining</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag, if True it will be executed pretraining task</p></li>
 </ul>
 </dd>
 </dl>
@@ -1189,7 +1218,7 @@ registered hooks while the latter silently ignores them.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-left" title="lit_saint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to SAINT Lightning’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

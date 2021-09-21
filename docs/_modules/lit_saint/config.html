@@ -36,7 +36,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Saint Lightning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../_generated/modules.html">lit_saint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../_generated/lit_saint.html">lit_saint package</a></li>
 </ul>
@@ -108,16 +107,16 @@
 <div class="viewcode-block" id="AugmentationConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.AugmentationConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">AugmentationConfig</span><span class="p">(</span><span class="n">DictConfig</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Define the parameters used for the augmentations&quot;&quot;&quot;</span>
-    <span class="n">cutmix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CutMixConfig</span><span class="p">]</span>
-    <span class="n">mixup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MixUpConfig</span><span class="p">]</span></div>
+    <span class="n">cutmix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CutMixConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">mixup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MixUpConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="PreTrainTaskConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.PreTrainTaskConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">PreTrainTaskConfig</span><span class="p">(</span><span class="n">DictConfig</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Define the parameters used for pretraining tasks&quot;&quot;&quot;</span>
-    <span class="n">contrastive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstrastiveConfig</span><span class="p">]</span>
-    <span class="n">contrastive_sim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstrastiveSimConfig</span><span class="p">]</span>
-    <span class="n">denoising</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DenoisingConfig</span><span class="p">]</span></div>
+    <span class="n">contrastive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstrastiveConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">contrastive_sim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstrastiveSimConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">denoising</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DenoisingConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="PreTrainConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.PreTrainConfig">[docs]</a><span class="nd">@dataclass</span>

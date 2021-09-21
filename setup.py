@@ -1,13 +1,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='lit_saint',
+    name='lit-saint',
     version='0.0.1',
     license='MIT',
     description='Pytorch Lightning implementation of SAINT Model',
     author='Luca Actis Grosso',
     author_email='lucaactisgrosso@gmail.com',
-    # REPLACE WITH YOUR OWN GITHUB PROJECT LINK
     url='https://github.com/Actis92/saint-lightning.git',
     download_url='https://github.com/Actis92/saint-lightning.git/archive/v_001.tar.gz',
     keywords=['TABULAR', 'SELF SUPERVISED', 'PYTORCH LIGHTNING'],

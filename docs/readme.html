@@ -17,9 +17,7 @@
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="lit_saint" href="_generated/modules.html" />
-    <link rel="prev" title="Welcome to SAINT Lightning’s documentation!" href="index.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,12 +36,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Saint Lightning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#network-architecture">Network Architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#credits">Credits</a></li>
-</ul>
-</li>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="_generated/modules.html">lit_saint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_generated/lit_saint.html">lit_saint package</a></li>
 </ul>
@@ -74,11 +67,26 @@
              
   <section id="saint-lightning">
 <h1>Saint Lightning<a class="headerlink" href="#saint-lightning" title="Permalink to this headline"></a></h1>
-<p>This repository contains an implementation of SAINT using Pytorch Lightning.
-Find the paper on [arxiv](<a class="reference external" href="https://arxiv.org/abs/2106.01342">https://arxiv.org/abs/2106.01342</a>)</p>
+<p>This repository contains an implementation of SAINT using <a class="reference external" href="https://www.pytorchlightning.ai/">Pytorch-Lightning</a> as a framework
+and <a class="reference external" href="https://hydra.cc/">Hydra</a> for the configuration.
+Find the paper on <a class="reference external" href="https://arxiv.org/abs/2106.01342">arxiv</a></p>
 <section id="network-architecture">
 <h2>Network Architecture<a class="headerlink" href="#network-architecture" title="Permalink to this headline"></a></h2>
+<div class="line-block">
+<div class="line">SAINT is a deep learning approach to solving tabular data problems. It performs attention over both rows and columns, and it includes an enhanced embedding method.</div>
+</div>
+<p>There are also contrastive self-supervised pre-training method for use when
+labels are scarce</p>
 <img alt="saint-image" src="_images/pipeline.png" />
+</section>
+<section id="how-use-it">
+<h2>How Use it<a class="headerlink" href="#how-use-it" title="Permalink to this headline"></a></h2>
+<ol class="arabic simple">
+<li><p>Create an yaml file that contains the configuration needed by the application and create an instance of SaintConfig using Hydra</p></li>
+<li><p>Create the Dataframe that will be used for the model. In order to split correctly the data you need to add a new column where you assign the label “train” to the rows of the training set, “validation” for the ones of the validation set and “test” for the test set</p></li>
+<li><p>Create an instance of SaintDataModule and SAINT</p></li>
+<li><p>Used the Trainer define by Pytorch lightning to fit the model</p></li>
+</ol>
 </section>
 <section id="credits">
 <h2>Credits<a class="headerlink" href="#credits" title="Permalink to this headline"></a></h2>
@@ -90,10 +98,7 @@ Find the paper on [arxiv](<a class="reference external" href="https://arxiv.org/
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to SAINT Lightning’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="_generated/modules.html" class="btn btn-neutral float-right" title="lit_saint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 
