@@ -46,36 +46,31 @@ class SaintDatamodule(LightningDataModule):
         :param split_column: name of column used to split the data
         """
         df = df.copy()
-        dim_target = None
         col_not_to_use = []
-        for i, col in enumerate(df.columns):
+        for col in df.columns:
             if df[col].dtypes.name in ["object", "category"]:
                 if df[col].isna().any():  # the columns contains nan
                     df[col] = df[col].fillna(self.NAN_LABEL)
                 if col != split_column:
-                    l_enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
+                    l_enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=len(df[col].unique()))
                     df[col] = l_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
                     self.dict_label_encoder[col] = l_enc
                     if col == self.target:
                         self.target_categorical = True
-                        dim_target = len(l_enc.categories_[0])
-
                         self.target_nan_index = list(l_enc.categories_[0]).index(self.NAN_LABEL) \
                             if self.NAN_LABEL in l_enc.categories_[0] else None
                     else:
-                        self.categorical_columns.append(i)
+                        self.categorical_columns.append(col)
                         self.categorical_dims.append(len(l_enc.categories_[0]) + 1)
             elif df[col].dtypes.name in ["int64", "float64", "int32", "float32"]:
                 if df[col].isna().any():  # the columns contains nan
                     df[col] = df[col].fillna(0)
                 if col != self.target:
-                    self.numerical_columns.append(i)
+                    self.numerical_columns.append(col)
             else:
                 col_not_to_use.append(col)
         if len(self.categorical_columns) == 0:
             self.categorical_dims.append(1)
-        if self.target_categorical:
-            self.categorical_dims.append(dim_target)
         print("The following cols will not be used because they have a not supported data type: ", col_not_to_use)
         self._split_data(df=df, split_column=split_column)
         self.scaler_continuous_columns(df=df, split_column=split_column)
@@ -86,7 +81,7 @@ class SaintDatamodule(LightningDataModule):
         :param df: contains the data that need to be processed
         :param split_column: name of column used to split the data
         """
-        df_train = df.loc[df[split_column] == "train"].iloc[:, self.numerical_columns].values
+        df_train = df.loc[df[split_column] == "train"].loc[:, self.numerical_columns].values
         if len(self.numerical_columns) > 0:
             self.scaler.fit(df_train)
 
@@ -111,11 +106,11 @@ class SaintDatamodule(LightningDataModule):
         """
         df = df.copy()
         for col, label_enc in self.dict_label_encoder.items():
-            if df[col].isna().any():  # the columns contains nan
-                df[col] = df[col].fillna(self.NAN_LABEL)
-            df[col] = label_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
+            if col != self.target or (col == self.target and col in df.columns):
+                if df[col].isna().any():  # the columns contains nan
+                    df[col] = df[col].fillna(self.NAN_LABEL)
+                df[col] = label_enc.transform(df[col].values.reshape(-1, 1)).astype(int)
         self.predict_set = df
-
     def _remove_rows_without_labels(self, df) -> pd.DataFrame:
         """Remove rows from a dataframe where the label was NaN
 
