@@ -28,7 +28,7 @@ labels are scarce.
     :alt: saint-image
 
 How to Use it
-----------
+-------------
 
 1. Create an yaml file that contains the configuration needed by the application and create an instance of SaintConfig using Hydra
 

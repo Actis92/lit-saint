@@ -32,11 +32,11 @@ def read_config(cfg: SaintConfig) -> None:
     data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split", pretraining=True)
     model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, pretraining=True)
-    pretrainer = Trainer(max_epochs=20, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
+    pretrainer = Trainer(max_epochs=2, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
     pretrainer.fit(model, data_module)
     model.pretraining = False
     data_module.pretraining = False
-    trainer = Trainer(max_epochs=30, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
+    trainer = Trainer(max_epochs=2, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
     trainer.fit(model, data_module)
     data_module.set_predict_set(df_test)
     prediction = trainer.predict(model, datamodule=data_module)

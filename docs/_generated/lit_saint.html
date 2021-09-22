@@ -469,9 +469,9 @@ save the dataframe in order to make the predictions</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Dataframe containing the data to use for the batches</p></li>
 <li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the target column</p></li>
-<li><p><strong>cat_cols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of names of categorical columns</p></li>
+<li><p><strong>cat_cols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – List of indices of categorical columns</p></li>
 <li><p><strong>target_categorical</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True the target is categorical, so it is a classification problem</p></li>
-<li><p><strong>con_cols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of names of continuous columns</p></li>
+<li><p><strong>con_cols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – List of indices of continuous columns</p></li>
 <li><p><strong>scaler</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerMixin</span></code>) – a scikit learn scaler used to transform the continuous columns</p></li>
 </ul>
 </dd>
@@ -743,11 +743,6 @@ PyTorch gradients have been disabled. At the end of the test epoch, the model go
 to training mode and gradients are enabled.</p>
 </dd>
 </dl>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -910,11 +905,6 @@ dataloader_idx (int): The index of the dataloader that produced this batch</p>
 <dt>Note:</dt><dd><p>When the <a class="reference internal" href="#lit_saint.model.SAINT.validation_step" title="lit_saint.model.SAINT.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a> is called, the model has been put in eval mode
 and PyTorch gradients have been disabled. At the end of validation,
 the model goes back to training mode and gradients are enabled.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
 </dd>
 </dl>
 </dd></dl>

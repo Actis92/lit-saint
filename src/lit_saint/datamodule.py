@@ -1,3 +1,5 @@
+import os
+
 from pytorch_lightning import LightningDataModule
 import pandas as pd
 from sklearn.base import TransformerMixin
@@ -143,7 +145,8 @@ class SaintDatamodule(LightningDataModule):
         )
         return DataLoader(
             dataset,
-            self.batch_size
+            self.batch_size,
+            num_workers=os.cpu_count()
         )
 
     def train_dataloader(self) -> DataLoader:
