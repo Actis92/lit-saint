@@ -92,6 +92,8 @@ class SAINT(LightningModule):
         :param x_cont: contains the values for the continuous features
         """
         x_categ = x_categ + self.cat_mask_offset.type_as(x_categ)
+        # mask the target
+        x_categ[:, -1] = torch.zeros(x_categ.shape[0])
         x_categ_enc = self.embedding_categorical(x_categ)
         n1, n2 = x_cont.shape
         _, n3 = x_categ.shape
@@ -237,34 +239,33 @@ class SAINT(LightningModule):
             loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
         return loss
 
-    def _common_step(self, batch: Tuple[Tensor, Tensor, Tensor]) -> Tensor:
-        x_categ, x_cont, y = batch
+    def _common_step(self, batch: Tuple[Tensor, Tensor]) -> Tensor:
+        x_categ, x_cont = batch
         loss = Tensor([0])
         if self.pretraining:
             loss += self.pretraining_step(x_categ, x_cont)
         else:
             y_pred = self(x_categ, x_cont)
-            loss += f.cross_entropy(y_pred, y)
+            loss += f.cross_entropy(y_pred, x_categ[:, self.num_categories - 1])
         return loss
 
-    def training_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
+    def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
         loss = self._common_step(batch)
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
-    def validation_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
+    def validation_step(self, batch, batch_idx):
         loss = self._common_step(batch)
         self.log("validation_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
-    def test_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
+    def test_step(self, batch, batch_idx):
         loss = self._common_step(batch)
         self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
-    def predict_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int,
-                     dataloader_idx: Optional[int] = None) -> Tensor:
-        x_categ, x_cont, _ = batch
+    def predict_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int, dataloader_idx: Optional[int] = None) -> Tensor:
+        x_categ, x_cont = batch
         y_pred = self(x_categ, x_cont)
         # return the class that has the greatest probability
         return y_pred.argmax(1)
