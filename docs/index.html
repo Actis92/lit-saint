@@ -83,15 +83,15 @@ Find the paper on <a class="reference external" href="https://arxiv.org/abs/2106
 <div class="line-block">
 <div class="line">SAINT is a deep learning approach to solving tabular data problems. It performs attention over both rows and columns, and it includes an enhanced embedding method.</div>
 </div>
-<p>There are also contrastive self-supervised pre-training method for use when
-labels are scarce</p>
+<p>There are also contrastive self-supervised pre-training methods that can be used when
+labels are scarce.</p>
 <img alt="saint-image" src="_images/pipeline.png" />
 </section>
-<section id="how-use-it">
-<h3>How Use it<a class="headerlink" href="#how-use-it" title="Permalink to this headline"></a></h3>
+<section id="how-to-use-it">
+<h3>How to Use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline"></a></h3>
 <ol class="arabic simple">
 <li><p>Create an yaml file that contains the configuration needed by the application and create an instance of SaintConfig using Hydra</p></li>
-<li><p>Create the Dataframe that will be used for the model. In order to split correctly the data you need to add a new column where you assign the label “train” to the rows of the training set, “validation” for the ones of the validation set and “test” for the test set</p></li>
+<li><p>Create the Dataframe that will be used for the model. In order to split correctly the data, you need to add a new column where you assign the label “train” to the rows of the training set, “validation” for the ones of the validation set and “test” for the testing one</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_module</span> <span class="o">=</span> <span class="n">SaintDatamodule</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;TARGET&quot;</span><span class="p">,</span> <span class="n">split_column</span><span class="o">=</span><span class="s2">&quot;SPLIT&quot;</span><span class="p">,</span> <span class="n">pretraining</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -104,14 +104,14 @@ labels are scarce</p>
 </pre></div>
 </div>
 <ol class="arabic simple" start="4">
-<li><p>Used the Trainer define by Pytorch lightning to fit the model</p></li>
+<li><p>Use the Trainer defined by Pytorch lightning to fit the model</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pretrainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">max_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">pretrainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data_module</span>
+<span class="n">pretrainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data_module</span><span class="p">)</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="5">
-<li><p>After the pretraining you can train using a supervised objective function</p></li>
+<li><p>After the pretraining, you can train the model using a supervised objective function</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">pretraining</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">data_module</span><span class="o">.</span><span class="n">pretraining</span> <span class="o">=</span> <span class="kc">False</span>
@@ -120,7 +120,7 @@ labels are scarce</p>
 </pre></div>
 </div>
 <ol class="arabic simple" start="6">
-<li><p>Then you can define on which data make the predictions</p></li>
+<li><p>Then you can define the data for the prediction step</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_module</span><span class="o">.</span><span class="n">set_predict_set</span><span class="p">(</span><span class="n">df_test</span><span class="p">)</span>
 <span class="n">prediction</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">data_module</span><span class="p">)</span>
