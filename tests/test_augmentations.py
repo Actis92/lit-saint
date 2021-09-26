@@ -26,5 +26,5 @@ def test_cutmix():
     lam = 0.5
     random_index = torch.from_numpy(np.array([2, 0, 1]))
     expected = torch.Tensor([[1.0, 1.0], [2.0, 2.0], [2.0, 3.0]])
-    actual = cutmix(x=x, random_index=random_index, noise_lambda=lam)
+    actual = cutmix(x=x, random_index=random_index, lam=lam)
     torch.testing.assert_equal(actual, expected)

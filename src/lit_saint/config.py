@@ -74,6 +74,3 @@ class SaintConfig:
     """Define all the parameters used in SAINT"""
     network: NetworkConfig
     pretrain: PreTrainConfig
-
-
-

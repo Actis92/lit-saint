@@ -91,13 +91,13 @@ class RowColTransformer(nn.Module):
             if "col" in self.style:
                 self.layers[i].extend(nn.ModuleList([
                     PreNorm(dim, Residual(Attention(dim, heads=heads, dim_head=64))),
-                    PreNorm(dim, Residual(SimpleMLP(dim, dim*4, dim, GEGLU(), dropout=ff_dropout)))
+                    PreNorm(dim, Residual(SimpleMLP(dim, dim * 4, dim, GEGLU(), dropout=ff_dropout)))
                 ]))
             if "row" in self.style:
                 self.layers[i].extend(nn.ModuleList([
-                    PreNorm(dim*nfeats, Residual(Attention(dim*nfeats, heads=heads, dim_head=64))),
-                    PreNorm(dim*nfeats, Residual(SimpleMLP(dim*nfeats, dim*nfeats*4, dim*nfeats, GEGLU(),
-                                                           dropout=ff_dropout))),
+                    PreNorm(dim * nfeats, Residual(Attention(dim * nfeats, heads=heads, dim_head=64))),
+                    PreNorm(dim * nfeats, Residual(SimpleMLP(dim * nfeats, dim * nfeats * 4, dim * nfeats, GEGLU(),
+                                                             dropout=ff_dropout))),
                 ]))
 
     @staticmethod
@@ -186,4 +186,3 @@ class SepMLP(nn.Module):
             pred = self.layers[i](x_i)
             y_pred.append(pred)
         return y_pred
-

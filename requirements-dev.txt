@@ -3,3 +3,9 @@ sphinx
 sphinx-rtd-theme
 sphinx-autodoc-typehints
 twine
+flake8
+tox
+coverage
+mypy
+radon
+xenon

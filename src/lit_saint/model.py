@@ -51,7 +51,7 @@ class SAINT(LightningModule):
         self._define_projection_head()
         self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, categories[-1])
 
-    def _define_transformer(self) -> None :
+    def _define_transformer(self) -> None:
         """Instantiate the type of Transformed that will be used in SAINT"""
         self.transformer = RowColTransformer(
             dim=self.config.network.embedding_size,
@@ -79,11 +79,11 @@ class SAINT(LightningModule):
     def _define_projection_head(self) -> None:
         """Define projection heads for contrastive learning"""
         self.pt_mlp = SimpleMLP(self.config.network.embedding_size * self.num_columns,
-                                  6 * self.config.network.embedding_size * self.num_columns // 5,
-                                  self.config.network.embedding_size * self.num_columns // 2)
+                                6 * self.config.network.embedding_size * self.num_columns // 5,
+                                self.config.network.embedding_size * self.num_columns // 2)
         self.pt_mlp2 = SimpleMLP(self.config.network.embedding_size * self.num_columns,
-                                  6 * self.config.network.embedding_size * self.num_columns // 5,
-                                  self.config.network.embedding_size * self.num_columns // 2)
+                                 6 * self.config.network.embedding_size * self.num_columns // 5,
+                                 self.config.network.embedding_size * self.num_columns // 2)
 
     def _embed_data(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[Tensor, Tensor]:
         """Converts categorical and continuous values in embeddings
@@ -119,7 +119,8 @@ class SAINT(LightningModule):
         embed_tranformed = self.transformer(embed_categ, embed_cont)
         embed_transformed_noised = self.transformer(embed_categ_noised, embed_cont_noised)
         embed_tranformed = (embed_tranformed / embed_tranformed.norm(dim=-1, keepdim=True)).flatten(1, 2)
-        embed_transformed_noised = (embed_transformed_noised / embed_transformed_noised.norm(dim=-1, keepdim=True)).flatten(1, 2)
+        embed_transformed_noised = (embed_transformed_noised /
+                                    embed_transformed_noised.norm(dim=-1, keepdim=True)).flatten(1, 2)
         if projhead_style == 'different':
             embed_tranformed = self.pt_mlp(embed_tranformed)
             embed_transformed_noised = self.pt_mlp2(embed_transformed_noised)
@@ -178,7 +179,7 @@ class SAINT(LightningModule):
         for j in range(self.num_categories - 1):
             loss_categorical_columns += f.cross_entropy(output_categorical[j], x_categ[:, j])
         return torch.mul(self.config.pretrain.task.denoising.weight_cross_entropy, loss_categorical_columns) +\
-               torch.mul(self.config.pretrain.task.denoising.weight_mse, loss_continuos_columns)
+            torch.mul(self.config.pretrain.task.denoising.weight_mse, loss_continuos_columns)
 
     def _pretraining_contrastive(self, embed_categ: Tensor, embed_cont: Tensor, embed_categ_noised: Tensor,
                                  embed_cont_noised: Tensor) -> Tensor:
@@ -191,9 +192,9 @@ class SAINT(LightningModule):
         :param embed_cont_noised: embeddings continuous features after the augmentation
         """
         if self.config.pretrain.task.get("contrastive"):
-            embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(embed_categ, embed_cont,
-                                                               embed_categ_noised, embed_cont_noised,
-                                                               self.config.pretrain.task.contrastive.projhead_style)
+            embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
+                embed_categ, embed_cont, embed_categ_noised, embed_cont_noised,
+                self.config.pretrain.task.contrastive.projhead_style)
             # @ is the matrix multiplication operator
             logits_1 = embed_tranformed @ embed_transformed_noised.t() / self.config.pretrain.task.contrastive.nce_temp
             logits_2 = embed_transformed_noised @ embed_tranformed.t() / self.config.pretrain.task.contrastive.nce_temp
@@ -206,10 +207,10 @@ class SAINT(LightningModule):
         elif self.config.pretrain.task.get("contrastive_sim"):
             # it apply the concept of simsiam we want that the embedding minimize the cosine similarity
             # the idea is that we want on the diagonal all 1, it means they are equal /because normalized)
-            embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(embed_categ, embed_cont,
-                                                               embed_categ_noised, embed_cont_noised)
+            embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
+                embed_categ, embed_cont, embed_categ_noised, embed_cont_noised)
             return - self.config.pretrain.task.contrastive_sim.weight * \
-                   f.cosine_similarity(embed_tranformed, embed_transformed_noised).add_(-1).sum()
+                f.cosine_similarity(embed_tranformed, embed_transformed_noised).add_(-1).sum()
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=0.02)
@@ -264,9 +265,9 @@ class SAINT(LightningModule):
         self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
-    def predict_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int, dataloader_idx: Optional[int] = None) -> Tensor:
+    def predict_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int,
+                     dataloader_idx: Optional[int] = None) -> Tensor:
         x_categ, x_cont = batch
         y_pred = self(x_categ, x_cont)
         # return the class that has the greatest probability
         return y_pred.argmax(1)
-

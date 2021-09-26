@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 
 from pytorch_lightning import LightningDataModule
 import pandas as pd
@@ -16,19 +17,19 @@ class SaintDatamodule(LightningDataModule):
     """
     NAN_LABEL = "SAINT_NAN"
 
-    def __init__(self, df: pd.DataFrame, target: str, split_column: str, batch_size: int = 256,
+    def __init__(self, df: pd.DataFrame, target: str, split_column: str, data_loader_params: Dict = None,
                  scaler: TransformerMixin = None, pretraining: bool = False):
         """
-        :param df: contains the data that will be used by the dataloaders
+        :param df: contains the data that will be used by the dataLoaders
         :param target: name of the target column
         :param split_column: name of the column used to split the data
-        :param batch_size: dimension of the batches
-        :param pretraining: boolean flag, if False it use only were the target is not NaN
+        :param data_loader_params: parameters used to configure the DataLoader
+        :param pretraining: boolean flag, if False it use only where the target is not NaN
         """
         super().__init__()
         self.target: str = target
         self.pretraining = pretraining
-        self.batch_size = batch_size
+        self.data_loader_params = data_loader_params if data_loader_params else {"batch_size": 256}
         self.categorical_columns = []
         self.categorical_dims = []
         self.numerical_columns = []
@@ -145,8 +146,8 @@ class SaintDatamodule(LightningDataModule):
         )
         return DataLoader(
             dataset,
-            self.batch_size,
-            num_workers=os.cpu_count()
+            num_workers=os.cpu_count(),
+            **self.data_loader_params
         )
 
     def train_dataloader(self) -> DataLoader:
