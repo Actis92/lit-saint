@@ -49,7 +49,7 @@ class SAINT(LightningModule):
         self._define_transformer()
         self._define_mlp(categories)
         self._define_projection_head()
-        self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, 2)
+        self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, categories[-1])
 
     def _define_transformer(self) -> None :
         """Instantiate the type of Transformed that will be used in SAINT"""
@@ -208,8 +208,8 @@ class SAINT(LightningModule):
             # the idea is that we want on the diagonal all 1, it means they are equal /because normalized)
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(embed_categ, embed_cont,
                                                                embed_categ_noised, embed_cont_noised)
-            c1 = embed_tranformed @ embed_transformed_noised.t()
-            return self.config.pretrain.task.contrastive_sim.weight * torch.diagonal(-1 * c1).add_(1).pow_(2).sum()
+            return - self.config.pretrain.task.contrastive_sim.weight * \
+                   f.cosine_similarity(embed_tranformed, embed_transformed_noised).add_(-1).sum()
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=0.02)

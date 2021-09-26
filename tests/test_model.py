@@ -27,7 +27,7 @@ def test_train():
         trainer.fit(model, data_module)
 
 
-def test_train_no_continuos_columns():
+def test_train_no_continuous_columns():
     with initialize(config_path="."):
         cfg = compose(config_name="config")
         saint_cfg = SaintConfig(**cfg)
