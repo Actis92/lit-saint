@@ -11,6 +11,11 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
+      - uses: "actions/checkout@master"
+      - name: "Set up Python 3.9"
+        uses: "actions/setup-python@v1"
+        with:
+          python-version: 3.9
       - uses: saadmk11/changelog-ci@v0.8.0
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -18,11 +23,6 @@ jobs:
           prerelease: false
           files: |
             *
-      - uses: "actions/checkout@master"
-      - name: "Set up Python 3.9"
-        uses: "actions/setup-python@v1"
-        with:
-          python-version: 3.9
       - name: Install pypa/build
         run: >-
           python -m
