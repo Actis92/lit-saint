@@ -22,6 +22,15 @@ jobs:
         uses: "actions/setup-python@v1"
         with:
           python-version: 3.9
+      - name: Build and Commit
+        uses: sphinx-notes/pages@master
+        with:
+          documentation_path: sphinx
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
       - name: Install pypa/build
         run: >-
           python -m
@@ -40,3 +49,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+      - uses: saadmk11/changelog-ci@v0.8.0
