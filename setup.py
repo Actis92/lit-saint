@@ -17,7 +17,7 @@ setup(
     author='Luca Actis Grosso',
     author_email='lucaactisgrosso@gmail.com',
     url='https://github.com/Actis92/lit-saint.git',
-    download_url='https://github.com/Actis92/lit-saint.git/archive/v0.0.6.tar.gz',
+    download_url=f'https://github.com/Actis92/lit-saint.git/archive/{version}.tar.gz',
     keywords=['TABULAR', 'SELF SUPERVISED', 'PYTORCH LIGHTNING'],
     install_requires=['pytorch-lightning>=1.3.8,<2',
                       'torch>=1.4',
