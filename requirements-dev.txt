@@ -9,3 +9,4 @@ coverage
 mypy
 radon
 xenon
+bump2version
