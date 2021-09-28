@@ -1,13 +1,19 @@
+name: "tagged-release"
+
 on:
   push:
-    branches:
-      - master
-name: release-please
+    tags:
+      - "v*"
+
 jobs:
-  release-please:
-    runs-on: ubuntu-latest
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v2
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          release-type: python
-          package-name: lit-saint
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            *
