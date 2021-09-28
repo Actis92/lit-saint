@@ -16,7 +16,6 @@ jobs:
         uses: "actions/setup-python@v1"
         with:
           python-version: 3.9
-      - uses: saadmk11/changelog-ci@v0.8.0
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
