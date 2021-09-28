@@ -1,8 +1,17 @@
+import os
+
 from setuptools import setup
+
+package_root = os.path.abspath(os.path.dirname(__file__))
+
+version = {}
+with open(os.path.join(package_root, "src/lit_saint/version.py")) as fp:
+    exec(fp.read(), version)
+version = version["__version__"]
 
 setup(
     name='lit-saint',
-    version='v0.0.6',
+    version=version,
     license='MIT',
     description='Pytorch Lightning implementation of SAINT Model',
     author='Luca Actis Grosso',
