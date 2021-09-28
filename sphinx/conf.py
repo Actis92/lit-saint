@@ -15,6 +15,10 @@ import sys
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../src'))
 
+version = {}
+with open(os.path.abspath("../src/lit_saint/version.py")) as fp:
+    exec(fp.read(), version)
+version = version["__version__"]
 
 # -- Project information -----------------------------------------------------
 
