@@ -11,6 +11,7 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
+      - uses: saadmk11/changelog-ci@v0.8.0
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -40,4 +41,3 @@ jobs:
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
-      - uses: saadmk11/changelog-ci@v0.8.0
