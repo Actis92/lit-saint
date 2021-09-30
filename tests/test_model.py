@@ -72,7 +72,8 @@ def test_predict():
                       config=saint_cfg)
         trainer = Trainer(max_epochs=1, fast_dev_run=True)
         trainer.fit(model, data_module)
-        data_module.set_predict_set(df)
+        df_predict = df[[col for col in df.columns if col != "target"]]
+        data_module.set_predict_set(df_predict)
         prediction = trainer.predict(model, datamodule=data_module)
         df["prediction"] = torch.cat(prediction).numpy()
 
