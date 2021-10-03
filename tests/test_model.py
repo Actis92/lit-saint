@@ -18,7 +18,7 @@ def test_train():
                            "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
         data_module = SaintDatamodule(df=df, target="target", split_column="split")
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                      config=saint_cfg, pretraining=True)
+                      config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
         pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
         pretrainer.fit(model, data_module)
         model.pretraining = False
@@ -35,7 +35,7 @@ def test_train_no_continuous_columns():
                            "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
         data_module = SaintDatamodule(df=df, target="target", split_column="split")
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                      config=saint_cfg, pretraining=True)
+                      config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
         pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
         pretrainer.fit(model, data_module)
         model.pretraining = False
@@ -52,7 +52,7 @@ def test_train_no_categorical_columns():
                            "feat_cont": [2, 3, 1, 4], "split": ["train", "train", "validation", "test"]})
         data_module = SaintDatamodule(df=df, target="target", split_column="split")
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                      config=saint_cfg, pretraining=True)
+                      config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
         pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
         pretrainer.fit(model, data_module)
         model.pretraining = False
@@ -69,7 +69,7 @@ def test_predict():
                            "feat_cont": [2, 3, 1, 4], "split": ["train", "train", "validation", "test"]})
         data_module = SaintDatamodule(df=df, target="target", split_column="split")
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                      config=saint_cfg)
+                      config=saint_cfg, dim_target=data_module.dim_target)
         trainer = Trainer(max_epochs=1, fast_dev_run=True)
         trainer.fit(model, data_module)
         df_predict = df[[col for col in df.columns if col != "target"]]
@@ -88,9 +88,26 @@ def test_predict_unknown_categ():
                                 "feat_cont": [2, 3, 1, 4]})
         data_module = SaintDatamodule(df=df, target="target", split_column="split")
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                      config=saint_cfg)
+                      config=saint_cfg, dim_target=data_module.dim_target)
         trainer = Trainer(max_epochs=1, fast_dev_run=True)
         trainer.fit(model, data_module)
         data_module.set_predict_set(df_test)
         prediction = trainer.predict(model, datamodule=data_module)
         df_test["prediction"] = torch.cat(prediction).numpy()
+
+
+def test_train_regression():
+    with initialize(config_path="."):
+        cfg = compose(config_name="config")
+        saint_cfg = SaintConfig(**cfg)
+        df = pd.DataFrame({"target": [1, 2, 3, 4], "feat_cont": [2, 3, 1, 4],
+                           "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
+        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                      config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
+        pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
+        pretrainer.fit(model, data_module)
+        model.pretraining = False
+        data_module.pretraining = False
+        trainer = Trainer(max_epochs=1, fast_dev_run=True)
+        trainer.fit(model, data_module)

@@ -1,7 +1,6 @@
 from typing import List, Tuple
 
 from einops import rearrange
-import numpy as np
 import pandas as pd
 from sklearn.base import TransformerMixin
 from torch.utils.data import Dataset
@@ -20,20 +19,49 @@ class SaintDataset(Dataset):
     :param scaler: a scikit learn scaler used to transform the continuous columns
     """
     def __init__(self, data: pd.DataFrame, target: str, cat_cols: List[str],
-                con_cols: List[str], scaler: TransformerMixin):
-        if len(cat_cols) > 0:
-            self.X_categorical: Tensor = torch.from_numpy(data.loc[:, cat_cols].values.astype(np.int64))
-        else:
-            self.X_categorical: Tensor = rearrange(torch.zeros(data.shape[0], dtype=torch.int64), 'n -> n 1')
-        if len(con_cols) > 0:
-            self.X_continuos = torch.from_numpy(scaler.fit_transform(data.loc[:, con_cols].values).astype(np.float32))
-        else:
-            self.X_continuos: Tensor = rearrange(torch.zeros(data.shape[0], dtype=torch.float32), 'n -> n 1')
-        self.y = torch.from_numpy(data[target].values)
+                 con_cols: List[str], scaler: TransformerMixin, target_categorical: bool):
+        self.X_categorical = self._define_tensor_features(data, cat_cols, torch.int64)
+        self.X_continuos = self._define_tensor_features(data, con_cols, torch.float32, scaler)
+        self.y = self._define_tensor_target(data, target, target_categorical)
         self.prediction_column: Tensor = rearrange(torch.zeros(data.shape[0], dtype=torch.int64), 'n -> n 1')
 
     def __len__(self):
         return len(self.y)
+
+    @staticmethod
+    def _define_tensor_features(df: pd.DataFrame, cols: List[str], dtype: torch.dtype,
+                                transformer: TransformerMixin = None) -> Tensor:
+        """It convert a ndarray fo features in a Tensor
+
+        :param df: Contains the data to put insert in the tensor
+        :param cols: list of column names used to selected the data
+        :param dtype: The type of returned Tensor
+        """
+        if len(cols) > 0:
+            df = df.loc[:, cols].values
+            if transformer:
+                df = transformer.transform(df)
+            return torch.from_numpy(df).to(dtype=dtype)
+        else:
+            return rearrange(torch.zeros(df.shape[0], dtype=dtype), 'n -> n 1')
+
+    @staticmethod
+    def _define_tensor_target(df: pd.DataFrame, target: str, target_categorical: bool) -> Tensor:
+        """It return a Tensor containing the values of the target column
+
+        :param df: Dataframe that contains the target
+        :param target: name of the target column
+        :param target_categorical: True if the target is categorical, otherwise is False
+        """
+        if target in df.columns:
+            if target_categorical:
+                y = torch.from_numpy(df[target].values).to(dtype=torch.int64)
+            else:
+                y = torch.from_numpy(df[target].values).to(dtype=torch.float32)
+                y = rearrange(y, 'n -> n 1')
+            return y
+        else:
+            return torch.zeros(df.shape[0], dtype=torch.float32)
 
     def __getitem__(self, idx) -> Tuple[Tensor, Tensor, Tensor]:
         """It returns two tensors one for the categorical values and another for the continuous values.
@@ -43,4 +71,4 @@ class SaintDataset(Dataset):
         :param idx: numeric index of the data that we want to process
         """
         return torch.cat([self.X_categorical[idx], self.prediction_column[idx]]), self.X_continuos[idx],\
-               self.y[idx]
+            self.y[idx]

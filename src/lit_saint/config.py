@@ -67,6 +67,8 @@ class NetworkConfig:
     heads: int  #: number of heads used in the transformer
     ff_dropout: float  #: probability dropout in the feed forward layers
     attention_type: str  #: type of attention can be the self attention or intersample attention
+    learning_rate: float  #: value used to specify the learning rate for the optimizer
+    learning_rate_pretraining: float  #: value used to specify the learning rate for the optimizer pretraining
 
 
 @dataclass

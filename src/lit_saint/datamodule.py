@@ -1,6 +1,7 @@
 import os
 from typing import Dict
 
+import numpy as np
 from pytorch_lightning import LightningDataModule
 import pandas as pd
 from sklearn.base import TransformerMixin
@@ -33,7 +34,7 @@ class SaintDatamodule(LightningDataModule):
         self.categorical_columns = []
         self.categorical_dims = []
         self.numerical_columns = []
-        self.target_categorical = False
+        self.dim_target = 1
         self.target_nan_index = None
         self.dict_label_encoder = {}
         self.predict_set = None
@@ -49,7 +50,6 @@ class SaintDatamodule(LightningDataModule):
         :param split_column: name of column used to split the data
         """
         df = df.copy()
-        dim_target = None
         col_not_to_use = []
         for col in df.columns:
             if df[col].dtypes.name in ["object", "category"]:
@@ -60,9 +60,7 @@ class SaintDatamodule(LightningDataModule):
                     df[col] = l_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
                     self.dict_label_encoder[col] = l_enc
                     if col == self.target:
-                        self.target_categorical = True
-                        dim_target = len(l_enc.categories_[0])
-
+                        self.dim_target = len(l_enc.categories_[0])
                         self.target_nan_index = list(l_enc.categories_[0]).index(self.NAN_LABEL) \
                             if self.NAN_LABEL in l_enc.categories_[0] else None
                     else:
@@ -73,12 +71,14 @@ class SaintDatamodule(LightningDataModule):
                     df[col] = df[col].fillna(0)
                 if col != self.target:
                     self.numerical_columns.append(col)
+                else:
+                    df[col] = df[col]
             else:
                 col_not_to_use.append(col)
         if len(self.categorical_columns) == 0:
             self.categorical_dims.append(1)
-        if self.target_categorical:
-            self.categorical_dims.append(dim_target)
+        # add dim for column used for prediction initialized with all zeros
+        self.categorical_dims.append(1)
         print("The following cols will not be used because they have a not supported data type: ", col_not_to_use)
         self._split_data(df=df, split_column=split_column)
         self.scaler_continuous_columns(df=df, split_column=split_column)
@@ -114,7 +114,7 @@ class SaintDatamodule(LightningDataModule):
         """
         df = df.copy()
         for col, label_enc in self.dict_label_encoder.items():
-            if col != self.target:
+            if col != self.target or (col == self.target and col in df.columns):
                 if df[col].isna().any():  # the columns contains nan
                     df[col] = df[col].fillna(self.NAN_LABEL)
                 df[col] = label_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
@@ -142,7 +142,8 @@ class SaintDatamodule(LightningDataModule):
             target=self.target,
             cat_cols=self.categorical_columns,
             con_cols=self.numerical_columns,
-            scaler=self.scaler
+            scaler=self.scaler,
+            target_categorical=self.dim_target > 1
         )
         return DataLoader(
             dataset,

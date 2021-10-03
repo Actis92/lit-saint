@@ -17,6 +17,7 @@ class SAINT(LightningModule):
 
     :param categories: List with the number of unique values for each categorical column
     :param continuous: List of indices with continuous columns
+    :param dim_target: if categorical represent number of classes of the target otherwise is 1
     :param config: configuration of the model
     :param pretraining: boolean flag, if True it will be executed pretraining task
     """
@@ -24,6 +25,7 @@ class SAINT(LightningModule):
             self,
             categories: List[int],
             continuous: List[int],
+            dim_target: int,
             config: SaintConfig,
             pretraining: bool = False,
     ):
@@ -31,6 +33,7 @@ class SAINT(LightningModule):
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
         self.config = config
         self.pretraining = pretraining
+        self.dim_target = dim_target
         self.num_categories = len(categories)
         self.num_unique_categories = sum(categories)
         self.num_continuous = len(continuous) if len(continuous) > 0 else 1
@@ -49,7 +52,7 @@ class SAINT(LightningModule):
         self._define_transformer()
         self._define_mlp(categories)
         self._define_projection_head()
-        self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, categories[-1])
+        self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, self.dim_target)
 
     def _define_transformer(self) -> None:
         """Instantiate the type of Transformed that will be used in SAINT"""
@@ -211,7 +214,12 @@ class SAINT(LightningModule):
                 f.cosine_similarity(embed_tranformed, embed_transformed_noised).add_(-1).sum()
 
     def configure_optimizers(self):
-        return torch.optim.AdamW(self.parameters(), lr=0.02)
+        if self.pretraining:
+            lr = self.config.network.learning_rate_pretraining
+        else:
+            lr = self.config.network.learning_rate
+        optimizer = torch.optim.Adam(self.parameters(), lr=lr)
+        return optimizer
 
     def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
         x_categ_enc, x_cont_enc = self._embed_data(x_categ, x_cont)
@@ -239,14 +247,19 @@ class SAINT(LightningModule):
         return loss
 
     def shared_step(self, batch: Tuple[Tensor, Tensor, Tensor]) -> Tensor:
+        """It define the commons step executed during training, validation and test
+
+        :param batch: Contains a batch of data
+        """
         x_categ, x_cont, target = batch
-        loss = Tensor([0])
         if self.pretraining:
-            loss += self.pretraining_step(x_categ, x_cont)
+            return self.pretraining_step(x_categ, x_cont)
         else:
             y_pred = self(x_categ, x_cont)
-            loss += f.cross_entropy(y_pred, target)
-        return loss
+            if self.dim_target > 1:
+                return self._classification_loss(y_pred, target)
+            else:
+                return self._regression_loss(y_pred, target)
 
     def training_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
         loss = self.shared_step(batch)
@@ -268,4 +281,22 @@ class SAINT(LightningModule):
         x_categ, x_cont, _ = batch
         y_pred = self(x_categ, x_cont)
         # return the class that has the greatest probability
-        return y_pred.argmax(1)
+        return y_pred.argmax(1) if self.dim_target > 1 else y_pred
+
+    @staticmethod
+    def _classification_loss(y_pred: Tensor, target: Tensor) -> Tensor:
+        """Loss function used in case of a classification problem
+
+        :param y_pred: Values predicted
+        :param target: Values to predict
+        """
+        return f.cross_entropy(y_pred, target)
+
+    @staticmethod
+    def _regression_loss(y_pred: Tensor, target: Tensor) -> Tensor:
+        """Loss function used in case of regression problem
+
+        :param y_pred: Values predicted
+        :param target: Values to predict
+        """
+        return f.mse_loss(y_pred, target)
