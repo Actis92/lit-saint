@@ -142,7 +142,7 @@ class SAINT(LightningModule):
         :param embed_categ: embeddings categorical features
         :param embed_cont: embeddings continuous features
         """
-        if self.config.pretrain.aug.get('cutmix'):
+        if self.config.pretrain.aug.cutmix:
             random_index = get_random_index(x_categ)
             x_categ_noised = cutmix(x_categ, random_index, self.config.pretrain.aug.cutmix.lam)
             x_cont_noised = cutmix(x_cont, random_index, self.config.pretrain.aug.cutmix.lam)
@@ -151,7 +151,7 @@ class SAINT(LightningModule):
             # if not apply cutmix the noised embeddings are equal to the original embeddings
             embed_categ_noised, embed_cont_noised = embed_categ, embed_cont
 
-        if self.config.pretrain.aug.get("mixup"):
+        if self.config.pretrain.aug.mixup:
             random_index = get_random_index(embed_categ_noised)
             embed_categ_noised = mixup(embed_categ_noised, random_index, lam=self.config.pretrain.aug.mixup.lam)
             embed_cont_noised = mixup(embed_cont_noised, random_index, lam=self.config.pretrain.aug.mixup.lam)
@@ -192,7 +192,7 @@ class SAINT(LightningModule):
         :param embed_categ_noised: embeddings categorical features after the augmentation
         :param embed_cont_noised: embeddings continuous features after the augmentation
         """
-        if self.config.pretrain.task.get("contrastive"):
+        if self.config.pretrain.task.contrastive:
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
                 embed_categ, embed_cont, embed_categ_noised, embed_cont_noised,
                 self.config.pretrain.task.contrastive.projhead_style)
@@ -205,7 +205,7 @@ class SAINT(LightningModule):
             loss_1 = f.cross_entropy(logits_1, targets)
             loss_2 = f.cross_entropy(logits_2, targets)
             return self.config.pretrain.task.contrastive.weight * (loss_1 + loss_2) / 2
-        elif self.config.pretrain.task.get("contrastive_sim"):
+        elif self.config.pretrain.task.contrastive_sim:
             # it apply the concept of simsiam we want that the embedding minimize the cosine similarity
             # the idea is that we want on the diagonal all 1, it means they are equal /because normalized)
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
@@ -242,7 +242,7 @@ class SAINT(LightningModule):
                                                                                embed_categ, embed_cont)
         loss += self._pretraining_contrastive(embed_categ, embed_cont,
                                               embed_categ_noised, embed_cont_noised)
-        if self.config.pretrain.task.get("denoising"):
+        if self.config.pretrain.task.denoising:
             loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
         return loss
 
