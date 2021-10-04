@@ -29,7 +29,7 @@
             <a href="#" class="icon icon-home"> SAINT Lightning
           </a>
               <div class="version">
-                0.0.7
+                0.0.8
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -93,27 +93,28 @@ labels are scarce.</p>
 <section id="how-to-use-it">
 <h3>How to Use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline"></a></h3>
 <ol class="arabic simple">
-<li><p>Create an yaml file that contains the configuration needed by the application and create an instance of SaintConfig using Hydra</p></li>
+<li><p>Create an yaml file that contains the configuration needed by the application or use default values</p></li>
+<li><p>Create an instance of SaintConfig using Hydra</p></li>
 <li><p>Create the Dataframe that will be used for the model. In order to split correctly the data, you need to add a new column where you assign the label “train” to the rows of the training set, “validation” for the ones of the validation set and “test” for the testing one</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_module</span> <span class="o">=</span> <span class="n">SaintDatamodule</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;TARGET&quot;</span><span class="p">,</span> <span class="n">split_column</span><span class="o">=</span><span class="s2">&quot;SPLIT&quot;</span><span class="p">,</span> <span class="n">pretraining</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="3">
+<ol class="arabic simple" start="4">
 <li><p>Create an instance of SaintDataModule and SAINT</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SAINT</span><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="n">data_module</span><span class="o">.</span><span class="n">categorical_dims</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="n">data_module</span><span class="o">.</span><span class="n">numerical_columns</span><span class="p">,</span>
               <span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">pretraining</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="4">
+<ol class="arabic simple" start="5">
 <li><p>Use the Trainer defined by Pytorch lightning to fit the model</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pretrainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">max_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">pretrainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data_module</span><span class="p">)</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="5">
+<ol class="arabic simple" start="6">
 <li><p>After the pretraining, you can train the model using a supervised objective function</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">pretraining</span> <span class="o">=</span> <span class="kc">False</span>
@@ -122,12 +123,24 @@ labels are scarce.</p>
 <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data_module</span><span class="p">)</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="6">
+<ol class="arabic simple" start="7">
 <li><p>Then you can define the data for the prediction step</p></li>
 </ol>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_module</span><span class="o">.</span><span class="n">set_predict_set</span><span class="p">(</span><span class="n">df_test</span><span class="p">)</span>
 <span class="n">prediction</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">data_module</span><span class="p">)</span>
 <span class="n">df_test</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="how-to-generate-yaml">
+<h3>How to Generate Yaml<a class="headerlink" href="#how-to-generate-yaml" title="Permalink to this headline"></a></h3>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lit_saint</span> <span class="k">import</span> <span class="n">SaintConfig</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="k">import</span> <span class="n">OmegaConf</span>
+
+
+<span class="n">conf</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">SaintConfig</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;&lt;FILE_NAME&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

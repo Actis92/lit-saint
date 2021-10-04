@@ -27,7 +27,7 @@
             <a href="../../index.html" class="icon icon-home"> SAINT Lightning
           </a>
               <div class="version">
-                0.0.7
+                0.0.8
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -86,6 +86,7 @@
 
 <span class="sd">    :param categories: List with the number of unique values for each categorical column</span>
 <span class="sd">    :param continuous: List of indices with continuous columns</span>
+<span class="sd">    :param dim_target: if categorical represent number of classes of the target otherwise is 1</span>
 <span class="sd">    :param config: configuration of the model</span>
 <span class="sd">    :param pretraining: boolean flag, if True it will be executed pretraining task</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -93,6 +94,7 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">categories</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
             <span class="n">continuous</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+            <span class="n">dim_target</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">SaintConfig</span><span class="p">,</span>
             <span class="n">pretraining</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
@@ -100,6 +102,7 @@
         <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">categories</span><span class="p">)),</span> <span class="s1">&#39;number of each category must be positive&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pretraining</span> <span class="o">=</span> <span class="n">pretraining</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span> <span class="o">=</span> <span class="n">dim_target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_categories</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_unique_categories</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_continuous</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">continuous</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">continuous</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
@@ -118,7 +121,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_define_transformer</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_define_mlp</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_define_projection_head</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mlpfory</span> <span class="o">=</span> <span class="n">SimpleMLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">categories</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlpfory</span> <span class="o">=</span> <span class="n">SimpleMLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_define_transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Instantiate the type of Transformed that will be used in SAINT&quot;&quot;&quot;</span>
@@ -208,7 +211,7 @@
 <span class="sd">        :param embed_categ: embeddings categorical features</span>
 <span class="sd">        :param embed_cont: embeddings continuous features</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">aug</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cutmix&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">aug</span><span class="o">.</span><span class="n">cutmix</span><span class="p">:</span>
             <span class="n">random_index</span> <span class="o">=</span> <span class="n">get_random_index</span><span class="p">(</span><span class="n">x_categ</span><span class="p">)</span>
             <span class="n">x_categ_noised</span> <span class="o">=</span> <span class="n">cutmix</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">random_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">aug</span><span class="o">.</span><span class="n">cutmix</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span>
             <span class="n">x_cont_noised</span> <span class="o">=</span> <span class="n">cutmix</span><span class="p">(</span><span class="n">x_cont</span><span class="p">,</span> <span class="n">random_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">aug</span><span class="o">.</span><span class="n">cutmix</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span>
@@ -217,7 +220,7 @@
             <span class="c1"># if not apply cutmix the noised embeddings are equal to the original embeddings</span>
             <span class="n">embed_categ_noised</span><span class="p">,</span> <span class="n">embed_cont_noised</span> <span class="o">=</span> <span class="n">embed_categ</span><span class="p">,</span> <span class="n">embed_cont</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">aug</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mixup&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">aug</span><span class="o">.</span><span class="n">mixup</span><span class="p">:</span>
             <span class="n">random_index</span> <span class="o">=</span> <span class="n">get_random_index</span><span class="p">(</span><span class="n">embed_categ_noised</span><span class="p">)</span>
             <span class="n">embed_categ_noised</span> <span class="o">=</span> <span class="n">mixup</span><span class="p">(</span><span class="n">embed_categ_noised</span><span class="p">,</span> <span class="n">random_index</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">aug</span><span class="o">.</span><span class="n">mixup</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span>
             <span class="n">embed_cont_noised</span> <span class="o">=</span> <span class="n">mixup</span><span class="p">(</span><span class="n">embed_cont_noised</span><span class="p">,</span> <span class="n">random_index</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">aug</span><span class="o">.</span><span class="n">mixup</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span>
@@ -258,7 +261,7 @@
 <span class="sd">        :param embed_categ_noised: embeddings categorical features after the augmentation</span>
 <span class="sd">        :param embed_cont_noised: embeddings continuous features after the augmentation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;contrastive&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">contrastive</span><span class="p">:</span>
             <span class="n">embed_tranformed</span><span class="p">,</span> <span class="n">embed_transformed_noised</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embeddings_contrastive</span><span class="p">(</span>
                 <span class="n">embed_categ</span><span class="p">,</span> <span class="n">embed_cont</span><span class="p">,</span> <span class="n">embed_categ_noised</span><span class="p">,</span> <span class="n">embed_cont_noised</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">contrastive</span><span class="o">.</span><span class="n">projhead_style</span><span class="p">)</span>
@@ -271,7 +274,7 @@
             <span class="n">loss_1</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits_1</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
             <span class="n">loss_2</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits_2</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">contrastive</span><span class="o">.</span><span class="n">weight</span> <span class="o">*</span> <span class="p">(</span><span class="n">loss_1</span> <span class="o">+</span> <span class="n">loss_2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;contrastive_sim&quot;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">contrastive_sim</span><span class="p">:</span>
             <span class="c1"># it apply the concept of simsiam we want that the embedding minimize the cosine similarity</span>
             <span class="c1"># the idea is that we want on the diagonal all 1, it means they are equal /because normalized)</span>
             <span class="n">embed_tranformed</span><span class="p">,</span> <span class="n">embed_transformed_noised</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embeddings_contrastive</span><span class="p">(</span>
@@ -280,7 +283,12 @@
                 <span class="n">f</span><span class="o">.</span><span class="n">cosine_similarity</span><span class="p">(</span><span class="n">embed_tranformed</span><span class="p">,</span> <span class="n">embed_transformed_noised</span><span class="p">)</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SAINT.configure_optimizers"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.model.SAINT.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pretraining</span><span class="p">:</span>
+            <span class="n">lr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">learning_rate_pretraining</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">learning_rate</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">optimizer</span></div>
 
 <div class="viewcode-block" id="SAINT.forward"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.model.SAINT.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_categ</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">x_categ_enc</span><span class="p">,</span> <span class="n">x_cont_enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embed_data</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">)</span>
@@ -303,19 +311,24 @@
                                                                                <span class="n">embed_categ</span><span class="p">,</span> <span class="n">embed_cont</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretraining_contrastive</span><span class="p">(</span><span class="n">embed_categ</span><span class="p">,</span> <span class="n">embed_cont</span><span class="p">,</span>
                                               <span class="n">embed_categ_noised</span><span class="p">,</span> <span class="n">embed_cont_noised</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;denoising&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretrain</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">denoising</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretraining_denoising</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">,</span> <span class="n">embed_categ_noised</span><span class="p">,</span> <span class="n">embed_cont_noised</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">loss</span></div>
 
 <div class="viewcode-block" id="SAINT.shared_step"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.model.SAINT.shared_step">[docs]</a>    <span class="k">def</span> <span class="nf">shared_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;It define the commons step executed during training, validation and test</span>
+
+<span class="sd">        :param batch: Contains a batch of data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pretraining</span><span class="p">:</span>
-            <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pretraining_step</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pretraining_step</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">)</span>
-            <span class="n">loss</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">loss</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classification_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regression_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SAINT.training_step"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.model.SAINT.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared_step</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
@@ -337,7 +350,25 @@
         <span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">batch</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">)</span>
         <span class="c1"># return the class that has the greatest probability</span>
-        <span class="k">return</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">y_pred</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_classification_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Loss function used in case of a classification problem</span>
+
+<span class="sd">        :param y_pred: Values predicted</span>
+<span class="sd">        :param target: Values to predict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_regression_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Loss function used in case of regression problem</span>
+
+<span class="sd">        :param y_pred: Values predicted</span>
+<span class="sd">        :param target: Values to predict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
