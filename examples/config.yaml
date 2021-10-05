@@ -4,7 +4,7 @@ network:
   embedding_size: 10
   depth: 3
   heads: 1
-  ff_dropout: .0
+  ff_dropout: 0.2
   attention_type:  'col'
   learning_rate: 0.01
   learning_rate_pretraining: 0.01

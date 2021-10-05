@@ -39,7 +39,11 @@ def read_config(cfg: SaintConfig) -> None:
     trainer = Trainer(max_epochs=1, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
     trainer.fit(model, data_module)
     data_module.set_predict_set(df_test)
+    for m in model.modules():
+        if m.__class__.__name__.startswith('Dropout'):
+            m.train()
     prediction = trainer.predict(model, datamodule=data_module)
+    prediction2 = trainer.predict(model, datamodule=data_module)
     df_test["prediction"] = torch.cat(prediction).numpy()
     print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
 

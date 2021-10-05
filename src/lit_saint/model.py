@@ -52,7 +52,8 @@ class SAINT(LightningModule):
         self._define_transformer()
         self._define_mlp(categories)
         self._define_projection_head()
-        self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, self.dim_target)
+        self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, self.dim_target,
+                                 dropout=self.config.network.ff_dropout)
 
     def _define_transformer(self) -> None:
         """Instantiate the type of Transformed that will be used in SAINT"""
@@ -68,7 +69,8 @@ class SAINT(LightningModule):
     def _define_embedding_layers(self) -> None:
         """Instatiate embedding layers"""
         # embed continuos variables using one different MLP for each column
-        self.embedding_continuos = nn.ModuleList([SimpleMLP(1, 100, self.config.network.embedding_size)
+        self.embedding_continuos = nn.ModuleList([SimpleMLP(1, 100, self.config.network.embedding_size,
+                                                            dropout=self.config.network.ff_dropout)
                                                   for _ in range(self.num_continuous)])
         # embedding layer categorical columns
         self.embedding_categorical = nn.Embedding(self.num_unique_categories, self.config.network.embedding_size)
@@ -83,10 +85,12 @@ class SAINT(LightningModule):
         """Define projection heads for contrastive learning"""
         self.pt_mlp = SimpleMLP(self.config.network.embedding_size * self.num_columns,
                                 6 * self.config.network.embedding_size * self.num_columns // 5,
-                                self.config.network.embedding_size * self.num_columns // 2)
+                                self.config.network.embedding_size * self.num_columns // 2,
+                                dropout=self.config.network.ff_dropout)
         self.pt_mlp2 = SimpleMLP(self.config.network.embedding_size * self.num_columns,
                                  6 * self.config.network.embedding_size * self.num_columns // 5,
-                                 self.config.network.embedding_size * self.num_columns // 2)
+                                 self.config.network.embedding_size * self.num_columns // 2,
+                                 dropout=self.config.network.ff_dropout)
 
     def _embed_data(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[Tensor, Tensor]:
         """Converts categorical and continuous values in embeddings
@@ -280,8 +284,7 @@ class SAINT(LightningModule):
                      dataloader_idx: Optional[int] = None) -> Tensor:
         x_categ, x_cont, _ = batch
         y_pred = self(x_categ, x_cont)
-        # return the class that has the greatest probability
-        return y_pred.argmax(1) if self.dim_target > 1 else y_pred
+        return y_pred
 
     @staticmethod
     def _classification_loss(y_pred: Tensor, target: Tensor) -> Tensor:

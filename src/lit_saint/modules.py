@@ -168,16 +168,18 @@ class SimpleMLP(nn.Module):
 class SepMLP(nn.Module):
     """Module that implements a separable MLP, this means that for each feature is used a different SimpleMLP
     """
-    def __init__(self, dim: int, dim_out_for_each_feat: List[int]):
+    def __init__(self, dim: int, dim_out_for_each_feat: List[int], dropout: float = .0):
         """
         :param dim: dimension of embedding in input to the module
         :param dim_out_for_each_feat: output dimension for each SimpleMLP
+        :param dropout: probability used in the dropout layer
         """
         super().__init__()
         self.len_feats = len(dim_out_for_each_feat)
         self.layers = nn.ModuleList([])
         for i in range(self.len_feats):
-            self.layers.append(SimpleMLP(dim=dim, dim_internal=5 * dim, dim_out=dim_out_for_each_feat[i]))
+            self.layers.append(SimpleMLP(dim=dim, dim_internal=5 * dim, dim_out=dim_out_for_each_feat[i],
+                                         dropout=dropout))
 
     def forward(self, x: Tensor) -> List[Tensor]:
         y_pred = list([])
