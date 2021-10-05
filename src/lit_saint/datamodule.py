@@ -118,6 +118,7 @@ class SaintDatamodule(LightningDataModule):
                 if df[col].isna().any():  # the columns contains nan
                     df[col] = df[col].fillna(self.NAN_LABEL)
                 df[col] = label_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
+        df = df.fillna(0)
         self.predict_set = df
 
     def _remove_rows_without_labels(self, df) -> pd.DataFrame:
@@ -147,7 +148,6 @@ class SaintDatamodule(LightningDataModule):
         )
         return DataLoader(
             dataset,
-            num_workers=os.cpu_count(),
             **self.data_loader_params
         )
 
