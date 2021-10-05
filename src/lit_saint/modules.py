@@ -138,13 +138,15 @@ class SimpleMLP(nn.Module):
     allow to divide the tensor in 2 parts
     """
     def __init__(self, dim: int, dim_internal: int, dim_out: int,
-                 activation_module: nn.Module = nn.ReLU(), dropout: float = 0.):
+                 activation_module: nn.Module = nn.ReLU(), dropout: float = 0.,
+                 output_layer: nn.Module = None):
         """
         :param dim: dimension of embedding in input to the module
         :param dim_internal: dimension after the first linear layer
         :param dim_out: output dimension
         :param activation_module: module with the activation function to use between the 2 linear layers
         :param dropout: probability used in the dropout layer
+        :param output_layer: if to add a nonlinear activation function after the final Linear Layer
         """
         super().__init__()
         mult = 1
@@ -155,8 +157,10 @@ class SimpleMLP(nn.Module):
             nn.Linear(dim, dim_internal * mult),
             activation_module,
             nn.Dropout(dropout),
-            nn.Linear(dim_internal, dim_out)
+            nn.Linear(dim_internal, dim_out),
         )
+        if output_layer:
+            self.layers.add_module("output", output_layer)
 
     def forward(self, x: Tensor) -> Tensor:
         if len(x.shape) == 1:

@@ -20,6 +20,7 @@ class SAINT(LightningModule):
     :param dim_target: if categorical represent number of classes of the target otherwise is 1
     :param config: configuration of the model
     :param pretraining: boolean flag, if True it will be executed pretraining task
+    :param mc_dropout: boolean flag, if true mc_dropout will be applied during prediction
     """
     def __init__(
             self,
@@ -28,9 +29,11 @@ class SAINT(LightningModule):
             dim_target: int,
             config: SaintConfig,
             pretraining: bool = False,
+            mc_dropout: bool = False
     ):
         super().__init__()
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
+        self.mc_dropout = mc_dropout
         self.config = config
         self.pretraining = pretraining
         self.dim_target = dim_target
@@ -53,7 +56,8 @@ class SAINT(LightningModule):
         self._define_mlp(categories)
         self._define_projection_head()
         self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, self.dim_target,
-                                 dropout=self.config.network.ff_dropout)
+                                 dropout=self.config.network.ff_dropout,
+                                 output_layer=nn.Softmax() if self.dim_target > 1 else None)
 
     def _define_transformer(self) -> None:
         """Instantiate the type of Transformed that will be used in SAINT"""
@@ -282,6 +286,10 @@ class SAINT(LightningModule):
 
     def predict_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int,
                      dataloader_idx: Optional[int] = None) -> Tensor:
+        if self.mc_dropout:
+            for m in self.modules():
+                if m.__class__.__name__.startswith('Dropout'):
+                    m.train()
         x_categ, x_cont, _ = batch
         y_pred = self(x_categ, x_cont)
         return y_pred

@@ -75,7 +75,8 @@ def test_predict():
         df_predict = df[[col for col in df.columns if col != "target"]]
         data_module.set_predict_set(df_predict)
         prediction = trainer.predict(model, datamodule=data_module)
-        df["prediction"] = torch.cat(prediction).numpy()
+        prediction = torch.cat(prediction).numpy()
+        assert prediction.shape[1] == 2
 
 
 def test_predict_unknown_categ():
@@ -96,7 +97,7 @@ def test_predict_unknown_categ():
         df_test["prediction"] = torch.cat(prediction).numpy()
 
 
-def test_train_regression():
+def test_regression():
     with initialize(config_path="."):
         cfg = compose(config_name="config")
         saint_cfg = SaintConfig(**cfg)
@@ -111,6 +112,11 @@ def test_train_regression():
         data_module.pretraining = False
         trainer = Trainer(max_epochs=1, fast_dev_run=True)
         trainer.fit(model, data_module)
+        df_predict = df[[col for col in df.columns if col != "target"]]
+        data_module.set_predict_set(df_predict)
+        prediction = trainer.predict(model, datamodule=data_module)
+        prediction = torch.cat(prediction).numpy()
+        assert prediction.shape[1] == 1
 
 
 def test_train_default_value_config():
@@ -126,3 +132,22 @@ def test_train_default_value_config():
     data_module.pretraining = False
     trainer = Trainer(max_epochs=1, fast_dev_run=True)
     trainer.fit(model, data_module)
+
+
+def test_multiclass():
+    with initialize(config_path="."):
+        cfg = compose(config_name="config")
+        saint_cfg = SaintConfig(**cfg)
+        df = pd.DataFrame({"target": ["0", "1", "1", "0", "2", "2"],
+                           "feat_cont": [2, 3, 1, 4, 5, 6], "split": ["train", "train", "validation", "val",
+                                                                "train", "validation"]})
+        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                      config=saint_cfg, dim_target=data_module.dim_target)
+        trainer = Trainer(max_epochs=1, fast_dev_run=True)
+        trainer.fit(model, data_module)
+        df_predict = df[[col for col in df.columns if col != "target"]]
+        data_module.set_predict_set(df_predict)
+        prediction = trainer.predict(model, datamodule=data_module)
+        prediction = torch.cat(prediction).numpy()
+        assert prediction.shape[1] == 3
