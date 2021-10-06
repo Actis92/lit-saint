@@ -75,7 +75,7 @@ class SAINT(LightningModule):
     def _define_embedding_layers(self) -> None:
         """Instatiate embedding layers"""
         # embed continuos variables using one different MLP for each column
-        self.embedding_continuos = nn.ModuleList([SimpleMLP(1, self.config.network.internal_dimension_embed_continuos,
+        self.embedding_continuos = nn.ModuleList([SimpleMLP(1, self.config.network.internal_dimension_embed_continuous,
                                                             self.config.network.embedding_size,
                                                             dropout=self.config.network.ff_dropout)
                                                   for _ in range(self.num_continuous)])

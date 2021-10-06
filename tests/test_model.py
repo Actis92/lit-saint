@@ -16,7 +16,7 @@ def test_train():
         saint_cfg = SaintConfig(**cfg)
         df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
                            "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
-        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
         pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
@@ -33,7 +33,7 @@ def test_train_no_continuous_columns():
         saint_cfg = SaintConfig(**cfg)
         df = pd.DataFrame({"target": ["0", "1", "1", "0"],
                            "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
-        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
         pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
@@ -50,7 +50,7 @@ def test_train_no_categorical_columns():
         saint_cfg = SaintConfig(**cfg)
         df = pd.DataFrame({"target": ["0", "1", "1", "0"],
                            "feat_cont": [2, 3, 1, 4], "split": ["train", "train", "validation", "test"]})
-        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
         pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
@@ -67,7 +67,7 @@ def test_predict():
         saint_cfg = SaintConfig(**cfg)
         df = pd.DataFrame({"target": ["0", "1", "1", "0"],
                            "feat_cont": [2, 3, 1, 4], "split": ["train", "train", "validation", "test"]})
-        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, dim_target=data_module.dim_target)
         trainer = Trainer(max_epochs=1, fast_dev_run=True)
@@ -87,7 +87,7 @@ def test_predict_unknown_categ():
                            "feat_cont": [2, 3, 1, 4], "split": ["train", "train", "validation", "test"]})
         df_test = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_categ": ["a", "c", "d", "b"],
                                 "feat_cont": [2, 3, 1, 4]})
-        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, dim_target=data_module.dim_target)
         trainer = Trainer(max_epochs=1, fast_dev_run=True)
@@ -104,7 +104,7 @@ def test_regression():
         saint_cfg = SaintConfig(**cfg)
         df = pd.DataFrame({"target": [1, 2, 3, 4], "feat_cont": [2, 3, 1, 4],
                            "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
-        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
         pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
@@ -124,7 +124,7 @@ def test_train_default_value_config():
     saint_cfg = SaintConfig()
     df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
                        "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
-    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
     model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=saint_cfg, pretraining=True, dim_target=data_module.dim_target)
     pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
@@ -142,7 +142,7 @@ def test_multiclass():
         df = pd.DataFrame({"target": ["0", "1", "1", "0", "2", "2"],
                            "feat_cont": [2, 3, 1, 4, 5, 6], "split": ["train", "train", "validation", "val",
                                                                       "train", "validation"]})
-        data_module = SaintDatamodule(df=df, target="target", split_column="split")
+        data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, dim_target=data_module.dim_target)
         trainer = Trainer(max_epochs=1, fast_dev_run=True)

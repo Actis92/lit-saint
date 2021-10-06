@@ -11,7 +11,7 @@ from src.lit_saint import SaintDatamodule
 def test_datamodule_target_categorical():
     df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
                        "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
-    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
     expected_train = pd.DataFrame({"target": [0, 1], "feat_cont": [2, 3], "feat_categ": [0, 1]})
     expected_validation = pd.DataFrame({"target": [1], "feat_cont": [1], "feat_categ": [0]})
     expected_test = pd.DataFrame({"target": [0], "feat_cont": [4], "feat_categ": [2]})
@@ -28,7 +28,7 @@ def test_datamodule_target_categorical():
 def test_datamodule_target_continuous():
     df = pd.DataFrame({"target": [1., 2., 3., 4.], "feat_cont": [2, 3, 1, 4],
                        "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
-    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
     expected_train = pd.DataFrame({"target": [1., 2.], "feat_cont": [2, 3], "feat_categ": [0, 1]})
     expected_validation = pd.DataFrame({"target": [3.], "feat_cont": [1], "feat_categ": [0]})
     expected_test = pd.DataFrame({"target": [4.], "feat_cont": [4], "feat_categ": [2]})
@@ -46,7 +46,7 @@ def test_wrong_data_types():
     df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_bool": [True, True, False, False],
                        "feat_date": [current_date, current_date, current_date, current_date],
                        "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
-    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
     expected_train = pd.DataFrame({"target": [0, 1], "feat_bool": [True, True],
                                    "feat_date": [current_date, current_date], "feat_categ": [0, 1]})
     expected_validation = pd.DataFrame({"target": [1], "feat_bool": [False],
@@ -64,7 +64,7 @@ def test_wrong_data_types():
 def test_datamodule_no_categorical_columns():
     df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
                        "split": ["train", "train", "validation", "test"]})
-    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
     expected_train = pd.DataFrame({"target": [0, 1], "feat_cont": [2, 3]})
     expected_validation = pd.DataFrame({"target": [1], "feat_cont": [1]})
     expected_test = pd.DataFrame({"target": [0], "feat_cont": [4]})
@@ -81,7 +81,7 @@ def test_datamodule_no_categorical_columns():
 def test_datamodule_no_continuous_columns():
     df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_categ": ["a", "b", "a", "c"],
                        "split": ["train", "train", "validation", "test"]})
-    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
     expected_train = pd.DataFrame({"target": [0, 1], "feat_categ": [0, 1]})
     expected_validation = pd.DataFrame({"target": [1], "feat_categ": [0]})
     expected_test = pd.DataFrame({"target": [0], "feat_categ": [2]})
@@ -98,7 +98,7 @@ def test_custom_scaler():
     df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
                        "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
     scaler = MinMaxScaler()
-    data_module = SaintDatamodule(df=df, target="target", split_column="split", scaler=scaler)
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", scaler=scaler, num_workers=0)
     expected_train = pd.DataFrame({"target": [0, 1], "feat_cont": [2, 3], "feat_categ": [0, 1]})
     expected_validation = pd.DataFrame({"target": [1], "feat_cont": [1], "feat_categ": [0]})
     expected_test = pd.DataFrame({"target": [0], "feat_cont": [4], "feat_categ": [2]})
@@ -116,7 +116,7 @@ def test_custom_scaler():
 def test_fillnan():
     df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, np.nan, 1, 4],
                        "feat_categ": ["a", "b", np.nan, "c"], "split": ["train", "train", "validation", "test"]})
-    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
     expected_train = pd.DataFrame({"target": [0, 1], "feat_cont": [2., 0.], "feat_categ": [1, 2]})
     expected_validation = pd.DataFrame({"target": [1], "feat_cont": [1.], "feat_categ": [0]})
     expected_test = pd.DataFrame({"target": [0], "feat_cont": [4.], "feat_categ": [3]})

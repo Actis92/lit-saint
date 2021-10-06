@@ -16,7 +16,8 @@ class SaintDatamodule(LightningDataModule):
     """
     NAN_LABEL = "SAINT_NAN"
 
-    def __init__(self, df: pd.DataFrame, target: str, split_column: str, data_loader_params: Dict = None,
+    def __init__(self, df: pd.DataFrame, target: str, split_column: str, num_workers: int,
+                 data_loader_params: Dict = None,
                  scaler: TransformerMixin = None, pretraining: bool = False):
         """
         :param df: contains the data that will be used by the dataLoaders
@@ -26,6 +27,7 @@ class SaintDatamodule(LightningDataModule):
         :param pretraining: boolean flag, if False it use only where the target is not NaN
         """
         super().__init__()
+        self.num_workers = num_workers
         self.target: str = target
         self.pretraining = pretraining
         self.data_loader_params = data_loader_params if data_loader_params else {"batch_size": 256}
@@ -144,7 +146,8 @@ class SaintDatamodule(LightningDataModule):
         )
         return DataLoader(
             dataset,
-            **self.data_loader_params
+            **self.data_loader_params,
+            num_workers=self.num_workers
         )
 
     def train_dataloader(self) -> DataLoader:
