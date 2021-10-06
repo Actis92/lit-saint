@@ -135,7 +135,9 @@
     <span class="n">ff_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>  <span class="c1">#: probability dropout in the feed forward layers</span>
     <span class="n">attention_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;col&#39;</span>  <span class="c1">#: type of attention can be the self attention or intersample attention</span>
     <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span>  <span class="c1">#: value used to specify the learning rate for the optimizer</span>
-    <span class="n">learning_rate_pretraining</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span>  <span class="c1">#: value used to specify the learning rate for the optimizer pretraining</span></div>
+    <span class="n">learning_rate_pretraining</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span>  <span class="c1">#: value used to specify the learning rate for the optimizer pretraining</span>
+    <span class="n">internal_dimension_output_layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1">#: internal dimension of the MLP that compute the output</span>
+    <span class="n">internal_dimension_embed_continuous</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1">#: internal dimension of the mlp used to project continuous columns</span></div>
 
 
 <div class="viewcode-block" id="SaintConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.SaintConfig">[docs]</a><span class="nd">@dataclass</span>

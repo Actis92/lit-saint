@@ -207,13 +207,15 @@
 <span class="sd">    allow to divide the tensor in 2 parts</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim_internal</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                 <span class="n">activation_module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span> <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">):</span>
+                 <span class="n">activation_module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span> <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span>
+                 <span class="n">output_layer</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param dim: dimension of embedding in input to the module</span>
 <span class="sd">        :param dim_internal: dimension after the first linear layer</span>
 <span class="sd">        :param dim_out: output dimension</span>
 <span class="sd">        :param activation_module: module with the activation function to use between the 2 linear layers</span>
 <span class="sd">        :param dropout: probability used in the dropout layer</span>
+<span class="sd">        :param output_layer: if to add a nonlinear activation function after the final Linear Layer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">mult</span> <span class="o">=</span> <span class="mi">1</span>
@@ -224,8 +226,10 @@
             <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim_internal</span> <span class="o">*</span> <span class="n">mult</span><span class="p">),</span>
             <span class="n">activation_module</span><span class="p">,</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_internal</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">)</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_internal</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="n">output_layer</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="n">output_layer</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SimpleMLP.forward"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.modules.SimpleMLP.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -237,16 +241,18 @@
 <div class="viewcode-block" id="SepMLP"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.modules.SepMLP">[docs]</a><span class="k">class</span> <span class="nc">SepMLP</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Module that implements a separable MLP, this means that for each feature is used a different SimpleMLP</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim_out_for_each_feat</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim_out_for_each_feat</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param dim: dimension of embedding in input to the module</span>
 <span class="sd">        :param dim_out_for_each_feat: output dimension for each SimpleMLP</span>
+<span class="sd">        :param dropout: probability used in the dropout layer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">len_feats</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim_out_for_each_feat</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([])</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">len_feats</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SimpleMLP</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim_internal</span><span class="o">=</span><span class="mi">5</span> <span class="o">*</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_out</span><span class="o">=</span><span class="n">dim_out_for_each_feat</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SimpleMLP</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim_internal</span><span class="o">=</span><span class="mi">5</span> <span class="o">*</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_out</span><span class="o">=</span><span class="n">dim_out_for_each_feat</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                         <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">))</span>
 
 <div class="viewcode-block" id="SepMLP.forward"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.modules.SepMLP.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([])</span>

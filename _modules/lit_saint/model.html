@@ -71,6 +71,7 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">f</span>
+<span class="kn">from</span> <span class="nn">einops</span> <span class="k">import</span> <span class="n">rearrange</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.core</span> <span class="k">import</span> <span class="n">LightningModule</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">Tensor</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -89,6 +90,7 @@
 <span class="sd">    :param dim_target: if categorical represent number of classes of the target otherwise is 1</span>
 <span class="sd">    :param config: configuration of the model</span>
 <span class="sd">    :param pretraining: boolean flag, if True it will be executed pretraining task</span>
+<span class="sd">    :param mc_dropout: boolean flag, if true mc_dropout will be applied during prediction</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -97,9 +99,11 @@
             <span class="n">dim_target</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">SaintConfig</span><span class="p">,</span>
             <span class="n">pretraining</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">mc_dropout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">categories</span><span class="p">)),</span> <span class="s1">&#39;number of each category must be positive&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mc_dropout</span> <span class="o">=</span> <span class="n">mc_dropout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pretraining</span> <span class="o">=</span> <span class="n">pretraining</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span> <span class="o">=</span> <span class="n">dim_target</span>
@@ -121,7 +125,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_define_transformer</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_define_mlp</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_define_projection_head</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mlpfory</span> <span class="o">=</span> <span class="n">SimpleMLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlpfory</span> <span class="o">=</span> <span class="n">SimpleMLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span><span class="p">,</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">internal_dimension_output_layer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span><span class="p">,</span>
+                                 <span class="n">dropout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">ff_dropout</span><span class="p">,</span>
+                                 <span class="n">output_layer</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_define_transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Instantiate the type of Transformed that will be used in SAINT&quot;&quot;&quot;</span>
@@ -137,7 +144,9 @@
     <span class="k">def</span> <span class="nf">_define_embedding_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Instatiate embedding layers&quot;&quot;&quot;</span>
         <span class="c1"># embed continuos variables using one different MLP for each column</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_continuos</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">SimpleMLP</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_continuos</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">SimpleMLP</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">internal_dimension_embed_continuos</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span><span class="p">,</span>
+                                                            <span class="n">dropout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">ff_dropout</span><span class="p">)</span>
                                                   <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_continuous</span><span class="p">)])</span>
         <span class="c1"># embedding layer categorical columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding_categorical</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_unique_categories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span><span class="p">)</span>
@@ -152,10 +161,12 @@
         <span class="sd">&quot;&quot;&quot;Define projection heads for contrastive learning&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pt_mlp</span> <span class="o">=</span> <span class="n">SimpleMLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span><span class="p">,</span>
                                 <span class="mi">6</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span> <span class="o">//</span> <span class="mi">5</span><span class="p">,</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                                <span class="n">dropout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">ff_dropout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pt_mlp2</span> <span class="o">=</span> <span class="n">SimpleMLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span><span class="p">,</span>
                                  <span class="mi">6</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span> <span class="o">//</span> <span class="mi">5</span><span class="p">,</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                                 <span class="n">dropout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">ff_dropout</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_embed_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_categ</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Converts categorical and continuous values in embeddings</span>
@@ -295,8 +306,8 @@
         <span class="n">reps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span><span class="p">(</span><span class="n">x_categ_enc</span><span class="p">,</span> <span class="n">x_cont_enc</span><span class="p">)</span>
         <span class="c1"># select only the representations corresponding to y and apply mlp on it</span>
         <span class="c1"># in the next step to get the predictions.</span>
-        <span class="n">y_reps</span> <span class="o">=</span> <span class="n">reps</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_categories</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="n">y_outs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlpfory</span><span class="p">(</span><span class="n">y_reps</span><span class="p">)</span>
+        <span class="n">reps</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">reps</span><span class="p">,</span> <span class="s1">&#39;b h n -&gt; b (h n)&#39;</span><span class="p">)</span>
+        <span class="n">y_outs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlpfory</span><span class="p">(</span><span class="n">reps</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">y_outs</span></div>
 
 <div class="viewcode-block" id="SAINT.pretraining_step"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.model.SAINT.pretraining_step">[docs]</a>    <span class="k">def</span> <span class="nf">pretraining_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_categ</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -326,7 +337,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classification_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classification_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">loss</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regression_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></div>
 
@@ -347,10 +359,13 @@
 
 <div class="viewcode-block" id="SAINT.predict_step"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.model.SAINT.predict_step">[docs]</a>    <span class="k">def</span> <span class="nf">predict_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                      <span class="n">dataloader_idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_dropout</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Dropout&#39;</span><span class="p">):</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
         <span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">batch</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x_categ</span><span class="p">,</span> <span class="n">x_cont</span><span class="p">)</span>
-        <span class="c1"># return the class that has the greatest probability</span>
-        <span class="k">return</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_target</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">y_pred</span></div>
+        <span class="k">return</span> <span class="n">y_pred</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_classification_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -359,6 +374,7 @@
 <span class="sd">        :param y_pred: Values predicted</span>
 <span class="sd">        :param target: Values to predict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
