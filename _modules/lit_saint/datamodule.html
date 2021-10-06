@@ -85,7 +85,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">NAN_LABEL</span> <span class="o">=</span> <span class="s2">&quot;SAINT_NAN&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">split_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_loader_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">split_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">data_loader_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">scaler</span><span class="p">:</span> <span class="n">TransformerMixin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pretraining</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param df: contains the data that will be used by the dataLoaders</span>
@@ -95,6 +96,7 @@
 <span class="sd">        :param pretraining: boolean flag, if False it use only where the target is not NaN</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pretraining</span> <span class="o">=</span> <span class="n">pretraining</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_loader_params</span> <span class="o">=</span> <span class="n">data_loader_params</span> <span class="k">if</span> <span class="n">data_loader_params</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">}</span>
@@ -213,7 +215,8 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
             <span class="n">dataset</span><span class="p">,</span>
-            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_loader_params</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_loader_params</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="SaintDatamodule.train_dataloader"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.datamodule.SaintDatamodule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
