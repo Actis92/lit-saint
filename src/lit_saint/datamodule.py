@@ -77,8 +77,6 @@ class SaintDatamodule(LightningDataModule):
                 col_not_to_use.append(col)
         if len(self.categorical_columns) == 0:
             self.categorical_dims.append(1)
-        # add dim for column used for prediction initialized with all zeros
-        self.categorical_dims.append(1)
         print("The following cols will not be used because they have a not supported data type: ", col_not_to_use)
         self._split_data(df=df, split_column=split_column)
         self.scaler_continuous_columns(df=df, split_column=split_column)

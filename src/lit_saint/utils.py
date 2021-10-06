@@ -8,6 +8,14 @@ from lit_saint import SaintDatamodule, SAINT
 
 def pretraining_and_training_model(data_module: SaintDatamodule, model: SAINT, pretrainer: Trainer=None,
                                    trainer: Trainer = None) -> [SAINT, Trainer]:
+    """Tis utility allow to execute the pretraining step and the training one or only one of them
+
+    :param data_module:
+    :param model:
+    :param pretrainer:
+    :param trainer:
+    :return:
+    """
     if pretrainer:
         pretrainer.fit(model, data_module)
     model.pretraining = False
@@ -20,6 +28,15 @@ def pretraining_and_training_model(data_module: SaintDatamodule, model: SAINT, p
 
 def mc_dropout(data_module: SaintDatamodule, model: SAINT, trainer: Trainer, n_iterations: int,
                df: pd.DataFrame) -> Tensor:
+    """
+
+    :param data_module:
+    :param model:
+    :param trainer:
+    :param n_iterations:
+    :param df:
+    :return:
+    """
     data_module.set_predict_set(df)
     model.mc_dropout = True
     mc_predictions = []

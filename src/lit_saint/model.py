@@ -2,6 +2,7 @@ from typing import List, Tuple, Optional
 
 import torch
 import torch.nn.functional as f
+from einops import rearrange
 from pytorch_lightning.core import LightningModule
 from torch import nn, Tensor
 import numpy as np
@@ -55,7 +56,8 @@ class SAINT(LightningModule):
         self._define_transformer()
         self._define_mlp(categories)
         self._define_projection_head()
-        self.mlpfory = SimpleMLP(self.config.network.embedding_size, 1000, self.dim_target,
+        self.mlpfory = SimpleMLP(self.config.network.embedding_size * self.num_columns,
+                                 self.config.network.internal_dimension_output_layer, self.dim_target,
                                  dropout=self.config.network.ff_dropout,
                                  output_layer=nn.Softmax() if self.dim_target > 1 else None)
 
@@ -73,7 +75,8 @@ class SAINT(LightningModule):
     def _define_embedding_layers(self) -> None:
         """Instatiate embedding layers"""
         # embed continuos variables using one different MLP for each column
-        self.embedding_continuos = nn.ModuleList([SimpleMLP(1, 100, self.config.network.embedding_size,
+        self.embedding_continuos = nn.ModuleList([SimpleMLP(1, self.config.network.internal_dimension_embed_continuos,
+                                                            self.config.network.embedding_size,
                                                             dropout=self.config.network.ff_dropout)
                                                   for _ in range(self.num_continuous)])
         # embedding layer categorical columns
@@ -234,8 +237,8 @@ class SAINT(LightningModule):
         reps = self.transformer(x_categ_enc, x_cont_enc)
         # select only the representations corresponding to y and apply mlp on it
         # in the next step to get the predictions.
-        y_reps = reps[:, self.num_categories - 1, :]
-        y_outs = self.mlpfory(y_reps)
+        reps = rearrange(reps, 'b h n -> b (h n)')
+        y_outs = self.mlpfory(reps)
         return y_outs
 
     def pretraining_step(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
@@ -265,7 +268,8 @@ class SAINT(LightningModule):
         else:
             y_pred = self(x_categ, x_cont)
             if self.dim_target > 1:
-                return self._classification_loss(y_pred, target)
+                loss = self._classification_loss(y_pred, target)
+                return loss
             else:
                 return self._regression_loss(y_pred, target)
 
@@ -301,6 +305,7 @@ class SAINT(LightningModule):
         :param y_pred: Values predicted
         :param target: Values to predict
         """
+        nn.CrossEntropyLoss()
         return f.cross_entropy(y_pred, target)
 
     @staticmethod
