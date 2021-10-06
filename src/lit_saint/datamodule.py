@@ -1,7 +1,5 @@
-import os
 from typing import Dict
 
-import numpy as np
 from pytorch_lightning import LightningDataModule
 import pandas as pd
 from sklearn.base import TransformerMixin
@@ -56,7 +54,7 @@ class SaintDatamodule(LightningDataModule):
                 if df[col].isna().any():  # the columns contains nan
                     df[col] = df[col].fillna(self.NAN_LABEL)
                 if col != split_column:
-                    l_enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
+                    l_enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=df[col].nunique())
                     df[col] = l_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
                     self.dict_label_encoder[col] = l_enc
                     if col == self.target:
@@ -115,7 +113,7 @@ class SaintDatamodule(LightningDataModule):
             if col != self.target or (col == self.target and col in df.columns):
                 if df[col].isna().any():  # the columns contains nan
                     df[col] = df[col].fillna(self.NAN_LABEL)
-                df[col] = label_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
+                df[col] = label_enc.transform(df[col].values.reshape(-1, 1)).astype(int)
         df = df.fillna(0)
         self.predict_set = df
 

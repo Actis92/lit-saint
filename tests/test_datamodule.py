@@ -21,7 +21,7 @@ def test_datamodule_target_categorical():
     assert data_module.categorical_columns == ["feat_categ"]
     assert data_module.numerical_columns == ["feat_cont"]
     # the target is always the last column and added one category in order to handling unknown
-    assert data_module.categorical_dims == [4, 1]
+    assert data_module.categorical_dims == [4]
     check_is_fitted(data_module.scaler)
 
 
@@ -37,7 +37,7 @@ def test_datamodule_target_continuous():
     pd.testing.assert_frame_equal(data_module.test, expected_test)
     assert data_module.categorical_columns == ["feat_categ"]
     assert data_module.numerical_columns == ["feat_cont"]
-    assert data_module.categorical_dims == [4, 1]
+    assert data_module.categorical_dims == [4]
     check_is_fitted(data_module.scaler)
 
 
@@ -58,7 +58,7 @@ def test_wrong_data_types():
     pd.testing.assert_frame_equal(data_module.test, expected_test)
     assert data_module.categorical_columns == ["feat_categ"]
     assert data_module.numerical_columns == []
-    assert data_module.categorical_dims == [4, 1]
+    assert data_module.categorical_dims == [4]
 
 
 def test_datamodule_no_categorical_columns():
@@ -74,7 +74,7 @@ def test_datamodule_no_categorical_columns():
     assert data_module.categorical_columns == []
     assert data_module.numerical_columns == ["feat_cont"]
     # the target is always the last column
-    assert data_module.categorical_dims == [1, 1]
+    assert data_module.categorical_dims == [1]
     check_is_fitted(data_module.scaler)
 
 
@@ -91,7 +91,7 @@ def test_datamodule_no_continuous_columns():
     assert data_module.categorical_columns == ["feat_categ"]
     assert data_module.numerical_columns == []
     # the target is always the last column
-    assert data_module.categorical_dims == [4, 1]
+    assert data_module.categorical_dims == [4]
 
 
 def test_custom_scaler():
@@ -108,7 +108,7 @@ def test_custom_scaler():
     assert data_module.categorical_columns == ["feat_categ"]
     assert data_module.numerical_columns == ["feat_cont"]
     # the target is always the last column
-    assert data_module.categorical_dims == [4, 1]
+    assert data_module.categorical_dims == [4]
     check_is_fitted(data_module.scaler)
     assert data_module.scaler.__class__.__name__ == scaler.__class__.__name__
 
@@ -126,5 +126,5 @@ def test_fillnan():
     assert data_module.categorical_columns == ["feat_categ"]
     assert data_module.numerical_columns == ["feat_cont"]
     # the target is always the last column
-    assert data_module.categorical_dims == [5, 1]
+    assert data_module.categorical_dims == [5]
     check_is_fitted(data_module.scaler)

@@ -6,7 +6,7 @@ from torch import Tensor
 from lit_saint import SaintDatamodule, SAINT
 
 
-def pretraining_and_training_model(data_module: SaintDatamodule, model: SAINT, pretrainer: Trainer=None,
+def pretraining_and_training_model(data_module: SaintDatamodule, model: SAINT, pretrainer: Trainer = None,
                                    trainer: Trainer = None) -> [SAINT, Trainer]:
     """Tis utility allow to execute the pretraining step and the training one or only one of them
 

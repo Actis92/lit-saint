@@ -94,7 +94,8 @@ def test_predict_unknown_categ():
         trainer.fit(model, data_module)
         data_module.set_predict_set(df_test)
         prediction = trainer.predict(model, datamodule=data_module)
-        df_test["prediction"] = torch.cat(prediction).numpy()
+        prediction = torch.cat(prediction).numpy()
+        assert prediction.shape[1] == 2
 
 
 def test_regression():
@@ -140,7 +141,7 @@ def test_multiclass():
         saint_cfg = SaintConfig(**cfg)
         df = pd.DataFrame({"target": ["0", "1", "1", "0", "2", "2"],
                            "feat_cont": [2, 3, 1, 4, 5, 6], "split": ["train", "train", "validation", "val",
-                                                                "train", "validation"]})
+                                                                      "train", "validation"]})
         data_module = SaintDatamodule(df=df, target="target", split_column="split")
         model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                       config=saint_cfg, dim_target=data_module.dim_target)
