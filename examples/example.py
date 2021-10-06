@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import numpy as np
 import torch
 import wget
 from hydra.core.config_store import ConfigStore
@@ -12,9 +13,10 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from hydra.utils import get_original_cwd
-from pytorch_lightning import Trainer
+from pytorch_lightning import Trainer, seed_everything
 
 from src.lit_saint import SAINT, SaintConfig, SaintDatamodule
+from src.lit_saint.utils import pretraining_and_training_model
 
 cs = ConfigStore.instance()
 # Registering the Config class with the name 'config'.
@@ -23,7 +25,8 @@ cs.store(name="base_config", node=SaintConfig)
 
 @hydra.main(config_path=".", config_name="config")
 def read_config(cfg: SaintConfig) -> None:
-    df = pd.read_csv(get_original_cwd() + "/data/adult.csv")
+    seed_everything(42, workers=True)
+    df = pd.read_csv(get_original_cwd() + "/data/adult.csv", header=None)
     df_train, df_test = train_test_split(df, test_size=0.10, random_state=42)
     df_train, df_val = train_test_split(df_train, test_size=0.10, random_state=42)
     df_train["split"] = "train"
@@ -32,19 +35,13 @@ def read_config(cfg: SaintConfig) -> None:
     data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split", pretraining=True)
     model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, pretraining=True, dim_target=data_module.dim_target)
-    pretrainer = Trainer(max_epochs=1, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
-    pretrainer.fit(model, data_module)
-    model.pretraining = False
-    data_module.pretraining = False
-    trainer = Trainer(max_epochs=1, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
-    trainer.fit(model, data_module)
+    pretrainer = Trainer(max_epochs=3, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
+    trainer = Trainer(max_epochs=10, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)],
+                      deterministic=True)
+    pretraining_and_training_model(data_module, model, pretrainer, trainer)
     data_module.set_predict_set(df_test)
-    for m in model.modules():
-        if m.__class__.__name__.startswith('Dropout'):
-            m.train()
     prediction = trainer.predict(model, datamodule=data_module)
-    prediction2 = trainer.predict(model, datamodule=data_module)
-    df_test["prediction"] = torch.cat(prediction).numpy()
+    df_test["prediction"] = np.argmax(torch.cat(prediction).numpy(), axis=1)
     print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
 
 

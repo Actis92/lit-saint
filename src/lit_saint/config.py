@@ -67,8 +67,8 @@ class NetworkConfig:
     attention_type: str = 'col'  #: type of attention can be the self attention or intersample attention
     learning_rate: float = 0.03  #: value used to specify the learning rate for the optimizer
     learning_rate_pretraining: float = 0.03  #: value used to specify the learning rate for the optimizer pretraining
-    internal_dimension_output_layer: int = 20
-    internal_dimension_embed_continuos: int = 100
+    internal_dimension_output_layer: int = 20  #: internal dimension of the MLP that compute the output
+    internal_dimension_embed_continuous: int = 100  #: internal dimension of the mlp used to project continuous columns
 
 
 @dataclass

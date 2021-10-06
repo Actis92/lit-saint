@@ -6,8 +6,8 @@ network:
   heads: 1
   ff_dropout: 0.2
   attention_type:  'col'
-  learning_rate: 0.01
-  learning_rate_pretraining: 0.01
+  learning_rate: 0.03
+  learning_rate_pretraining: 0.03
 pretrain:
   aug:
     cutmix:
