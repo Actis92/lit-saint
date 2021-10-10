@@ -58,8 +58,7 @@ class SAINT(LightningModule):
         self._define_projection_head()
         self.mlpfory = SimpleMLP(self.config.network.embedding_size * self.num_columns,
                                  self.config.network.internal_dimension_output_layer, self.dim_target,
-                                 dropout=self.config.network.ff_dropout,
-                                 output_layer=nn.Softmax() if self.dim_target > 1 else None)
+                                 dropout=self.config.network.ff_dropout)
 
     def _define_transformer(self) -> None:
         """Instantiate the type of Transformed that will be used in SAINT"""
@@ -235,8 +234,6 @@ class SAINT(LightningModule):
     def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
         x_categ_enc, x_cont_enc = self._embed_data(x_categ, x_cont)
         reps = self.transformer(x_categ_enc, x_cont_enc)
-        # select only the representations corresponding to y and apply mlp on it
-        # in the next step to get the predictions.
         reps = rearrange(reps, 'b h n -> b (h n)')
         y_outs = self.mlpfory(reps)
         return y_outs
@@ -296,7 +293,10 @@ class SAINT(LightningModule):
                     m.train()
         x_categ, x_cont, _ = batch
         y_pred = self(x_categ, x_cont)
-        return y_pred
+        if self.dim_target > 1:
+            return nn.Softmax(dim=-1)(y_pred)
+        else:
+            return y_pred
 
     @staticmethod
     def _classification_loss(y_pred: Tensor, target: Tensor) -> Tensor:
@@ -305,7 +305,6 @@ class SAINT(LightningModule):
         :param y_pred: Values predicted
         :param target: Values to predict
         """
-        nn.CrossEntropyLoss()
         return f.cross_entropy(y_pred, target)
 
     @staticmethod

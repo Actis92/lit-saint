@@ -17,10 +17,12 @@ def pretraining_and_training_model(data_module: SaintDatamodule, model: SAINT, p
     :return:
     """
     if pretrainer:
+        model.pretraining = True
+        data_module.pretraining = True
         pretrainer.fit(model, data_module)
-    model.pretraining = False
-    data_module.pretraining = False
     if trainer:
+        model.pretraining = False
+        data_module.pretraining = False
         trainer.fit(model, data_module)
         return model, trainer
     return model, pretrainer

@@ -61,7 +61,7 @@ class PreTrainConfig:
 @dataclass
 class NetworkConfig:
     """Define the neural network parameters"""
-    num_workers: int = os.cpu_count()  #: number of cores to use
+    num_workers: int = 0  #: number of cores to use
     embedding_size: int = 10  #: dimension of computed embeddings
     depth: int = 3  #: number of attention blocks used in the transformer
     heads: int = 1  #: number of heads used in the transformer

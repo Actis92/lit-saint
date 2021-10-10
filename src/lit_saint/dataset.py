@@ -69,5 +69,4 @@ class SaintDataset(Dataset):
 
         :param idx: numeric index of the data that we want to process
         """
-        return self.X_categorical[idx], self.X_continuos[idx],\
-            self.y[idx]
+        return self.X_categorical[idx], self.X_continuos[idx], self.y[idx]
