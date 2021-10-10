@@ -1,11 +1,11 @@
 network:
-  num_workers: 1
+  num_workers: 0
   embedding_size: 20
-  depth: 1
+  depth: 2
   heads: 1
   ff_dropout: .0
   attention_type: col
-  learning_rate: 0.001
+  learning_rate: 0.0001
   learning_rate_pretraining: 0.03
   internal_dimension_output_layer: 10
   internal_dimension_embed_continuous: 10

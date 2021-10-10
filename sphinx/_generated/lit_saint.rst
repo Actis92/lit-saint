@@ -52,6 +52,22 @@ lit\_saint.modules module
    :undoc-members:
    :show-inheritance:
 
+lit\_saint.utils module
+-----------------------
+
+.. automodule:: lit_saint.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+lit\_saint.version module
+-------------------------
+
+.. automodule:: lit_saint.version
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

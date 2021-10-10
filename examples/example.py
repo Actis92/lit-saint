@@ -9,6 +9,7 @@ from hydra.core.config_store import ConfigStore
 import pandas as pd
 
 import hydra
+from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
@@ -36,10 +37,18 @@ def read_config(cfg: SaintConfig) -> None:
                                   num_workers=cfg.network.num_workers)
     model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, dim_target=data_module.dim_target)
-    pretrainer = Trainer(max_epochs=4, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)])
-    trainer = Trainer(max_epochs=3, callbacks=[EarlyStopping(monitor="validation_loss", min_delta=0.00, patience=3)],
+    checkpoint_callback = ModelCheckpoint(
+        monitor="val_loss",
+        dirpath=".",
+        filename="saint-{epoch:02d}-{val_loss:.2f}",
+        mode="min",
+    )
+    early_stopping_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=3)
+
+    pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback, early_stopping_callback])
+    trainer = Trainer(max_epochs=5, callbacks=[checkpoint_callback, early_stopping_callback],
                       deterministic=True)
-    pretraining_and_training_model(data_module, model, pretrainer, trainer)
+    model, trainer = pretraining_and_training_model(data_module, model, pretrainer, trainer)
     data_module.set_predict_set(df_test)
     prediction = trainer.predict(model, datamodule=data_module)
     df_test["prediction"] = np.argmax(torch.cat(prediction).numpy(), axis=1)

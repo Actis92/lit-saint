@@ -33,6 +33,7 @@ class SAINT(LightningModule):
             mc_dropout: bool = False
     ):
         super().__init__()
+        self.save_hyperparameters()
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
         self.mc_dropout = mc_dropout
         self.config = config
@@ -277,7 +278,7 @@ class SAINT(LightningModule):
 
     def validation_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
         loss = self.shared_step(batch)
-        self.log("validation_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def test_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
