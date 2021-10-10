@@ -49,6 +49,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.dataset">lit_saint.dataset module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.model">lit_saint.model module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.modules">lit_saint.modules module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.utils">lit_saint.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.version">lit_saint.version module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint">Module contents</a></li>
 </ul>
 </li>
@@ -244,7 +246,7 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.NetworkConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">NetworkConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'col'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate_pretraining</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_dimension_output_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_dimension_embed_continuous</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#NetworkConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.NetworkConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">NetworkConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'col'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate_pretraining</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_dimension_output_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_dimension_embed_continuous</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#NetworkConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.NetworkConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define the neural network parameters</p>
 <dl class="py attribute">
@@ -303,7 +305,7 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.num_workers">
-<span class="sig-name descname"><span class="pre">num_workers</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.num_workers" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">num_workers</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.num_workers" title="Permalink to this definition"></a></dt>
 <dd><p>number of cores to use</p>
 </dd></dl>
 
@@ -350,12 +352,12 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.SaintConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">SaintConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NetworkConfig(num_workers=2,</span> <span class="pre">embedding_size=10,</span> <span class="pre">depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">ff_dropout=0.0,</span> <span class="pre">attention_type='col',</span> <span class="pre">learning_rate=0.03,</span> <span class="pre">learning_rate_pretraining=0.03,</span> <span class="pre">internal_dimension_output_layer=20,</span> <span class="pre">internal_dimension_embed_continuous=100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PreTrainConfig(aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1),</span> <span class="pre">mixup=MixUpConfig(lam=0.1)),</span> <span class="pre">task=PreTrainTaskConfig(contrastive=None,</span> <span class="pre">contrastive_sim=ConstrastiveSimConfig(weight=0.1),</span> <span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5)))</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#SaintConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.SaintConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">SaintConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NetworkConfig(num_workers=0,</span> <span class="pre">embedding_size=10,</span> <span class="pre">depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">ff_dropout=0.0,</span> <span class="pre">attention_type='col',</span> <span class="pre">learning_rate=0.03,</span> <span class="pre">learning_rate_pretraining=0.03,</span> <span class="pre">internal_dimension_output_layer=20,</span> <span class="pre">internal_dimension_embed_continuous=100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PreTrainConfig(aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1),</span> <span class="pre">mixup=MixUpConfig(lam=0.1)),</span> <span class="pre">task=PreTrainTaskConfig(contrastive=None,</span> <span class="pre">contrastive_sim=ConstrastiveSimConfig(weight=0.1),</span> <span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5)))</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#SaintConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.SaintConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define all the parameters used in SAINT</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.SaintConfig.network">
-<span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.NetworkConfig" title="lit_saint.config.NetworkConfig"><span class="pre">lit_saint.config.NetworkConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">NetworkConfig(num_workers=2,</span> <span class="pre">embedding_size=10,</span> <span class="pre">depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">ff_dropout=0.0,</span> <span class="pre">attention_type='col',</span> <span class="pre">learning_rate=0.03,</span> <span class="pre">learning_rate_pretraining=0.03,</span> <span class="pre">internal_dimension_output_layer=20,</span> <span class="pre">internal_dimension_embed_continuous=100)</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.network" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.NetworkConfig" title="lit_saint.config.NetworkConfig"><span class="pre">lit_saint.config.NetworkConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">NetworkConfig(num_workers=0,</span> <span class="pre">embedding_size=10,</span> <span class="pre">depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">ff_dropout=0.0,</span> <span class="pre">attention_type='col',</span> <span class="pre">learning_rate=0.03,</span> <span class="pre">learning_rate_pretraining=0.03,</span> <span class="pre">internal_dimension_output_layer=20,</span> <span class="pre">internal_dimension_embed_continuous=100)</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.network" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1309,7 +1311,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.modules.SimpleMLP">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.modules.</span></span><span class="sig-name descname"><span class="pre">SimpleMLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_internal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation_module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ReLU()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/modules.html#SimpleMLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.modules.SimpleMLP" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.modules.</span></span><span class="sig-name descname"><span class="pre">SimpleMLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_internal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation_module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ReLU()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/modules.html#SimpleMLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.modules.SimpleMLP" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <p>Module that implements a MLP that consists of 2 linear layers with an activation layer
 and dropout in between them. In case of GEGLU activation function, there is a multiplier that
@@ -1322,7 +1324,6 @@ allow to divide the tensor in 2 parts</p>
 <li><p><strong>dim_out</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – output dimension</p></li>
 <li><p><strong>activation_module</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>) – module with the activation function to use between the 2 linear layers</p></li>
 <li><p><strong>dropout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – probability used in the dropout layer</p></li>
-<li><p><strong>output_layer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>]) – if to add a nonlinear activation function after the final Linear Layer</p></li>
 </ul>
 </dd>
 </dl>
@@ -1352,6 +1353,56 @@ registered hooks while the latter silently ignores them.</p>
 
 </dd></dl>
 
+</section>
+<section id="module-lit_saint.utils">
+<span id="lit-saint-utils-module"></span><h2>lit_saint.utils module<a class="headerlink" href="#module-lit_saint.utils" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="lit_saint.utils.mc_dropout">
+<span class="sig-prename descclassname"><span class="pre">lit_saint.utils.</span></span><span class="sig-name descname"><span class="pre">mc_dropout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/utils.html#mc_dropout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.utils.mc_dropout" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_module</strong> (<a class="reference internal" href="#lit_saint.datamodule.SaintDatamodule" title="lit_saint.datamodule.SaintDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintDatamodule</span></code></a>) – </p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="#lit_saint.model.SAINT" title="lit_saint.model.SAINT"><code class="xref py py-class docutils literal notranslate"><span class="pre">SAINT</span></code></a>) – </p></li>
+<li><p><strong>trainer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>) – </p></li>
+<li><p><strong>n_iterations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lit_saint.utils.pretraining_and_training_model">
+<span class="sig-prename descclassname"><span class="pre">lit_saint.utils.</span></span><span class="sig-name descname"><span class="pre">pretraining_and_training_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrainer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/utils.html#pretraining_and_training_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.utils.pretraining_and_training_model" title="Permalink to this definition"></a></dt>
+<dd><p>Tis utility allow to execute the pretraining step and the training one or only one of them</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_module</strong> (<a class="reference internal" href="#lit_saint.datamodule.SaintDatamodule" title="lit_saint.datamodule.SaintDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintDatamodule</span></code></a>) – </p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="#lit_saint.model.SAINT" title="lit_saint.model.SAINT"><code class="xref py py-class docutils literal notranslate"><span class="pre">SAINT</span></code></a>) – </p></li>
+<li><p><strong>pretrainer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>]) – </p></li>
+<li><p><strong>trainer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>[&lt;class ‘lit_saint.model.SAINT’&gt;, &lt;class ‘pytorch_lightning.trainer.trainer.Trainer’&gt;]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-lit_saint.version">
+<span id="lit-saint-version-module"></span><h2>lit_saint.version module<a class="headerlink" href="#module-lit_saint.version" title="Permalink to this headline"></a></h2>
 </section>
 <section id="module-lit_saint">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-lit_saint" title="Permalink to this headline"></a></h2>
