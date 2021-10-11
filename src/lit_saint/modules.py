@@ -45,7 +45,7 @@ class GEGLU(nn.Module):
 
 class Attention(nn.Module):
     """Module that implements self attention"""
-    def __init__(self, dim: int, heads: int = 8, dim_head: int = 16):
+    def __init__(self, dim: int, heads: int, dim_head: int):
         """
         :param dim: dimension embedding used in input
         :param heads: number of heads for the Multi Head Attention
@@ -75,13 +75,20 @@ class Attention(nn.Module):
 
 class RowColTransformer(nn.Module):
     """Module use to define RowColTransformer"""
-    def __init__(self, dim: int, nfeats: int, depth: int, heads: int, ff_dropout: float, style: str = 'col'):
+    def __init__(self, dim: int, nfeats: int, depth: int, heads: int, dim_head: int,
+                 ff_dropout: float, scale_dim_internal_col: float,
+                 scale_dim_internal_row: float, style: str):
         """
         :param dim: dimension of embedding in input to the module
         :param nfeats: total number of features, needed for the intersample attention
         :param depth: depth of the network, this imply how many times is applied the attention
         :param heads: number of heads for the Multi Head Attention
+        :param dim_head: dimension of embedding used in each head
         :param ff_dropout: probability used in the dropout layer of the feed forward layers applied after the attention
+        :param scale_dim_internal_col: scale factor input dimension in order to obtain the output dimension of the
+        first linear layer in case of style col
+        :param scale_dim_internal_row: scale factor input dimension in order to obtain the output dimension of the
+        first linear layer in case of style row
         :param style: can be col, row, or colrow
         """
         super().__init__()
@@ -90,14 +97,16 @@ class RowColTransformer(nn.Module):
         for i in range(depth):
             if "col" in self.style:
                 self.layers[i].extend(nn.ModuleList([
-                    PreNorm(dim, Residual(Attention(dim, heads=heads, dim_head=64))),
-                    PreNorm(dim, Residual(SimpleMLP(dim, dim * 4, dim, GEGLU(), dropout=ff_dropout)))
+                    PreNorm(dim, Residual(Attention(dim, heads=heads, dim_head=dim_head))),
+                    PreNorm(dim, Residual(SimpleMLP(dim, int(dim * scale_dim_internal_col),
+                                                    dim, GEGLU(), dropout=ff_dropout)))
                 ]))
             if "row" in self.style:
                 self.layers[i].extend(nn.ModuleList([
-                    PreNorm(dim * nfeats, Residual(Attention(dim * nfeats, heads=heads, dim_head=64))),
-                    PreNorm(dim * nfeats, Residual(SimpleMLP(dim * nfeats, dim * nfeats * 4, dim * nfeats, GEGLU(),
-                                                             dropout=ff_dropout))),
+                    PreNorm(dim * nfeats, Residual(Attention(dim * nfeats, heads=heads, dim_head=dim_head))),
+                    PreNorm(dim * nfeats, Residual(SimpleMLP(dim * nfeats,
+                                                             int(dim * nfeats * scale_dim_internal_row),
+                                                             dim * nfeats, GEGLU(), dropout=ff_dropout))),
                 ]))
 
     @staticmethod
@@ -168,17 +177,20 @@ class SimpleMLP(nn.Module):
 class SepMLP(nn.Module):
     """Module that implements a separable MLP, this means that for each feature is used a different SimpleMLP
     """
-    def __init__(self, dim: int, dim_out_for_each_feat: List[int], dropout: float = .0):
+    def __init__(self, dim: int, dim_out_for_each_feat: List[int], scale_dim_internal: float, dropout: float = .0):
         """
         :param dim: dimension of embedding in input to the module
         :param dim_out_for_each_feat: output dimension for each SimpleMLP
+        :param scale_dim_internal: scale factor input dimension in order to obtain the output dimension of the
+        first linear layer
         :param dropout: probability used in the dropout layer
         """
         super().__init__()
         self.len_feats = len(dim_out_for_each_feat)
         self.layers = nn.ModuleList([])
         for i in range(self.len_feats):
-            self.layers.append(SimpleMLP(dim=dim, dim_internal=5 * dim, dim_out=dim_out_for_each_feat[i],
+            self.layers.append(SimpleMLP(dim=dim, dim_internal=int(dim * scale_dim_internal),
+                                         dim_out=dim_out_for_each_feat[i],
                                          dropout=dropout))
 
     def forward(self, x: Tensor) -> List[Tensor]:

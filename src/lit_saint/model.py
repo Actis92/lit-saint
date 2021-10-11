@@ -68,8 +68,11 @@ class SAINT(LightningModule):
             nfeats=self.num_categories + self.num_continuous,
             depth=self.config.network.depth,
             heads=self.config.network.heads,
+            dim_head=self.config.network.dim_head,
             ff_dropout=self.config.network.ff_dropout,
-            style=self.config.network.attention_type
+            style=self.config.network.attention_type,
+            scale_dim_internal_col=self.config.network.scale_dim_internal_col,
+            scale_dim_internal_row=self.config.network.scale_dim_internal_row
         )
 
     def _define_embedding_layers(self) -> None:
@@ -83,10 +86,12 @@ class SAINT(LightningModule):
         self.embedding_categorical = nn.Embedding(self.num_unique_categories, self.config.network.embedding_size)
 
     def _define_mlp(self, categories: List[int]) -> None:
-        """Define MLP used for the inference"""
-        self.mlp1 = SepMLP(dim=self.config.network.embedding_size, dim_out_for_each_feat=categories)
+        """Define MLP used for the Denoising task"""
+        self.mlp1 = SepMLP(dim=self.config.network.embedding_size, dim_out_for_each_feat=categories,
+                           scale_dim_internal=self.config.pretrain.task.denoising.scale_dim_internal_sepmlp)
         self.mlp2 = SepMLP(dim=self.config.network.embedding_size,
-                           dim_out_for_each_feat=list(np.ones(self.num_continuous).astype(int)))
+                           dim_out_for_each_feat=list(np.ones(self.num_continuous).astype(int)),
+                           scale_dim_internal=self.config.pretrain.task.denoising.scale_dim_internal_sepmlp)
 
     def _define_projection_head(self) -> None:
         """Define projection heads for contrastive learning"""

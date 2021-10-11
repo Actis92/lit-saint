@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 from typing import Optional
 
@@ -34,6 +33,7 @@ class DenoisingConfig:
     """Define the parameters for Denoising pretraining task"""
     weight_cross_entropy: float = 0.5  #: weight reconstruction loss for categorical features
     weight_mse: float = 0.5  #: weight reconstruction loss for continuous features
+    scale_dim_internal_sepmlp: float = 5  # scale factor of the input dimension for the first linear layer
 
 
 @dataclass
@@ -71,6 +71,9 @@ class NetworkConfig:
     learning_rate_pretraining: float = 0.03  #: value used to specify the learning rate for the optimizer pretraining
     internal_dimension_output_layer: int = 20  #: internal dimension of the MLP that compute the output
     internal_dimension_embed_continuous: int = 100  #: internal dimension of the mlp used to project continuous columns
+    dim_head: int = 64
+    scale_dim_internal_col: float = 4  # scale factor of the input dimension in case of attention_type col
+    scale_dim_internal_row: float = 4  # scale factor of the input dimension in case of attention_type row
 
 
 @dataclass

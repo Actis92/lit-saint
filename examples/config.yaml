@@ -9,6 +9,9 @@ network:
   learning_rate_pretraining: 0.03
   internal_dimension_output_layer: 10
   internal_dimension_embed_continuous: 10
+  dim_head: 64
+  scale_dim_internal_col: 4
+  scale_dim_internal_row: 4
 pretrain:
   aug:
     cutmix:
@@ -22,3 +25,4 @@ pretrain:
     denoising:
       weight_cross_entropy: 0.5
       weight_mse: 0.5
+      scale_dim_internal_sepmlp: 5
