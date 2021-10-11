@@ -68,8 +68,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lit_saint.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="k">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="k">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span>
 
 
@@ -103,7 +102,8 @@
 <span class="k">class</span> <span class="nc">DenoisingConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define the parameters for Denoising pretraining task&quot;&quot;&quot;</span>
     <span class="n">weight_cross_entropy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: weight reconstruction loss for categorical features</span>
-    <span class="n">weight_mse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: weight reconstruction loss for continuous features</span></div>
+    <span class="n">weight_mse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: weight reconstruction loss for continuous features</span>
+    <span class="n">scale_dim_internal_sepmlp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># scale factor of the input dimension for the first linear layer</span></div>
 
 
 <div class="viewcode-block" id="AugmentationConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.AugmentationConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -140,7 +140,10 @@
     <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span>  <span class="c1">#: value used to specify the learning rate for the optimizer</span>
     <span class="n">learning_rate_pretraining</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span>  <span class="c1">#: value used to specify the learning rate for the optimizer pretraining</span>
     <span class="n">internal_dimension_output_layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1">#: internal dimension of the MLP that compute the output</span>
-    <span class="n">internal_dimension_embed_continuous</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1">#: internal dimension of the mlp used to project continuous columns</span></div>
+    <span class="n">internal_dimension_embed_continuous</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1">#: internal dimension of the mlp used to project continuous columns</span>
+    <span class="n">dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">scale_dim_internal_col</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># scale factor of the input dimension in case of attention_type col</span>
+    <span class="n">scale_dim_internal_row</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># scale factor of the input dimension in case of attention_type row</span></div>
 
 
 <div class="viewcode-block" id="SaintConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.SaintConfig">[docs]</a><span class="nd">@dataclass</span>
