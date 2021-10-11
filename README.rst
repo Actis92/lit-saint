@@ -18,15 +18,6 @@ How to install
     pip install lit-saint
 
 
-Network Architecture
---------------------
-| SAINT is a deep learning approach to solving tabular data problems. It performs attention over both rows and columns, and it includes an enhanced embedding method.
-There are also contrastive self-supervised pre-training methods that can be used when
-labels are scarce.
-
-.. image:: ./pipeline.png
-    :alt: saint-image
-
 How to Use it
 -------------
 

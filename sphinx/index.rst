@@ -11,6 +11,7 @@ Welcome to SAINT Lightning's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   architecture.rst
    _generated/lit_saint
 
 
