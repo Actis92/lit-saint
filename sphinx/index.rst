@@ -13,6 +13,7 @@ Welcome to SAINT Lightning's documentation!
 
    architecture.rst
    augmentations.rst
+   uncertainty.rst
    _generated/lit_saint
 
 
