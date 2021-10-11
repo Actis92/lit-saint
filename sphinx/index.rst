@@ -12,6 +12,7 @@ Welcome to SAINT Lightning's documentation!
    :caption: Contents:
 
    architecture.rst
+   augmentations.rst
    _generated/lit_saint
 
 
