@@ -15,7 +15,7 @@ Pretraining
 ------------
 In this section we will consider the case to use as augmentation both CutMix and Mixup, and to use as pretrained tasks both contrastive and denoising
 
-.. image:: ./_static/saint_pretraining.png
+.. image:: ./_images/saint_pretraining.png
     :alt: saint-pretraining
 
 Steps
@@ -31,7 +31,7 @@ Steps
 
 Training
 ---------
-.. image:: ./_static/saint.png
+.. image:: ./_images/saint.png
     :alt: saint-network
 
 Steps
