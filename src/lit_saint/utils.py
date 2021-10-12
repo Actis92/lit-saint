@@ -28,9 +28,9 @@ def pretraining_and_training_model(data_module: SaintDatamodule, model: SAINT, p
         model.pretraining = False
         data_module.pretraining = False
         trainer.fit(model, data_module)
-        checkpoint_callback_training = [c for c in pretrainer.callbacks if c.__class__.__name__ == 'ModelCheckpoint']
+        checkpoint_callback_training = [c for c in trainer.callbacks if c.__class__.__name__ == 'ModelCheckpoint']
         if len(checkpoint_callback_training) == 1:
-            model = SAINT.load_from_checkpoint(checkpoint_path=checkpoint_callback_pretraining[0].best_model_path)
+            model = SAINT.load_from_checkpoint(checkpoint_path=checkpoint_callback_training[0].best_model_path)
         return model, trainer
     return model, pretrainer
 

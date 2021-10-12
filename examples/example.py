@@ -38,6 +38,12 @@ def read_config(cfg: SaintConfig) -> None:
                                   num_workers=cfg.network.num_workers)
     model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, dim_target=data_module.dim_target)
+    checkpoint_callback_pre = ModelCheckpoint(
+        monitor="val_loss",
+        dirpath=".",
+        filename="saint-{epoch:02d}-{val_loss:.2f}",
+        mode="min",
+    )
     checkpoint_callback = ModelCheckpoint(
         monitor="val_loss",
         dirpath=".",
@@ -46,15 +52,15 @@ def read_config(cfg: SaintConfig) -> None:
     )
     early_stopping_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=3)
 
-    pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback, early_stopping_callback])
+    pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback_pre, early_stopping_callback])
     trainer = Trainer(max_epochs=5, callbacks=[checkpoint_callback, early_stopping_callback],
                       deterministic=True)
     model, trainer = pretraining_and_training_model(data_module, model, pretrainer, trainer)
     data_module.set_predict_set(df_test)
     prediction = trainer.predict(model, datamodule=data_module)
     df_test["prediction"] = np.argmax(torch.cat(prediction).numpy(), axis=1)
-    #print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
-    return f1_score(data_module.predict_set[df.columns[14]], df_test["prediction"])
+    print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
+    #return f1_score(data_module.predict_set[df.columns[14]], df_test["prediction"])
 
 
 if __name__ == "__main__":
