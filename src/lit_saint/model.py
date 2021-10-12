@@ -58,21 +58,21 @@ class SAINT(LightningModule):
         self._define_mlp(categories)
         self._define_projection_head()
         self.mlpfory = SimpleMLP(self.config.network.embedding_size * self.num_columns,
-                                 self.config.network.internal_dimension_output_layer, self.dim_target,
-                                 dropout=self.config.network.ff_dropout)
+                                 self.config.train.internal_dimension_output_layer, self.dim_target,
+                                 dropout=self.config.train.mlpfory_dropout)
 
     def _define_transformer(self) -> None:
         """Instantiate the type of Transformed that will be used in SAINT"""
         self.transformer = RowColTransformer(
             dim=self.config.network.embedding_size,
             nfeats=self.num_categories + self.num_continuous,
-            depth=self.config.network.depth,
-            heads=self.config.network.heads,
-            dim_head=self.config.network.dim_head,
-            ff_dropout=self.config.network.ff_dropout,
-            style=self.config.network.attention_type,
-            scale_dim_internal_col=self.config.network.scale_dim_internal_col,
-            scale_dim_internal_row=self.config.network.scale_dim_internal_row
+            depth=self.config.network.transformer.depth,
+            heads=self.config.network.transformer.heads,
+            dim_head=self.config.network.transformer.dim_head,
+            ff_dropout=self.config.network.transformer.dropout,
+            style=self.config.network.transformer.attention_type,
+            scale_dim_internal_col=self.config.network.transformer.scale_dim_internal_col,
+            scale_dim_internal_row=self.config.network.transformer.scale_dim_internal_row
         )
 
     def _define_embedding_layers(self) -> None:
@@ -80,7 +80,7 @@ class SAINT(LightningModule):
         # embed continuos variables using one different MLP for each column
         self.embedding_continuos = nn.ModuleList([SimpleMLP(1, self.config.network.internal_dimension_embed_continuous,
                                                             self.config.network.embedding_size,
-                                                            dropout=self.config.network.ff_dropout)
+                                                            dropout=self.config.network.dropout_embed_continuous)
                                                   for _ in range(self.num_continuous)])
         # embedding layer categorical columns
         self.embedding_categorical = nn.Embedding(self.num_unique_categories, self.config.network.embedding_size)
@@ -88,21 +88,23 @@ class SAINT(LightningModule):
     def _define_mlp(self, categories: List[int]) -> None:
         """Define MLP used for the Denoising task"""
         self.mlp1 = SepMLP(dim=self.config.network.embedding_size, dim_out_for_each_feat=categories,
-                           scale_dim_internal=self.config.pretrain.task.denoising.scale_dim_internal_sepmlp)
+                           scale_dim_internal=self.config.pretrain.task.denoising.scale_dim_internal_sepmlp,
+                           dropout=self.config.pretrain.task.denoising.dropout)
         self.mlp2 = SepMLP(dim=self.config.network.embedding_size,
                            dim_out_for_each_feat=list(np.ones(self.num_continuous).astype(int)),
-                           scale_dim_internal=self.config.pretrain.task.denoising.scale_dim_internal_sepmlp)
+                           scale_dim_internal=self.config.pretrain.task.denoising.scale_dim_internal_sepmlp,
+                           dropout=self.config.pretrain.task.denoising.dropout)
 
     def _define_projection_head(self) -> None:
         """Define projection heads for contrastive learning"""
         self.pt_mlp = SimpleMLP(self.config.network.embedding_size * self.num_columns,
                                 6 * self.config.network.embedding_size * self.num_columns // 5,
                                 self.config.network.embedding_size * self.num_columns // 2,
-                                dropout=self.config.network.ff_dropout)
+                                dropout=self.config.pretrain.task.contrastive.dropout)
         self.pt_mlp2 = SimpleMLP(self.config.network.embedding_size * self.num_columns,
                                  6 * self.config.network.embedding_size * self.num_columns // 5,
                                  self.config.network.embedding_size * self.num_columns // 2,
-                                 dropout=self.config.network.ff_dropout)
+                                 dropout=self.config.pretrain.task.contrastive.dropout)
 
     def _embed_data(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[Tensor, Tensor]:
         """Converts categorical and continuous values in embeddings
@@ -122,7 +124,7 @@ class SAINT(LightningModule):
         return x_categ_enc, x_cont_enc
 
     def _embeddings_contrastive(self, embed_categ: Tensor, embed_cont: Tensor, embed_categ_noised: Tensor,
-                                embed_cont_noised: Tensor, projhead_style: str = "different") -> Tuple[Tensor, Tensor]:
+                                embed_cont_noised: Tensor, projhead_style) -> Tuple[Tensor, Tensor]:
         """Given embeddings original and noised version of the categorical and continuous features are
         transformed using attention, normalized and eventually projected using MLP
 
@@ -208,7 +210,7 @@ class SAINT(LightningModule):
         :param embed_categ_noised: embeddings categorical features after the augmentation
         :param embed_cont_noised: embeddings continuous features after the augmentation
         """
-        if self.config.pretrain.task.contrastive:
+        if self.config.pretrain.task.contrastive.constrastive_type == 'standard':
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
                 embed_categ, embed_cont, embed_categ_noised, embed_cont_noised,
                 self.config.pretrain.task.contrastive.projhead_style)
@@ -221,19 +223,20 @@ class SAINT(LightningModule):
             loss_1 = f.cross_entropy(logits_1, targets)
             loss_2 = f.cross_entropy(logits_2, targets)
             return self.config.pretrain.task.contrastive.weight * (loss_1 + loss_2) / 2
-        elif self.config.pretrain.task.contrastive_sim:
+        elif self.config.pretrain.task.contrastive.constrastive_type == 'simsiam':
             # it apply the concept of simsiam we want that the embedding minimize the cosine similarity
             # the idea is that we want on the diagonal all 1, it means they are equal /because normalized)
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
-                embed_categ, embed_cont, embed_categ_noised, embed_cont_noised)
-            return - self.config.pretrain.task.contrastive_sim.weight * \
+                embed_categ, embed_cont, embed_categ_noised, embed_cont_noised,
+                self.config.pretrain.task.contrastive.projhead_style)
+            return - self.config.pretrain.task.contrastive.weight * \
                 f.cosine_similarity(embed_tranformed, embed_transformed_noised).add_(-1).sum()
 
     def configure_optimizers(self):
         if self.pretraining:
-            lr = self.config.network.learning_rate_pretraining
+            lr = self.config.pretrain.learning_rate
         else:
-            lr = self.config.network.learning_rate
+            lr = self.config.train.learning_rate
         optimizer = torch.optim.Adam(self.parameters(), lr=lr)
         return optimizer
 

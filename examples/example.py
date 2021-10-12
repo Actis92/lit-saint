@@ -12,6 +12,7 @@ import hydra
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from sklearn.metrics import classification_report
+from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 from hydra.utils import get_original_cwd
 from pytorch_lightning import Trainer, seed_everything
@@ -52,7 +53,8 @@ def read_config(cfg: SaintConfig) -> None:
     data_module.set_predict_set(df_test)
     prediction = trainer.predict(model, datamodule=data_module)
     df_test["prediction"] = np.argmax(torch.cat(prediction).numpy(), axis=1)
-    print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
+    #print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
+    return f1_score(data_module.predict_set[df.columns[14]], df_test["prediction"])
 
 
 if __name__ == "__main__":
