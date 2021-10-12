@@ -20,7 +20,7 @@ pretrain:
   task:
     contrastive:
       constrastive_type: simsiam
-      projhead_style: same
+      projhead_style: different
       nce_temp: 0.5
       weight: 0.1
       dropout: 0.0
