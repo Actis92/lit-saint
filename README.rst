@@ -29,38 +29,35 @@ How to Use it
 
 .. code-block:: python3
 
-    data_module = SaintDatamodule(df=df, target="TARGET", split_column="SPLIT", pretraining=True)
+    data_module = SaintDatamodule(df=df, target="TARGET", split_column="SPLIT")
 
 4. Create an instance of SaintDataModule and SAINT
 
 .. code-block:: python3
 
-    model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                  config=cfg, pretraining=True)
+    model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                  config=cfg, dim_target=data_module.dim_target)
 
-5. Use the Trainer defined by Pytorch lightning to fit the model
-
-.. code-block:: python3
-
-    pretrainer = Trainer(max_epochs=10)
-    pretrainer.fit(model, data_module)
-
-6. After the pretraining, you can train the model using a supervised objective function
+5. Create the Trainers defined by Pytorch lightning to fit the model
 
 .. code-block:: python3
 
-    model.pretraining = False
-    data_module.pretraining = False
-    trainer = Trainer(max_epochs=10)
-    trainer.fit(model, data_module)
+    pretrainer = Trainer(max_epochs=1)
+    trainer = Trainer(max_epochs=5)
+
+6. Create the SaintTrainer that will be used in order to fit the model and make predictions
+
+.. code-block:: python3
+
+    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
+    saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=True)
 
 7. Then you can define the data for the prediction step
 
 .. code-block:: python3
 
-    data_module.set_predict_set(df_test)
-    prediction = trainer.predict(model, datamodule=data_module)
-    df_test["prediction"] = torch.cat(prediction).numpy()
+    prediction = saint_trainer.predict(model=model, datamodule=data_module, df=df_to_predict)
+    df_test["prediction"] = np.argmax(prediction, axis=1)
 
 How to Generate Yaml
 --------------------

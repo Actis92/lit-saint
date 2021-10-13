@@ -12,7 +12,7 @@ from lit_saint.modules import SimpleMLP, RowColTransformer, SepMLP
 from lit_saint.augmentations import cutmix, mixup, get_random_index
 
 
-class SAINT(LightningModule):
+class Saint(LightningModule):
     """Contains the definition of the network and how to execute the pretraining tasks, and how perform
     the training, validation and test steps
 
@@ -20,8 +20,6 @@ class SAINT(LightningModule):
     :param continuous: List of indices with continuous columns
     :param dim_target: if categorical represent number of classes of the target otherwise is 1
     :param config: configuration of the model
-    :param pretraining: boolean flag, if True it will be executed pretraining task
-    :param mc_dropout: boolean flag, if true mc_dropout will be applied during prediction
     """
     def __init__(
             self,
@@ -29,15 +27,13 @@ class SAINT(LightningModule):
             continuous: List[int],
             dim_target: int,
             config: SaintConfig,
-            pretraining: bool = False,
-            mc_dropout: bool = False
     ):
         super().__init__()
         self.save_hyperparameters()
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
-        self.mc_dropout = mc_dropout
+        self.mc_dropout = False
         self.config = config
-        self.pretraining = pretraining
+        self.pretraining = False
         self.dim_target = dim_target
         self.num_categories = len(categories)
         self.num_unique_categories = sum(categories)
@@ -324,3 +320,9 @@ class SAINT(LightningModule):
         :param target: Values to predict
         """
         return f.mse_loss(y_pred, target)
+
+    def set_pretraining(self, pretraining: bool):
+        self.pretraining = pretraining
+
+    def set_mcdropout(self, mc_dropout: bool):
+        self.mc_dropout = mc_dropout

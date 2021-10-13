@@ -18,18 +18,17 @@ class SaintDatamodule(LightningDataModule):
 
     def __init__(self, df: pd.DataFrame, target: str, split_column: str, num_workers: int,
                  data_loader_params: Dict = None,
-                 scaler: TransformerMixin = None, pretraining: bool = False):
+                 scaler: TransformerMixin = None):
         """
         :param df: contains the data that will be used by the dataLoaders
         :param target: name of the target column
         :param split_column: name of the column used to split the data
         :param data_loader_params: parameters used to configure the DataLoader
-        :param pretraining: boolean flag, if False it use only where the target is not NaN
         """
         super().__init__()
         self.num_workers = num_workers
         self.target: str = target
-        self.pretraining = pretraining
+        self.pretraining = False
         self.data_loader_params = data_loader_params if data_loader_params else {"batch_size": 256}
         self.categorical_columns = []
         self.categorical_dims = []
@@ -165,3 +164,6 @@ class SaintDatamodule(LightningDataModule):
     def predict_dataloader(self) -> DataLoader:
         """ Function that loads the dataset for the prediction. """
         return self._create_dataloader(self.predict_set)
+
+    def set_pretraining(self, pretraining: bool):
+        self.pretraining = pretraining

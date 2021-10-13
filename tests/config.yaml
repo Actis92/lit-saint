@@ -1,22 +1,36 @@
-defaults:
-  - base_config
 network:
-  embedding_size: 10
-  depth: 3
-  heads: 1
-  ff_dropout: .0
-  attention_type:  'col'
-  learning_rate: 0.01
-  learning_rate_pretraining: 0.01
+  transformer:
+    depth: 2
+    heads: 1
+    dropout: 0.0
+    attention_type: col
+    dim_head: 64
+    scale_dim_internal_col: 4.0
+    scale_dim_internal_row: 4.0
+  num_workers: 0
+  embedding_size: 20
+  internal_dimension_embed_continuous: 10
+  dropout_embed_continuous: 0.0
 pretrain:
   aug:
     cutmix:
       lam: 0.1
+    mixup:
+      lam: 0.1
   task:
     contrastive:
-      weight: 0.1
-      projhead_style: 'same'
+      constrastive_type: simsiam
+      projhead_style: different
       nce_temp: 0.5
+      weight: 0.1
+      dropout: 0.0
     denoising:
       weight_cross_entropy: 0.5
-      weight_mse:  0.1
+      weight_mse: 0.5
+      scale_dim_internal_sepmlp: 5.0
+      dropout: 0.0
+  learning_rate: 0.03
+train:
+  learning_rate: 0.0001
+  internal_dimension_output_layer: 10
+  mlpfory_dropout: 0.0

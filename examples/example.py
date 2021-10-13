@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 import numpy as np
-import torch
 import wget
 from hydra.core.config_store import ConfigStore
 
@@ -12,13 +11,11 @@ import hydra
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from sklearn.metrics import classification_report
-from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 from hydra.utils import get_original_cwd
 from pytorch_lightning import Trainer, seed_everything
 
-from src.lit_saint import SAINT, SaintConfig, SaintDatamodule
-from src.lit_saint.utils import pretraining_and_training_model
+from lit_saint import Saint, SaintConfig, SaintDatamodule, SaintTrainer
 
 cs = ConfigStore.instance()
 # Registering the Config class with the name 'config'.
@@ -36,7 +33,7 @@ def read_config(cfg: SaintConfig) -> None:
     df = pd.concat([df_train, df_val])
     data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split",
                                   num_workers=cfg.network.num_workers)
-    model = SAINT(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+    model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, dim_target=data_module.dim_target)
     checkpoint_callback_pre = ModelCheckpoint(
         monitor="val_loss",
@@ -55,10 +52,10 @@ def read_config(cfg: SaintConfig) -> None:
     pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback_pre, early_stopping_callback])
     trainer = Trainer(max_epochs=5, callbacks=[checkpoint_callback, early_stopping_callback],
                       deterministic=True)
-    model, trainer = pretraining_and_training_model(data_module, model, pretrainer, trainer)
-    data_module.set_predict_set(df_test)
-    prediction = trainer.predict(model, datamodule=data_module)
-    df_test["prediction"] = np.argmax(torch.cat(prediction).numpy(), axis=1)
+    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
+    saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=True)
+    prediction = saint_trainer.predict(model=model, datamodule=data_module, df=df_test)
+    df_test["prediction"] = np.argmax(prediction, axis=1)
     print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
     #return f1_score(data_module.predict_set[df.columns[14]], df_test["prediction"])
 
