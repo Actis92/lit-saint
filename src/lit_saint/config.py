@@ -1,5 +1,12 @@
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Optional, Dict
+
+
+@dataclass
+class OptimizerConfig:
+    """Define the parameters for CutMix augmentation"""
+    learning_rate: float = 0.0001  #: value used to specify the learning rate
+    other_params: Optional[Dict] = field(default_factory=dict)
 
 
 @dataclass
@@ -18,7 +25,7 @@ class MixUpConfig:
 class ConstrastiveConfig:
     """Define the parameters for Contrastive pretraining task"""
     constrastive_type: str = 'simsiam'
-    projhead_style: str = 'same'  #: it is used to project embeddings
+    projhead_style: str = 'different'  #: it is used to project embeddings
     nce_temp: float = 0.5  #: temperature used for the logits in case of standard constrastive type
     weight: float = 0.1  #: weight of the loss for this pretraining task
     dropout: float = .0  #: probability dropout in projection head
@@ -52,15 +59,17 @@ class PreTrainConfig:
     """Define parameters for the steps used during the pretraining"""
     aug: AugmentationConfig = AugmentationConfig()
     task: PreTrainTaskConfig = PreTrainTaskConfig()
-    learning_rate: float = 0.03  #: value used to specify the learning rate for the optimizer pretraining
+    optimizer: OptimizerConfig = OptimizerConfig()
+    epochs: int = 2  #: number of epochs of training phase
 
 
 @dataclass
 class TrainConfig:
     """Define parameters for the steps used during the training"""
-    learning_rate: float = 0.03  #: value used to specify the learning rate for the optimizer pretraining
     internal_dimension_output_layer: int = 20  #: internal dimension of the MLP that compute the output
     mlpfory_dropout: float = .0  #: probability dropout in the the MLP used for prediction
+    epochs: int = 5  #: number of epochs of training phase
+    optimizer: OptimizerConfig = OptimizerConfig()
 
 
 @dataclass

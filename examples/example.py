@@ -49,8 +49,8 @@ def read_config(cfg: SaintConfig) -> None:
     )
     early_stopping_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=3)
 
-    pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback_pre, early_stopping_callback])
-    trainer = Trainer(max_epochs=5, callbacks=[checkpoint_callback, early_stopping_callback],
+    pretrainer = Trainer(max_epochs=cfg.pretrain.epochs, callbacks=[checkpoint_callback_pre, early_stopping_callback])
+    trainer = Trainer(max_epochs=cfg.train.epochs, callbacks=[checkpoint_callback, early_stopping_callback],
                       deterministic=True)
     saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
     saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=True)

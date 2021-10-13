@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Callable
 
 import torch
 import torch.nn.functional as f
@@ -27,10 +27,14 @@ class Saint(LightningModule):
             continuous: List[int],
             dim_target: int,
             config: SaintConfig,
+            optimizer: Callable = torch.optim.Adam,
+            loss_fn: Callable = None
     ):
         super().__init__()
         self.save_hyperparameters()
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
+        self.loss_fn = loss_fn
+        self.optimizer = optimizer
         self.mc_dropout = False
         self.config = config
         self.pretraining = False
@@ -230,10 +234,13 @@ class Saint(LightningModule):
 
     def configure_optimizers(self):
         if self.pretraining:
-            lr = self.config.pretrain.learning_rate
+            lr = self.config.pretrain.optimizer.learning_rate
+            other_params = self.config.pretrain.optimizer.other_params
         else:
-            lr = self.config.train.learning_rate
-        optimizer = torch.optim.Adam(self.parameters(), lr=lr)
+            lr = self.config.train.optimizer.learning_rate
+            other_params = self.config.pretrain.optimizer.other_params
+
+        optimizer = self.optimizer(self.parameters(), lr=lr, **other_params)
         return optimizer
 
     def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
@@ -269,11 +276,14 @@ class Saint(LightningModule):
             return self.pretraining_step(x_categ, x_cont)
         else:
             y_pred = self(x_categ, x_cont)
-            if self.dim_target > 1:
-                loss = self._classification_loss(y_pred, target)
-                return loss
+            if self.loss_fn:
+                return self.loss_fn(y_pred, target)
             else:
-                return self._regression_loss(y_pred, target)
+                if self.dim_target > 1:
+                    loss = self._classification_loss(y_pred, target)
+                    return loss
+                else:
+                    return self._regression_loss(y_pred, target)
 
     def training_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
         loss = self.shared_step(batch)

@@ -1,6 +1,6 @@
 network:
   transformer:
-    depth: 2
+    depth: 3
     heads: 1
     dropout: 0.0
     attention_type: col
@@ -8,8 +8,8 @@ network:
     scale_dim_internal_col: 4.0
     scale_dim_internal_row: 4.0
   num_workers: 0
-  embedding_size: 20
-  internal_dimension_embed_continuous: 10
+  embedding_size: 10
+  internal_dimension_embed_continuous: 100
   dropout_embed_continuous: 0.0
 pretrain:
   aug:
@@ -29,8 +29,14 @@ pretrain:
       weight_mse: 0.5
       scale_dim_internal_sepmlp: 5.0
       dropout: 0.0
-  learning_rate: 0.03
+  optimizer:
+    learning_rate: 0.0001
+    other_params: {}
+  epochs: 2
 train:
-  learning_rate: 0.0001
-  internal_dimension_output_layer: 10
+  internal_dimension_output_layer: 20
   mlpfory_dropout: 0.0
+  epochs: 5
+  optimizer:
+    learning_rate: 0.0001
+    other_params: {}
