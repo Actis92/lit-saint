@@ -70,7 +70,7 @@ class Saint(LightningModule):
             heads=self.config.network.transformer.heads,
             dim_head=self.config.network.transformer.dim_head,
             ff_dropout=self.config.network.transformer.dropout,
-            style=self.config.network.transformer.attention_type,
+            style=self.config.network.transformer.attention_type.value,
             scale_dim_internal_col=self.config.network.transformer.scale_dim_internal_col,
             scale_dim_internal_row=self.config.network.transformer.scale_dim_internal_row
         )
@@ -140,10 +140,10 @@ class Saint(LightningModule):
         embed_tranformed = (embed_tranformed / embed_tranformed.norm(dim=-1, keepdim=True)).flatten(1, 2)
         embed_transformed_noised = (embed_transformed_noised /
                                     embed_transformed_noised.norm(dim=-1, keepdim=True)).flatten(1, 2)
-        if projhead_style == 'different':
+        if projhead_style.value == 'different':
             embed_tranformed = self.pt_mlp(embed_tranformed)
             embed_transformed_noised = self.pt_mlp2(embed_transformed_noised)
-        elif projhead_style == 'same':
+        elif projhead_style.value == 'same':
             embed_tranformed = self.pt_mlp(embed_tranformed)
             embed_transformed_noised = self.pt_mlp(embed_transformed_noised)
         else:
@@ -210,7 +210,7 @@ class Saint(LightningModule):
         :param embed_categ_noised: embeddings categorical features after the augmentation
         :param embed_cont_noised: embeddings continuous features after the augmentation
         """
-        if self.config.pretrain.task.contrastive.constrastive_type == 'standard':
+        if self.config.pretrain.task.contrastive.constrastive_type.value == 'standard':
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
                 embed_categ, embed_cont, embed_categ_noised, embed_cont_noised,
                 self.config.pretrain.task.contrastive.projhead_style)
@@ -223,7 +223,7 @@ class Saint(LightningModule):
             loss_1 = f.cross_entropy(logits_1, targets)
             loss_2 = f.cross_entropy(logits_2, targets)
             return self.config.pretrain.task.contrastive.weight * (loss_1 + loss_2) / 2
-        elif self.config.pretrain.task.contrastive.constrastive_type == 'simsiam':
+        elif self.config.pretrain.task.contrastive.constrastive_type.value == 'simsiam':
             # it apply the concept of simsiam we want that the embedding minimize the cosine similarity
             # the idea is that we want on the diagonal all 1, it means they are equal /because normalized)
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(

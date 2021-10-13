@@ -72,6 +72,14 @@ How to Generate Yaml
         OmegaConf.save(config=conf, f=fp.name)
 
 
+In order to make type validation at runtime, you need to add at the beginning of your file the following lines:
+
+.. code-block:: yaml
+
+    defaults:
+      - base_config
+
+
 Credits
 -------
 

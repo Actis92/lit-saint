@@ -69,7 +69,6 @@ def test_predict():
         saint_trainer.fit(model, data_module, enable_pretraining=False)
         df_predict = df[[col for col in df.columns if col != "target"]]
         prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict)
-        prediction = prediction.numpy()
         assert prediction.shape[1] == 2
 
 
@@ -87,7 +86,7 @@ def test_predict_unknown_categ():
         trainer = Trainer(max_epochs=1, fast_dev_run=True)
         saint_trainer = SaintTrainer(None, trainer=trainer)
         saint_trainer.fit(model, data_module, enable_pretraining=False)
-        prediction = saint_trainer.predict(model, datamodule=data_module, df=df_test).numpy()
+        prediction = saint_trainer.predict(model, datamodule=data_module, df=df_test)
         assert prediction.shape[1] == 2
 
 
@@ -105,7 +104,7 @@ def test_regression():
         saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
         saint_trainer.fit(model, data_module, enable_pretraining=True)
         df_predict = df[[col for col in df.columns if col != "target"]]
-        prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict).numpy()
+        prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict)
         assert prediction.shape[1] == 1
 
 
@@ -136,5 +135,5 @@ def test_multiclass():
         saint_trainer = SaintTrainer(None, trainer=trainer)
         saint_trainer.fit(model, data_module, enable_pretraining=False)
         df_predict = df[[col for col in df.columns if col != "target"]]
-        prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict).numpy()
+        prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict)
         assert prediction.shape[1] == 3

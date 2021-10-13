@@ -1,5 +1,22 @@
 from dataclasses import dataclass, field
 from typing import Optional, Dict
+from enum import Enum
+
+
+class ConstrativeEnum(Enum):
+    simsiam = 'simsiam'
+    standard = 'standard'
+
+
+class ProjectionHeadStyleEnum(Enum):
+    same = 'same'
+    different = 'different'
+
+
+class AttentionTypeEnum(Enum):
+    col = "col"
+    row = "row"
+    colrow = "colrow"
 
 
 @dataclass
@@ -24,11 +41,11 @@ class MixUpConfig:
 @dataclass
 class ConstrastiveConfig:
     """Define the parameters for Contrastive pretraining task"""
-    constrastive_type: str = 'simsiam'
-    projhead_style: str = 'different'  #: it is used to project embeddings
+    dropout: float = .0  #: probability dropout in projection head
+    constrastive_type: ConstrativeEnum = ConstrativeEnum.simsiam
+    projhead_style: ProjectionHeadStyleEnum = ProjectionHeadStyleEnum.different  #: it is used to project embeddings
     nce_temp: float = 0.5  #: temperature used for the logits in case of standard constrastive type
     weight: float = 0.1  #: weight of the loss for this pretraining task
-    dropout: float = .0  #: probability dropout in projection head
 
 
 @dataclass
@@ -77,7 +94,7 @@ class TransformerConfig:
     depth: int = 3  #: number of attention blocks used in the transformer
     heads: int = 1  #: number of heads used in the transformer
     dropout: float = .0  #: probability dropout in the transformer
-    attention_type: str = 'col'  #: type of attention
+    attention_type: AttentionTypeEnum = AttentionTypeEnum.col  #: type of attention
     dim_head: int = 64
     scale_dim_internal_col: float = 4  # scale factor of the input dimension in case of attention_type col
     scale_dim_internal_row: float = 4  # scale factor of the input dimension in case of attention_type row
