@@ -52,10 +52,10 @@ lit\_saint.modules module
    :undoc-members:
    :show-inheritance:
 
-lit\_saint.utils module
------------------------
+lit\_saint.trainer module
+-------------------------
 
-.. automodule:: lit_saint.utils
+.. automodule:: lit_saint.trainer
    :members:
    :undoc-members:
    :show-inheritance:

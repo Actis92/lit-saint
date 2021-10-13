@@ -52,7 +52,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.dataset">lit_saint.dataset module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.model">lit_saint.model module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.modules">lit_saint.modules module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.utils">lit_saint.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.trainer">lit_saint.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.version">lit_saint.version module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint">Module contents</a></li>
 </ul>
@@ -148,6 +148,28 @@ and some random element of the tensor taking random rows</p>
 <section id="module-lit_saint.config">
 <span id="lit-saint-config-module"></span><h2>lit_saint.config module<a class="headerlink" href="#module-lit_saint.config" title="Permalink to this headline"></a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="lit_saint.config.AttentionTypeEnum">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">AttentionTypeEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#AttentionTypeEnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.AttentionTypeEnum" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.AttentionTypeEnum.col">
+<span class="sig-name descname"><span class="pre">col</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'col'</span></em><a class="headerlink" href="#lit_saint.config.AttentionTypeEnum.col" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.AttentionTypeEnum.colrow">
+<span class="sig-name descname"><span class="pre">colrow</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'colrow'</span></em><a class="headerlink" href="#lit_saint.config.AttentionTypeEnum.colrow" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.AttentionTypeEnum.row">
+<span class="sig-name descname"><span class="pre">row</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'row'</span></em><a class="headerlink" href="#lit_saint.config.AttentionTypeEnum.row" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.AugmentationConfig">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">AugmentationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutmix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">CutMixConfig(lam=0.1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">MixUpConfig(lam=0.1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#AugmentationConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.AugmentationConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -166,19 +188,30 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.ConstrastiveConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">ConstrastiveConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projhead_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'same'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nce_temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#ConstrastiveConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.ConstrastiveConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">ConstrastiveConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrastive_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConstrativeEnum.simsiam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projhead_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ProjectionHeadStyleEnum.different</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nce_temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#ConstrastiveConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.ConstrastiveConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define the parameters for Contrastive pretraining task</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.ConstrastiveConfig.constrastive_type">
+<span class="sig-name descname"><span class="pre">constrastive_type</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.ConstrativeEnum" title="lit_saint.config.ConstrativeEnum"><span class="pre">lit_saint.config.ConstrativeEnum</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">'simsiam'</span></em><a class="headerlink" href="#lit_saint.config.ConstrastiveConfig.constrastive_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.ConstrastiveConfig.dropout">
+<span class="sig-name descname"><span class="pre">dropout</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0</span></em><a class="headerlink" href="#lit_saint.config.ConstrastiveConfig.dropout" title="Permalink to this definition"></a></dt>
+<dd><p>probability dropout in projection head</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.ConstrastiveConfig.nce_temp">
 <span class="sig-name descname"><span class="pre">nce_temp</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.5</span></em><a class="headerlink" href="#lit_saint.config.ConstrastiveConfig.nce_temp" title="Permalink to this definition"></a></dt>
-<dd><p>temperature used for the logits</p>
+<dd><p>temperature used for the logits in case of standard constrastive type</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.ConstrastiveConfig.projhead_style">
-<span class="sig-name descname"><span class="pre">projhead_style</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'same'</span></em><a class="headerlink" href="#lit_saint.config.ConstrastiveConfig.projhead_style" title="Permalink to this definition"></a></dt>
-<dd><p>can be same or different and it is used to project embeddings</p>
+<span class="sig-name descname"><span class="pre">projhead_style</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.ProjectionHeadStyleEnum" title="lit_saint.config.ProjectionHeadStyleEnum"><span class="pre">lit_saint.config.ProjectionHeadStyleEnum</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">'different'</span></em><a class="headerlink" href="#lit_saint.config.ConstrastiveConfig.projhead_style" title="Permalink to this definition"></a></dt>
+<dd><p>it is used to project embeddings</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -190,15 +223,19 @@ and some random element of the tensor taking random rows</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="lit_saint.config.ConstrastiveSimConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">ConstrastiveSimConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#ConstrastiveSimConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.ConstrastiveSimConfig" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Define the parameters for ContrastiveSim pretraining task</p>
+<dt class="sig sig-object py" id="lit_saint.config.ConstrativeEnum">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">ConstrativeEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#ConstrativeEnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.ConstrativeEnum" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.ConstrastiveSimConfig.weight">
-<span class="sig-name descname"><span class="pre">weight</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.1</span></em><a class="headerlink" href="#lit_saint.config.ConstrastiveSimConfig.weight" title="Permalink to this definition"></a></dt>
-<dd><p>weight of the loss for this pretraining task</p>
-</dd></dl>
+<dt class="sig sig-object py" id="lit_saint.config.ConstrativeEnum.simsiam">
+<span class="sig-name descname"><span class="pre">simsiam</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'simsiam'</span></em><a class="headerlink" href="#lit_saint.config.ConstrativeEnum.simsiam" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.ConstrativeEnum.standard">
+<span class="sig-name descname"><span class="pre">standard</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'standard'</span></em><a class="headerlink" href="#lit_saint.config.ConstrativeEnum.standard" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -217,9 +254,15 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.DenoisingConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">DenoisingConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight_cross_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_mse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_sepmlp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#DenoisingConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.DenoisingConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">DenoisingConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight_cross_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_mse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_sepmlp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#DenoisingConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.DenoisingConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define the parameters for Denoising pretraining task</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.DenoisingConfig.dropout">
+<span class="sig-name descname"><span class="pre">dropout</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0</span></em><a class="headerlink" href="#lit_saint.config.DenoisingConfig.dropout" title="Permalink to this definition"></a></dt>
+<dd><p>probability dropout in SepMLP</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.DenoisingConfig.scale_dim_internal_sepmlp">
 <span class="sig-name descname"><span class="pre">scale_dim_internal_sepmlp</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">5</span></em><a class="headerlink" href="#lit_saint.config.DenoisingConfig.scale_dim_internal_sepmlp" title="Permalink to this definition"></a></dt>
@@ -254,42 +297,19 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.NetworkConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">NetworkConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'col'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate_pretraining</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_dimension_output_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_dimension_embed_continuous</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#NetworkConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.NetworkConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">NetworkConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">transformer=TransformerConfig(depth=3</span></em>, <em class="sig-param"><span class="pre">heads=1</span></em>, <em class="sig-param"><span class="pre">dropout=0.0</span></em>, <em class="sig-param"><span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;</span></em>, <em class="sig-param"><span class="pre">dim_head=64</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_col=4</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_row=4)</span></em>, <em class="sig-param"><span class="pre">num_workers=0</span></em>, <em class="sig-param"><span class="pre">embedding_size=10</span></em>, <em class="sig-param"><span class="pre">internal_dimension_embed_continuous=100</span></em>, <em class="sig-param"><span class="pre">dropout_embed_continuous=0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#NetworkConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.NetworkConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define the neural network parameters</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.attention_type">
-<span class="sig-name descname"><span class="pre">attention_type</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'col'</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.attention_type" title="Permalink to this definition"></a></dt>
-<dd><p>type of attention can be the self attention or intersample attention</p>
+<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.dropout_embed_continuous">
+<span class="sig-name descname"><span class="pre">dropout_embed_continuous</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.dropout_embed_continuous" title="Permalink to this definition"></a></dt>
+<dd><p>dropout used to compute embedding continuous features</p>
 </dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.depth">
-<span class="sig-name descname"><span class="pre">depth</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.depth" title="Permalink to this definition"></a></dt>
-<dd><p>number of attention blocks used in the transformer</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.dim_head">
-<span class="sig-name descname"><span class="pre">dim_head</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">64</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.dim_head" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.embedding_size">
 <span class="sig-name descname"><span class="pre">embedding_size</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">10</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.embedding_size" title="Permalink to this definition"></a></dt>
 <dd><p>dimension of computed embeddings</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.ff_dropout">
-<span class="sig-name descname"><span class="pre">ff_dropout</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.ff_dropout" title="Permalink to this definition"></a></dt>
-<dd><p>probability dropout in the feed forward layers</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.heads">
-<span class="sig-name descname"><span class="pre">heads</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.heads" title="Permalink to this definition"></a></dt>
-<dd><p>number of heads used in the transformer</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -299,44 +319,39 @@ and some random element of the tensor taking random rows</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.internal_dimension_output_layer">
-<span class="sig-name descname"><span class="pre">internal_dimension_output_layer</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">20</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.internal_dimension_output_layer" title="Permalink to this definition"></a></dt>
-<dd><p>internal dimension of the MLP that compute the output</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.learning_rate">
-<span class="sig-name descname"><span class="pre">learning_rate</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.03</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.learning_rate" title="Permalink to this definition"></a></dt>
-<dd><p>value used to specify the learning rate for the optimizer</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.learning_rate_pretraining">
-<span class="sig-name descname"><span class="pre">learning_rate_pretraining</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.03</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.learning_rate_pretraining" title="Permalink to this definition"></a></dt>
-<dd><p>value used to specify the learning rate for the optimizer pretraining</p>
-</dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.num_workers">
 <span class="sig-name descname"><span class="pre">num_workers</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.num_workers" title="Permalink to this definition"></a></dt>
 <dd><p>number of cores to use</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.scale_dim_internal_col">
-<span class="sig-name descname"><span class="pre">scale_dim_internal_col</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">4</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.scale_dim_internal_col" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.transformer">
+<span class="sig-name descname"><span class="pre">transformer</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.TransformerConfig" title="lit_saint.config.TransformerConfig"><span class="pre">lit_saint.config.TransformerConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">TransformerConfig(depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">dropout=0.0,</span> <span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;,</span> <span class="pre">dim_head=64,</span> <span class="pre">scale_dim_internal_col=4,</span> <span class="pre">scale_dim_internal_row=4)</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.transformer" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lit_saint.config.OptimizerConfig">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">OptimizerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">learning_rate=0.0001</span></em>, <em class="sig-param"><span class="pre">other_params=&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#OptimizerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.OptimizerConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Define the parameters for CutMix augmentation</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.scale_dim_internal_row">
-<span class="sig-name descname"><span class="pre">scale_dim_internal_row</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">4</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.scale_dim_internal_row" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.config.OptimizerConfig.learning_rate">
+<span class="sig-name descname"><span class="pre">learning_rate</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0001</span></em><a class="headerlink" href="#lit_saint.config.OptimizerConfig.learning_rate" title="Permalink to this definition"></a></dt>
+<dd><p>value used to specify the learning rate</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.OptimizerConfig.other_params">
+<span class="sig-name descname"><span class="pre">other_params</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lit_saint.config.OptimizerConfig.other_params" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">PreTrainConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">AugmentationConfig(cutmix=CutMixConfig(lam=0.1),</span> <span class="pre">mixup=MixUpConfig(lam=0.1))</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PreTrainTaskConfig(contrastive=None,</span> <span class="pre">contrastive_sim=ConstrastiveSimConfig(weight=0.1),</span> <span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5))</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#PreTrainConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.PreTrainConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">PreTrainConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1)</span></em>, <em class="sig-param"><span class="pre">mixup=MixUpConfig(lam=0.1))</span></em>, <em class="sig-param"><span class="pre">task=PreTrainTaskConfig(contrastive=&lt;class</span> <span class="pre">'lit_saint.config.ConstrastiveConfig'&gt;</span></em>, <em class="sig-param"><span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5</span></em>, <em class="sig-param"><span class="pre">weight_mse=0.5</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_sepmlp=5</span></em>, <em class="sig-param"><span class="pre">dropout=0.0))</span></em>, <em class="sig-param"><span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001</span></em>, <em class="sig-param"><span class="pre">other_params={})</span></em>, <em class="sig-param"><span class="pre">epochs=2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#PreTrainConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.PreTrainConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define parameters for the steps used during the pretraining</p>
 <dl class="py attribute">
@@ -345,47 +360,151 @@ and some random element of the tensor taking random rows</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.PreTrainConfig.epochs">
+<span class="sig-name descname"><span class="pre">epochs</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#lit_saint.config.PreTrainConfig.epochs" title="Permalink to this definition"></a></dt>
+<dd><p>number of epochs of training phase</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.PreTrainConfig.optimizer">
+<span class="sig-name descname"><span class="pre">optimizer</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.OptimizerConfig" title="lit_saint.config.OptimizerConfig"><span class="pre">lit_saint.config.OptimizerConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={})</span></em><a class="headerlink" href="#lit_saint.config.PreTrainConfig.optimizer" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainConfig.task">
-<span class="sig-name descname"><span class="pre">task</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.PreTrainTaskConfig" title="lit_saint.config.PreTrainTaskConfig"><span class="pre">lit_saint.config.PreTrainTaskConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">PreTrainTaskConfig(contrastive=None,</span> <span class="pre">contrastive_sim=ConstrastiveSimConfig(weight=0.1),</span> <span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5))</span></em><a class="headerlink" href="#lit_saint.config.PreTrainConfig.task" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">task</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.PreTrainTaskConfig" title="lit_saint.config.PreTrainTaskConfig"><span class="pre">lit_saint.config.PreTrainTaskConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">PreTrainTaskConfig(contrastive=&lt;class</span> <span class="pre">'lit_saint.config.ConstrastiveConfig'&gt;,</span> <span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5,</span> <span class="pre">dropout=0.0))</span></em><a class="headerlink" href="#lit_saint.config.PreTrainConfig.task" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainTaskConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">PreTrainTaskConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contrastive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrastive_sim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConstrastiveSimConfig(weight=0.1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">denoising</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#PreTrainTaskConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">PreTrainTaskConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">contrastive=&lt;class</span> <span class="pre">'lit_saint.config.ConstrastiveConfig'&gt;</span></em>, <em class="sig-param"><span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5</span></em>, <em class="sig-param"><span class="pre">weight_mse=0.5</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_sepmlp=5</span></em>, <em class="sig-param"><span class="pre">dropout=0.0)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#PreTrainTaskConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define the parameters used for pretraining tasks</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainTaskConfig.contrastive">
-<span class="sig-name descname"><span class="pre">contrastive</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.ConstrastiveConfig" title="lit_saint.config.ConstrastiveConfig"><span class="pre">lit_saint.config.ConstrastiveConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.contrastive" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.config.PreTrainTaskConfig.contrastive_sim">
-<span class="sig-name descname"><span class="pre">contrastive_sim</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.ConstrastiveSimConfig" title="lit_saint.config.ConstrastiveSimConfig"><span class="pre">lit_saint.config.ConstrastiveSimConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">ConstrastiveSimConfig(weight=0.1)</span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.contrastive_sim" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">contrastive</span></span><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.contrastive" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#lit_saint.config.ConstrastiveConfig" title="lit_saint.config.ConstrastiveConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">lit_saint.config.ConstrastiveConfig</span></code></a></p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.PreTrainTaskConfig.denoising">
-<span class="sig-name descname"><span class="pre">denoising</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.DenoisingConfig" title="lit_saint.config.DenoisingConfig"><span class="pre">lit_saint.config.DenoisingConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5)</span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.denoising" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">denoising</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lit_saint.config.DenoisingConfig" title="lit_saint.config.DenoisingConfig"><span class="pre">lit_saint.config.DenoisingConfig</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5,</span> <span class="pre">dropout=0.0)</span></em><a class="headerlink" href="#lit_saint.config.PreTrainTaskConfig.denoising" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lit_saint.config.ProjectionHeadStyleEnum">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">ProjectionHeadStyleEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#ProjectionHeadStyleEnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.ProjectionHeadStyleEnum" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.ProjectionHeadStyleEnum.different">
+<span class="sig-name descname"><span class="pre">different</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'different'</span></em><a class="headerlink" href="#lit_saint.config.ProjectionHeadStyleEnum.different" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.ProjectionHeadStyleEnum.same">
+<span class="sig-name descname"><span class="pre">same</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'same'</span></em><a class="headerlink" href="#lit_saint.config.ProjectionHeadStyleEnum.same" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.SaintConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">SaintConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NetworkConfig(num_workers=0,</span> <span class="pre">embedding_size=10,</span> <span class="pre">depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">ff_dropout=0.0,</span> <span class="pre">attention_type='col',</span> <span class="pre">learning_rate=0.03,</span> <span class="pre">learning_rate_pretraining=0.03,</span> <span class="pre">internal_dimension_output_layer=20,</span> <span class="pre">internal_dimension_embed_continuous=100,</span> <span class="pre">dim_head=64,</span> <span class="pre">scale_dim_internal_col=4,</span> <span class="pre">scale_dim_internal_row=4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PreTrainConfig(aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1),</span> <span class="pre">mixup=MixUpConfig(lam=0.1)),</span> <span class="pre">task=PreTrainTaskConfig(contrastive=None,</span> <span class="pre">contrastive_sim=ConstrastiveSimConfig(weight=0.1),</span> <span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5)))</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#SaintConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.SaintConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">SaintConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">network=NetworkConfig(transformer=TransformerConfig(depth=3</span></em>, <em class="sig-param"><span class="pre">heads=1</span></em>, <em class="sig-param"><span class="pre">dropout=0.0</span></em>, <em class="sig-param"><span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;</span></em>, <em class="sig-param"><span class="pre">dim_head=64</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_col=4</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_row=4)</span></em>, <em class="sig-param"><span class="pre">num_workers=0</span></em>, <em class="sig-param"><span class="pre">embedding_size=10</span></em>, <em class="sig-param"><span class="pre">internal_dimension_embed_continuous=100</span></em>, <em class="sig-param"><span class="pre">dropout_embed_continuous=0.0)</span></em>, <em class="sig-param"><span class="pre">pretrain=PreTrainConfig(aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1)</span></em>, <em class="sig-param"><span class="pre">mixup=MixUpConfig(lam=0.1))</span></em>, <em class="sig-param"><span class="pre">task=PreTrainTaskConfig(contrastive=&lt;class</span> <span class="pre">'lit_saint.config.ConstrastiveConfig'&gt;</span></em>, <em class="sig-param"><span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5</span></em>, <em class="sig-param"><span class="pre">weight_mse=0.5</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_sepmlp=5</span></em>, <em class="sig-param"><span class="pre">dropout=0.0))</span></em>, <em class="sig-param"><span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001</span></em>, <em class="sig-param"><span class="pre">other_params={})</span></em>, <em class="sig-param"><span class="pre">epochs=2)</span></em>, <em class="sig-param"><span class="pre">train=TrainConfig(internal_dimension_output_layer=20</span></em>, <em class="sig-param"><span class="pre">mlpfory_dropout=0.0</span></em>, <em class="sig-param"><span class="pre">epochs=5</span></em>, <em class="sig-param"><span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001</span></em>, <em class="sig-param"><span class="pre">other_params={}))</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#SaintConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.SaintConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define all the parameters used in SAINT</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.SaintConfig.network">
-<span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.NetworkConfig" title="lit_saint.config.NetworkConfig"><span class="pre">lit_saint.config.NetworkConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">NetworkConfig(num_workers=0,</span> <span class="pre">embedding_size=10,</span> <span class="pre">depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">ff_dropout=0.0,</span> <span class="pre">attention_type='col',</span> <span class="pre">learning_rate=0.03,</span> <span class="pre">learning_rate_pretraining=0.03,</span> <span class="pre">internal_dimension_output_layer=20,</span> <span class="pre">internal_dimension_embed_continuous=100,</span> <span class="pre">dim_head=64,</span> <span class="pre">scale_dim_internal_col=4,</span> <span class="pre">scale_dim_internal_row=4)</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.network" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.NetworkConfig" title="lit_saint.config.NetworkConfig"><span class="pre">lit_saint.config.NetworkConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">NetworkConfig(transformer=TransformerConfig(depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">dropout=0.0,</span> <span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;,</span> <span class="pre">dim_head=64,</span> <span class="pre">scale_dim_internal_col=4,</span> <span class="pre">scale_dim_internal_row=4),</span> <span class="pre">num_workers=0,</span> <span class="pre">embedding_size=10,</span> <span class="pre">internal_dimension_embed_continuous=100,</span> <span class="pre">dropout_embed_continuous=0.0)</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.network" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.SaintConfig.pretrain">
-<span class="sig-name descname"><span class="pre">pretrain</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.PreTrainConfig" title="lit_saint.config.PreTrainConfig"><span class="pre">lit_saint.config.PreTrainConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">PreTrainConfig(aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1),</span> <span class="pre">mixup=MixUpConfig(lam=0.1)),</span> <span class="pre">task=PreTrainTaskConfig(contrastive=None,</span> <span class="pre">contrastive_sim=ConstrastiveSimConfig(weight=0.1),</span> <span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5)))</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.pretrain" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">pretrain</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.PreTrainConfig" title="lit_saint.config.PreTrainConfig"><span class="pre">lit_saint.config.PreTrainConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">PreTrainConfig(aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1),</span> <span class="pre">mixup=MixUpConfig(lam=0.1)),</span> <span class="pre">task=PreTrainTaskConfig(contrastive=&lt;class</span> <span class="pre">'lit_saint.config.ConstrastiveConfig'&gt;,</span> <span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5,</span> <span class="pre">weight_mse=0.5,</span> <span class="pre">scale_dim_internal_sepmlp=5,</span> <span class="pre">dropout=0.0)),</span> <span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={}),</span> <span class="pre">epochs=2)</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.pretrain" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.SaintConfig.train">
+<span class="sig-name descname"><span class="pre">train</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.TrainConfig" title="lit_saint.config.TrainConfig"><span class="pre">lit_saint.config.TrainConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">TrainConfig(internal_dimension_output_layer=20,</span> <span class="pre">mlpfory_dropout=0.0,</span> <span class="pre">epochs=5,</span> <span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={}))</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.train" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lit_saint.config.TrainConfig">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">TrainConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">internal_dimension_output_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlpfory_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#TrainConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.TrainConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Define parameters for the steps used during the training</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TrainConfig.epochs">
+<span class="sig-name descname"><span class="pre">epochs</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">5</span></em><a class="headerlink" href="#lit_saint.config.TrainConfig.epochs" title="Permalink to this definition"></a></dt>
+<dd><p>number of epochs of training phase</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TrainConfig.internal_dimension_output_layer">
+<span class="sig-name descname"><span class="pre">internal_dimension_output_layer</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">20</span></em><a class="headerlink" href="#lit_saint.config.TrainConfig.internal_dimension_output_layer" title="Permalink to this definition"></a></dt>
+<dd><p>internal dimension of the MLP that compute the output</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TrainConfig.mlpfory_dropout">
+<span class="sig-name descname"><span class="pre">mlpfory_dropout</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0</span></em><a class="headerlink" href="#lit_saint.config.TrainConfig.mlpfory_dropout" title="Permalink to this definition"></a></dt>
+<dd><p>probability dropout in the the MLP used for prediction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TrainConfig.optimizer">
+<span class="sig-name descname"><span class="pre">optimizer</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.OptimizerConfig" title="lit_saint.config.OptimizerConfig"><span class="pre">lit_saint.config.OptimizerConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={})</span></em><a class="headerlink" href="#lit_saint.config.TrainConfig.optimizer" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lit_saint.config.TransformerConfig">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">TransformerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">AttentionTypeEnum.col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#TransformerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.TransformerConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.attention_type">
+<span class="sig-name descname"><span class="pre">attention_type</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.AttentionTypeEnum" title="lit_saint.config.AttentionTypeEnum"><span class="pre">lit_saint.config.AttentionTypeEnum</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">'col'</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.attention_type" title="Permalink to this definition"></a></dt>
+<dd><p>type of attention</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.depth">
+<span class="sig-name descname"><span class="pre">depth</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.depth" title="Permalink to this definition"></a></dt>
+<dd><p>number of attention blocks used in the transformer</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.dim_head">
+<span class="sig-name descname"><span class="pre">dim_head</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">64</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.dim_head" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.dropout">
+<span class="sig-name descname"><span class="pre">dropout</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.dropout" title="Permalink to this definition"></a></dt>
+<dd><p>probability dropout in the transformer</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.heads">
+<span class="sig-name descname"><span class="pre">heads</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.heads" title="Permalink to this definition"></a></dt>
+<dd><p>number of heads used in the transformer</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.scale_dim_internal_col">
+<span class="sig-name descname"><span class="pre">scale_dim_internal_col</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">4</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.scale_dim_internal_col" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.scale_dim_internal_row">
+<span class="sig-name descname"><span class="pre">scale_dim_internal_row</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">4</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.scale_dim_internal_row" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -395,7 +514,7 @@ and some random element of the tensor taking random rows</p>
 <span id="lit-saint-datamodule-module"></span><h2>lit_saint.datamodule module<a class="headerlink" href="#module-lit_saint.datamodule" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.datamodule.SaintDatamodule">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.datamodule.</span></span><span class="sig-name descname"><span class="pre">SaintDatamodule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_loader_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretraining</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.datamodule.</span></span><span class="sig-name descname"><span class="pre">SaintDatamodule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_loader_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.datamodule.LightningDataModule</span></code></p>
 <p>It preprocess the data, doing LabelEncoding for the categorical values and fitting a StandardScaler
 for the numerical columns on the training set. And it splits the data and defines the dataloaders</p>
@@ -406,7 +525,6 @@ for the numerical columns on the training set. And it splits the data and define
 <li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the target column</p></li>
 <li><p><strong>split_column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the column used to split the data</p></li>
 <li><p><strong>data_loader_params</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – parameters used to configure the DataLoader</p></li>
-<li><p><strong>pretraining</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag, if False it use only where the target is not NaN</p></li>
 </ul>
 </dd>
 </dl>
@@ -480,6 +598,11 @@ save the dataframe in order to make the predictions</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.datamodule.SaintDatamodule.set_pretraining">
+<span class="sig-name descname"><span class="pre">set_pretraining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretraining</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule.set_pretraining"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule.set_pretraining" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="lit_saint.datamodule.SaintDatamodule.test_dataloader">
 <span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/datamodule.html#SaintDatamodule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.datamodule.SaintDatamodule.test_dataloader" title="Permalink to this definition"></a></dt>
 <dd><p>Function that loads the validation set.</p>
@@ -540,8 +663,8 @@ save the dataframe in order to make the predictions</p>
 <section id="module-lit_saint.model">
 <span id="lit-saint-model-module"></span><h2>lit_saint.model module<a class="headerlink" href="#module-lit_saint.model" title="Permalink to this headline"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.model.</span></span><span class="sig-name descname"><span class="pre">SAINT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">categories</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretraining</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mc_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.model.</span></span><span class="sig-name descname"><span class="pre">Saint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">categories</span></em>, <em class="sig-param"><span class="pre">continuous</span></em>, <em class="sig-param"><span class="pre">dim_target</span></em>, <em class="sig-param"><span class="pre">config</span></em>, <em class="sig-param"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></em>, <em class="sig-param"><span class="pre">loss_fn=None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
 <p>Contains the definition of the network and how to execute the pretraining tasks, and how perform
 the training, validation and test steps</p>
@@ -552,14 +675,12 @@ the training, validation and test steps</p>
 <li><p><strong>continuous</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – List of indices with continuous columns</p></li>
 <li><p><strong>dim_target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – if categorical represent number of classes of the target otherwise is 1</p></li>
 <li><p><strong>config</strong> (<a class="reference internal" href="#lit_saint.config.SaintConfig" title="lit_saint.config.SaintConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintConfig</span></code></a>) – configuration of the model</p></li>
-<li><p><strong>pretraining</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag, if True it will be executed pretraining task</p></li>
-<li><p><strong>mc_dropout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag, if true mc_dropout will be applied during prediction</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.configure_optimizers">
-<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT.configure_optimizers" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.configure_optimizers" title="Permalink to this definition"></a></dt>
 <dd><p>Choose what optimizers and learning-rate schedulers to use in your optimization.
 Normally you’d need one. But in the case of GANs or similar you might have multiple.</p>
 <dl class="simple">
@@ -713,7 +834,7 @@ the scheduler will only be updated when its optimizer is being used.</p>
 <ul class="simple">
 <li><p>Lightning calls <code class="docutils literal notranslate"><span class="pre">.backward()</span></code> and <code class="docutils literal notranslate"><span class="pre">.step()</span></code> on each optimizer and learning rate scheduler as needed.</p></li>
 <li><p>If you use 16-bit precision (<code class="docutils literal notranslate"><span class="pre">precision=16</span></code>), Lightning will automatically handle the optimizers.</p></li>
-<li><p>If you use multiple optimizers, <a class="reference internal" href="#lit_saint.model.SAINT.training_step" title="lit_saint.model.SAINT.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a> will have an additional <code class="docutils literal notranslate"><span class="pre">optimizer_idx</span></code> parameter.</p></li>
+<li><p>If you use multiple optimizers, <a class="reference internal" href="#lit_saint.model.Saint.training_step" title="lit_saint.model.Saint.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a> will have an additional <code class="docutils literal notranslate"><span class="pre">optimizer_idx</span></code> parameter.</p></li>
 <li><p>If you use <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.optim.LBFGS</span></code>, Lightning handles the closure function automatically for you.</p></li>
 <li><p>If you use multiple optimizers, gradients will be calculated only for the parameters of current optimizer
 at each training step.</p></li>
@@ -725,8 +846,8 @@ override the <code class="xref py py-meth docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_categ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cont</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT.forward" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_categ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cont</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.forward" title="Permalink to this definition"></a></dt>
 <dd><p>Same as <code class="xref py py-meth docutils literal notranslate"><span class="pre">torch.nn.Module.forward()</span></code>.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p><a href="#id1"><span class="problematic" id="id2">*</span></a>args: Whatever you decide to pass into the forward method.
@@ -743,8 +864,8 @@ override the <code class="xref py py-meth docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.predict_step">
-<span class="sig-name descname"><span class="pre">predict_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT.predict_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT.predict_step" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.predict_step">
+<span class="sig-name descname"><span class="pre">predict_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.predict_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.predict_step" title="Permalink to this definition"></a></dt>
 <dd><p>Step function called during <code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code>.
 By default, it calls <code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code>.
 Override to add any processing logic.</p>
@@ -783,8 +904,8 @@ dataloader_idx: Index of the current dataloader</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.pretraining_step">
-<span class="sig-name descname"><span class="pre">pretraining_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_categ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cont</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT.pretraining_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT.pretraining_step" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.pretraining_step">
+<span class="sig-name descname"><span class="pre">pretraining_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_categ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cont</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.pretraining_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.pretraining_step" title="Permalink to this definition"></a></dt>
 <dd><p>Defines all the step that must be sued in the pretraing step and return the computed loss</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -800,8 +921,18 @@ dataloader_idx: Index of the current dataloader</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.shared_step">
-<span class="sig-name descname"><span class="pre">shared_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT.shared_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT.shared_step" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.set_mcdropout">
+<span class="sig-name descname"><span class="pre">set_mcdropout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mc_dropout</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.set_mcdropout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.set_mcdropout" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.model.Saint.set_pretraining">
+<span class="sig-name descname"><span class="pre">set_pretraining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretraining</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.set_pretraining"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.set_pretraining" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.model.Saint.shared_step">
+<span class="sig-name descname"><span class="pre">shared_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.shared_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.shared_step" title="Permalink to this definition"></a></dt>
 <dd><p>It define the commons step executed during training, validation and test</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -814,8 +945,8 @@ dataloader_idx: Index of the current dataloader</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.test_step">
-<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT.test_step" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.test_step" title="Permalink to this definition"></a></dt>
 <dd><p>Operates on a single batch of data from the test set.
 In this step you’d normally generate examples or calculate anything of interest
 such as accuracy.</p>
@@ -880,7 +1011,7 @@ dataloader_idx (int): The index of the dataloader that produced this batch</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">({</span><span class="s1">&#39;test_loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;test_acc&#39;</span><span class="p">:</span> <span class="n">test_acc</span><span class="p">})</span>
 </pre></div>
 </div>
-<p>If you pass in multiple test dataloaders, <a class="reference internal" href="#lit_saint.model.SAINT.test_step" title="lit_saint.model.SAINT.test_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test_step()</span></code></a> will have an additional argument.</p>
+<p>If you pass in multiple test dataloaders, <a class="reference internal" href="#lit_saint.model.Saint.test_step" title="lit_saint.model.Saint.test_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test_step()</span></code></a> will have an additional argument.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># CASE 2: multiple test dataloaders</span>
 <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">dataloader_idx</span><span class="p">):</span>
     <span class="c1"># dataloader_idx tells you which dataset this is.</span>
@@ -890,7 +1021,7 @@ dataloader_idx (int): The index of the dataloader that produced this batch</p>
 <dl class="simple">
 <dt>Note:</dt><dd><p>If you don’t need to test you don’t need to implement this method.</p>
 </dd>
-<dt>Note:</dt><dd><p>When the <a class="reference internal" href="#lit_saint.model.SAINT.test_step" title="lit_saint.model.SAINT.test_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test_step()</span></code></a> is called, the model has been put in eval mode and
+<dt>Note:</dt><dd><p>When the <a class="reference internal" href="#lit_saint.model.Saint.test_step" title="lit_saint.model.Saint.test_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test_step()</span></code></a> is called, the model has been put in eval mode and
 PyTorch gradients have been disabled. At the end of the test epoch, the model goes back
 to training mode and gradients are enabled.</p>
 </dd>
@@ -903,13 +1034,13 @@ to training mode and gradients are enabled.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#lit_saint.model.SAINT.training" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#lit_saint.model.Saint.training" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.training_step">
-<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT.training_step" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.training_step" title="Permalink to this definition"></a></dt>
 <dd><p>Here you compute and return the training loss and some additional metrics for e.g.
 the progress bar or logger.</p>
 <dl>
@@ -982,8 +1113,8 @@ so it differs from the actual loss returned in train/validation step.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lit_saint.model.SAINT.validation_step">
-<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#SAINT.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.SAINT.validation_step" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lit_saint.model.Saint.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.validation_step" title="Permalink to this definition"></a></dt>
 <dd><p>Operates on a single batch of data from the validation set.
 In this step you’d might generate examples or calculate anything of interest like accuracy.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># the pseudocode for these calls</span>
@@ -1054,7 +1185,7 @@ dataloader_idx (int): The index of the dataloader that produced this batch</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">({</span><span class="s1">&#39;val_loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;val_acc&#39;</span><span class="p">:</span> <span class="n">val_acc</span><span class="p">})</span>
 </pre></div>
 </div>
-<p>If you pass in multiple val dataloaders, <a class="reference internal" href="#lit_saint.model.SAINT.validation_step" title="lit_saint.model.SAINT.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a> will have an additional argument.</p>
+<p>If you pass in multiple val dataloaders, <a class="reference internal" href="#lit_saint.model.Saint.validation_step" title="lit_saint.model.Saint.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a> will have an additional argument.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># CASE 2: multiple validation dataloaders</span>
 <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">dataloader_idx</span><span class="p">):</span>
     <span class="c1"># dataloader_idx tells you which dataset this is.</span>
@@ -1064,7 +1195,7 @@ dataloader_idx (int): The index of the dataloader that produced this batch</p>
 <dl class="simple">
 <dt>Note:</dt><dd><p>If you don’t need to validate you don’t need to implement this method.</p>
 </dd>
-<dt>Note:</dt><dd><p>When the <a class="reference internal" href="#lit_saint.model.SAINT.validation_step" title="lit_saint.model.SAINT.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a> is called, the model has been put in eval mode
+<dt>Note:</dt><dd><p>When the <a class="reference internal" href="#lit_saint.model.Saint.validation_step" title="lit_saint.model.Saint.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a> is called, the model has been put in eval mode
 and PyTorch gradients have been disabled. At the end of validation,
 the model goes back to training mode and gradients are enabled.</p>
 </dd>
@@ -1387,50 +1518,96 @@ registered hooks while the latter silently ignores them.</p>
 </dd></dl>
 
 </section>
-<section id="module-lit_saint.utils">
-<span id="lit-saint-utils-module"></span><h2>lit_saint.utils module<a class="headerlink" href="#module-lit_saint.utils" title="Permalink to this headline"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="lit_saint.utils.mc_dropout">
-<span class="sig-prename descclassname"><span class="pre">lit_saint.utils.</span></span><span class="sig-name descname"><span class="pre">mc_dropout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/utils.html#mc_dropout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.utils.mc_dropout" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<section id="module-lit_saint.trainer">
+<span id="lit-saint-trainer-module"></span><h2>lit_saint.trainer module<a class="headerlink" href="#module-lit_saint.trainer" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lit_saint.trainer.SaintTrainer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.trainer.</span></span><span class="sig-name descname"><span class="pre">SaintTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrainer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/trainer.html#SaintTrainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.trainer.SaintTrainer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class simplify how to train and make predictions using Saint</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_module</strong> (<a class="reference internal" href="#lit_saint.datamodule.SaintDatamodule" title="lit_saint.datamodule.SaintDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintDatamodule</span></code></a>) – </p></li>
-<li><p><strong>model</strong> (<a class="reference internal" href="#lit_saint.model.SAINT" title="lit_saint.model.SAINT"><code class="xref py py-class docutils literal notranslate"><span class="pre">SAINT</span></code></a>) – </p></li>
-<li><p><strong>trainer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>) – </p></li>
-<li><p><strong>n_iterations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
-<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – </p></li>
+<li><p><strong>pretrainer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>]) – The Trainer that will be used during the pretraining phase</p></li>
+<li><p><strong>trainer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>]) – The Trainer that will be used during the training and preciction phase</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.trainer.SaintTrainer.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datamodule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_pretraining</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/trainer.html#SaintTrainer.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.trainer.SaintTrainer.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Runs the full optimization routine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#lit_saint.model.Saint" title="lit_saint.model.Saint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Saint</span></code></a>) – instance of Saint that will be used for the training</p></li>
+<li><p><strong>datamodule</strong> (<a class="reference internal" href="#lit_saint.datamodule.SaintDatamodule" title="lit_saint.datamodule.SaintDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintDatamodule</span></code></a>) – instance of SaintDataModule that contains the data for the training</p></li>
+<li><p><strong>enable_pretraining</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag, if True the pretraining will be executed otherwise only the training</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="lit_saint.utils.pretraining_and_training_model">
-<span class="sig-prename descclassname"><span class="pre">lit_saint.utils.</span></span><span class="sig-name descname"><span class="pre">pretraining_and_training_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrainer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/utils.html#pretraining_and_training_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.utils.pretraining_and_training_model" title="Permalink to this definition"></a></dt>
-<dd><p>Tis utility allow to execute the pretraining step and the training one or only one of them</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.trainer.SaintTrainer.get_model_from_checkpoint">
+<span class="sig-name descname"><span class="pre">get_model_from_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretraining</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/trainer.html#SaintTrainer.get_model_from_checkpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.trainer.SaintTrainer.get_model_from_checkpoint" title="Permalink to this definition"></a></dt>
+<dd><p>Function that load the best checkpoint and update the model inplace</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_module</strong> (<a class="reference internal" href="#lit_saint.datamodule.SaintDatamodule" title="lit_saint.datamodule.SaintDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintDatamodule</span></code></a>) – </p></li>
-<li><p><strong>model</strong> (<a class="reference internal" href="#lit_saint.model.SAINT" title="lit_saint.model.SAINT"><code class="xref py py-class docutils literal notranslate"><span class="pre">SAINT</span></code></a>) – </p></li>
-<li><p><strong>pretrainer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>]) – </p></li>
-<li><p><strong>trainer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>]) – </p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="#lit_saint.model.Saint" title="lit_saint.model.Saint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Saint</span></code></a>) – instance of Saint that will be updated by the checkpoint</p></li>
+<li><p><strong>pretraining</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag if true the checkpoint will be taken from the pretrainer</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>[&lt;class ‘lit_saint.model.SAINT’&gt;, &lt;class ‘pytorch_lightning.trainer.trainer.Trainer’&gt;]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.trainer.SaintTrainer.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datamodule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mc_dropout_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/trainer.html#SaintTrainer.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.trainer.SaintTrainer.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Separates from fit to make sure you never run on your predictions set until you want to.
+This will call the model forward function to compute predictions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#lit_saint.model.Saint" title="lit_saint.model.Saint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Saint</span></code></a>) – model used for the prediction</p></li>
+<li><p><strong>datamodule</strong> (<a class="reference internal" href="#lit_saint.datamodule.SaintDatamodule" title="lit_saint.datamodule.SaintDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintDatamodule</span></code></a>) – the datamodule that will preprocess the data before prediction</p></li>
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – the data taht will be used for prediction</p></li>
+<li><p><strong>mc_dropout_iterations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of iterations used for mcdropout estimation, if 0 it will not use</p></li>
+</ul>
+</dd>
+</dl>
+<p>mcdropout</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.trainer.SaintTrainer.prefit">
+<span class="sig-name descname"><span class="pre">prefit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datamodule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/trainer.html#SaintTrainer.prefit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.trainer.SaintTrainer.prefit" title="Permalink to this definition"></a></dt>
+<dd><p>Function that is used for the pretraining of the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#lit_saint.model.Saint" title="lit_saint.model.Saint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Saint</span></code></a>) – instance of Saint that will be used for the pretraining</p></li>
+<li><p><strong>datamodule</strong> (<a class="reference internal" href="#lit_saint.datamodule.SaintDatamodule" title="lit_saint.datamodule.SaintDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintDatamodule</span></code></a>) – instance of SaintDataModule that contains the data for the pretraining</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>

@@ -70,8 +70,32 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lit_saint.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="k">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="k">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="ConstrativeEnum"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ConstrativeEnum">[docs]</a><span class="k">class</span> <span class="nc">ConstrativeEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">simsiam</span> <span class="o">=</span> <span class="s1">&#39;simsiam&#39;</span>
+    <span class="n">standard</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span></div>
+
+
+<div class="viewcode-block" id="ProjectionHeadStyleEnum"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ProjectionHeadStyleEnum">[docs]</a><span class="k">class</span> <span class="nc">ProjectionHeadStyleEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">same</span> <span class="o">=</span> <span class="s1">&#39;same&#39;</span>
+    <span class="n">different</span> <span class="o">=</span> <span class="s1">&#39;different&#39;</span></div>
+
+
+<div class="viewcode-block" id="AttentionTypeEnum"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.AttentionTypeEnum">[docs]</a><span class="k">class</span> <span class="nc">AttentionTypeEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="s2">&quot;col&quot;</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="s2">&quot;row&quot;</span>
+    <span class="n">colrow</span> <span class="o">=</span> <span class="s2">&quot;colrow&quot;</span></div>
+
+
+<div class="viewcode-block" id="OptimizerConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.OptimizerConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">OptimizerConfig</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Define the parameters for CutMix augmentation&quot;&quot;&quot;</span>
+    <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span>  <span class="c1">#: value used to specify the learning rate</span>
+    <span class="n">other_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CutMixConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.CutMixConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -86,17 +110,13 @@
     <span class="n">lam</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1">#: weight used for the linear combination</span></div>
 
 
-<div class="viewcode-block" id="ConstrastiveSimConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ConstrastiveSimConfig">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ConstrastiveSimConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Define the parameters for ContrastiveSim pretraining task&quot;&quot;&quot;</span>
-    <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1">#: weight of the loss for this pretraining task</span></div>
-
-
 <div class="viewcode-block" id="ConstrastiveConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ConstrastiveConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ConstrastiveConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define the parameters for Contrastive pretraining task&quot;&quot;&quot;</span>
-    <span class="n">projhead_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;same&#39;</span>  <span class="c1">#: can be same or different and it is used to project embeddings</span>
-    <span class="n">nce_temp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: temperature used for the logits</span>
+    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>  <span class="c1">#: probability dropout in projection head</span>
+    <span class="n">constrastive_type</span><span class="p">:</span> <span class="n">ConstrativeEnum</span> <span class="o">=</span> <span class="n">ConstrativeEnum</span><span class="o">.</span><span class="n">simsiam</span>
+    <span class="n">projhead_style</span><span class="p">:</span> <span class="n">ProjectionHeadStyleEnum</span> <span class="o">=</span> <span class="n">ProjectionHeadStyleEnum</span><span class="o">.</span><span class="n">different</span>  <span class="c1">#: it is used to project embeddings</span>
+    <span class="n">nce_temp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: temperature used for the logits in case of standard constrastive type</span>
     <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1">#: weight of the loss for this pretraining task</span></div>
 
 
@@ -105,7 +125,8 @@
     <span class="sd">&quot;&quot;&quot;Define the parameters for Denoising pretraining task&quot;&quot;&quot;</span>
     <span class="n">weight_cross_entropy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: weight reconstruction loss for categorical features</span>
     <span class="n">weight_mse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: weight reconstruction loss for continuous features</span>
-    <span class="n">scale_dim_internal_sepmlp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># scale factor of the input dimension for the first linear layer</span></div>
+    <span class="n">scale_dim_internal_sepmlp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># scale factor of the input dimension for the first linear layer</span>
+    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>  <span class="c1">#: probability dropout in SepMLP</span></div>
 
 
 <div class="viewcode-block" id="AugmentationConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.AugmentationConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -118,8 +139,7 @@
 <div class="viewcode-block" id="PreTrainTaskConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.PreTrainTaskConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">PreTrainTaskConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define the parameters used for pretraining tasks&quot;&quot;&quot;</span>
-    <span class="n">contrastive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstrastiveConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">contrastive_sim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstrastiveSimConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConstrastiveSimConfig</span><span class="p">()</span>
+    <span class="n">contrastive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstrastiveConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConstrastiveConfig</span>
     <span class="n">denoising</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DenoisingConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">DenoisingConfig</span><span class="p">()</span></div>
 
 
@@ -127,32 +147,47 @@
 <span class="k">class</span> <span class="nc">PreTrainConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define parameters for the steps used during the pretraining&quot;&quot;&quot;</span>
     <span class="n">aug</span><span class="p">:</span> <span class="n">AugmentationConfig</span> <span class="o">=</span> <span class="n">AugmentationConfig</span><span class="p">()</span>
-    <span class="n">task</span><span class="p">:</span> <span class="n">PreTrainTaskConfig</span> <span class="o">=</span> <span class="n">PreTrainTaskConfig</span><span class="p">()</span></div>
+    <span class="n">task</span><span class="p">:</span> <span class="n">PreTrainTaskConfig</span> <span class="o">=</span> <span class="n">PreTrainTaskConfig</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">OptimizerConfig</span> <span class="o">=</span> <span class="n">OptimizerConfig</span><span class="p">()</span>
+    <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1">#: number of epochs of training phase</span></div>
+
+
+<div class="viewcode-block" id="TrainConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.TrainConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TrainConfig</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Define parameters for the steps used during the training&quot;&quot;&quot;</span>
+    <span class="n">internal_dimension_output_layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1">#: internal dimension of the MLP that compute the output</span>
+    <span class="n">mlpfory_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>  <span class="c1">#: probability dropout in the the MLP used for prediction</span>
+    <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1">#: number of epochs of training phase</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">OptimizerConfig</span> <span class="o">=</span> <span class="n">OptimizerConfig</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TransformerConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.TransformerConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TransformerConfig</span><span class="p">:</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1">#: number of attention blocks used in the transformer</span>
+    <span class="n">heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1">#: number of heads used in the transformer</span>
+    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>  <span class="c1">#: probability dropout in the transformer</span>
+    <span class="n">attention_type</span><span class="p">:</span> <span class="n">AttentionTypeEnum</span> <span class="o">=</span> <span class="n">AttentionTypeEnum</span><span class="o">.</span><span class="n">col</span>  <span class="c1">#: type of attention</span>
+    <span class="n">dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">scale_dim_internal_col</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># scale factor of the input dimension in case of attention_type col</span>
+    <span class="n">scale_dim_internal_row</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># scale factor of the input dimension in case of attention_type row</span></div>
 
 
 <div class="viewcode-block" id="NetworkConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.NetworkConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">NetworkConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define the neural network parameters&quot;&quot;&quot;</span>
+    <span class="n">transformer</span><span class="p">:</span> <span class="n">TransformerConfig</span> <span class="o">=</span> <span class="n">TransformerConfig</span><span class="p">()</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1">#: number of cores to use</span>
     <span class="n">embedding_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1">#: dimension of computed embeddings</span>
-    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1">#: number of attention blocks used in the transformer</span>
-    <span class="n">heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1">#: number of heads used in the transformer</span>
-    <span class="n">ff_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>  <span class="c1">#: probability dropout in the feed forward layers</span>
-    <span class="n">attention_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;col&#39;</span>  <span class="c1">#: type of attention can be the self attention or intersample attention</span>
-    <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span>  <span class="c1">#: value used to specify the learning rate for the optimizer</span>
-    <span class="n">learning_rate_pretraining</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span>  <span class="c1">#: value used to specify the learning rate for the optimizer pretraining</span>
-    <span class="n">internal_dimension_output_layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1">#: internal dimension of the MLP that compute the output</span>
     <span class="n">internal_dimension_embed_continuous</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1">#: internal dimension of the mlp used to project continuous columns</span>
-    <span class="n">dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span>
-    <span class="n">scale_dim_internal_col</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># scale factor of the input dimension in case of attention_type col</span>
-    <span class="n">scale_dim_internal_row</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># scale factor of the input dimension in case of attention_type row</span></div>
+    <span class="n">dropout_embed_continuous</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>  <span class="c1">#: dropout used to compute embedding continuous features</span></div>
 
 
 <div class="viewcode-block" id="SaintConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.SaintConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SaintConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define all the parameters used in SAINT&quot;&quot;&quot;</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">NetworkConfig</span> <span class="o">=</span> <span class="n">NetworkConfig</span><span class="p">()</span>
-    <span class="n">pretrain</span><span class="p">:</span> <span class="n">PreTrainConfig</span> <span class="o">=</span> <span class="n">PreTrainConfig</span><span class="p">()</span></div>
+    <span class="n">pretrain</span><span class="p">:</span> <span class="n">PreTrainConfig</span> <span class="o">=</span> <span class="n">PreTrainConfig</span><span class="p">()</span>
+    <span class="n">train</span><span class="p">:</span> <span class="n">TrainConfig</span> <span class="o">=</span> <span class="n">TrainConfig</span><span class="p">()</span></div>
 </pre></div>
 
            </div>
