@@ -32,7 +32,8 @@ def read_config(cfg: SaintConfig) -> None:
     df_val["split"] = "validation"
     df = pd.concat([df_train, df_val])
     data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split",
-                                  num_workers=cfg.network.num_workers)
+                                  num_workers=cfg.network.num_workers,
+                                  data_loader_params={"batch_size": cfg.network.batch_size})
     model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, dim_target=data_module.dim_target)
     checkpoint_callback_pre = ModelCheckpoint(
@@ -49,15 +50,14 @@ def read_config(cfg: SaintConfig) -> None:
     )
     early_stopping_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=3)
 
-    pretrainer = Trainer(max_epochs=cfg.pretrain.epochs, callbacks=[checkpoint_callback_pre, early_stopping_callback])
-    trainer = Trainer(max_epochs=cfg.train.epochs, callbacks=[checkpoint_callback, early_stopping_callback],
+    pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback_pre, early_stopping_callback])
+    trainer = Trainer(max_epochs=2, callbacks=[checkpoint_callback, early_stopping_callback],
                       deterministic=True)
     saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
     saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=True)
     prediction = saint_trainer.predict(model=model, datamodule=data_module, df=df_test)
     df_test["prediction"] = np.argmax(prediction, axis=1)
     print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
-    #return f1_score(data_module.predict_set[df.columns[14]], df_test["prediction"])
 
 
 if __name__ == "__main__":

@@ -85,7 +85,7 @@ class TrainConfig:
     """Define parameters for the steps used during the training"""
     internal_dimension_output_layer: int = 20  #: internal dimension of the MLP that compute the output
     mlpfory_dropout: float = .0  #: probability dropout in the the MLP used for prediction
-    epochs: int = 5  #: number of epochs of training phase
+    epochs: int = 10  #: number of epochs of training phase
     optimizer: OptimizerConfig = OptimizerConfig()
 
 
@@ -93,7 +93,7 @@ class TrainConfig:
 class TransformerConfig:
     depth: int = 3  #: number of attention blocks used in the transformer
     heads: int = 1  #: number of heads used in the transformer
-    dropout: float = .0  #: probability dropout in the transformer
+    dropout: float = 0.1  #: probability dropout in the transformer
     attention_type: AttentionTypeEnum = AttentionTypeEnum.col  #: type of attention
     dim_head: int = 64
     scale_dim_internal_col: float = 4  # scale factor of the input dimension in case of attention_type col
@@ -108,6 +108,7 @@ class NetworkConfig:
     embedding_size: int = 10  #: dimension of computed embeddings
     internal_dimension_embed_continuous: int = 100  #: internal dimension of the mlp used to project continuous columns
     dropout_embed_continuous: float = .0  #: dropout used to compute embedding continuous features
+    batch_size: int = 256  #: dimension of batches using by dataloaders
 
 
 @dataclass
