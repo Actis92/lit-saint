@@ -14,6 +14,7 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -42,6 +43,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Network Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../augmentations.html">Data Augmentation Techniques</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../uncertainty.html">Uncertainty Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_classification.html">Example Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_regression.html">Example Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../_generated/lit_saint.html">lit_saint package</a></li>
 </ul>
 
@@ -72,10 +75,10 @@
   <h1>Source code for lit_saint.trainer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 
-<span class="kn">from</span> <span class="nn">lit_saint</span> <span class="k">import</span> <span class="n">Saint</span><span class="p">,</span> <span class="n">SaintDatamodule</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning.trainer</span> <span class="k">import</span> <span class="n">Trainer</span>
+<span class="kn">from</span> <span class="nn">lit_saint</span> <span class="kn">import</span> <span class="n">Saint</span><span class="p">,</span> <span class="n">SaintDatamodule</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning.trainer</span> <span class="kn">import</span> <span class="n">Trainer</span>
 
 
 <div class="viewcode-block" id="SaintTrainer"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.trainer.SaintTrainer">[docs]</a><span class="k">class</span> <span class="nc">SaintTrainer</span><span class="p">:</span>
@@ -84,7 +87,7 @@
 <span class="sd">    :param pretrainer: The Trainer that will be used during the pretraining phase</span>
 <span class="sd">    :param trainer: The Trainer that will be used during the training and preciction phase</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretrainer</span><span class="p">:</span> <span class="n">Trainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretrainer</span><span class="p">:</span> <span class="n">Trainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pretrainer</span> <span class="o">=</span> <span class="n">pretrainer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">trainer</span>
 

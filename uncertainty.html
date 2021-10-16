@@ -15,10 +15,11 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="lit_saint package" href="_generated/lit_saint.html" />
+    <link rel="next" title="Example Classification" href="example_classification.html" />
     <link rel="prev" title="Data Augmentation Techniques" href="augmentations.html" /> 
 </head>
 
@@ -47,10 +48,13 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Uncertainty Estimation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#monte-carlo-dropout">Monte Carlo Dropout</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#implementation">Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-use-it">How to use it</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="example_classification.html">Example Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_regression.html">Example Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_generated/lit_saint.html">lit_saint package</a></li>
 </ul>
 
@@ -78,7 +82,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="uncertainty-estimation">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="uncertainty-estimation">
 <h1>Uncertainty Estimation<a class="headerlink" href="#uncertainty-estimation" title="Permalink to this headline"></a></h1>
 <section id="monte-carlo-dropout">
 <h2>Monte Carlo Dropout<a class="headerlink" href="#monte-carlo-dropout" title="Permalink to this headline"></a></h2>
@@ -101,6 +129,24 @@ often improves its performance.</p>
 <p>In this way all the Dropout layers become trainable during the predict step and so
 we will get different prediction anytime we call the model on the same data</p>
 </section>
+<section id="how-to-use-it">
+<h3>How to use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline"></a></h3>
+<p>Using the SaintTrainer is possible to specify the number of iterations to use for the
+MCDropout in the predict, when it is zero it doesn’t use the algorithm and return the standard result.
+The dimension of the output will be [N_SAMPLE, N_CLASS, N_ITERATION] where:</p>
+<ul class="simple">
+<li><p>N_SAMPLE is equal to the number of rows of the dataset used for the prediction;</p></li>
+<li><p>N_CLASS is equal to the number of classes of the problem(in case of regression is equal to 1);</p></li>
+<li><p>N_ITERATION is equal to the number of iteration of the MCDropout process</p></li>
+</ul>
+<p>Remember to set the value for the dropout in the Transformer or/and in the embeddings different from zero,
+otherwise all the predictions will have the same value and this technique will be not applicable.</p>
+<p>This technique can be used to perform Active Learning, and find the the samples where the model has a greatest uncertainty
+and that if we can obtain labels for these samples we can improve the performance of the network</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span> <span class="o">=</span> <span class="n">saint_trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">data_module</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df_test</span><span class="p">,</span> <span class="n">mc_dropout_iterations</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 
@@ -109,7 +155,7 @@ we will get different prediction anytime we call the model on the same data</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="augmentations.html" class="btn btn-neutral float-left" title="Data Augmentation Techniques" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="_generated/lit_saint.html" class="btn btn-neutral float-right" title="lit_saint package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="example_classification.html" class="btn btn-neutral float-right" title="Example Classification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

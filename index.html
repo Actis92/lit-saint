@@ -15,6 +15,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -44,6 +45,8 @@
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Network Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="augmentations.html">Data Augmentation Techniques</a></li>
 <li class="toctree-l1"><a class="reference internal" href="uncertainty.html">Uncertainty Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_classification.html">Example Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_regression.html">Example Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_generated/lit_saint.html">lit_saint package</a></li>
 </ul>
 
@@ -71,7 +74,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-saint-lightning-s-documentation">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="welcome-to-saint-lightning-s-documentation">
 <h1>Welcome to SAINT Lightning’s documentation!<a class="headerlink" href="#welcome-to-saint-lightning-s-documentation" title="Permalink to this headline"></a></h1>
 <section id="saint-lightning">
 <h2>Saint Lightning<a class="headerlink" href="#saint-lightning" title="Permalink to this headline"></a></h2>
@@ -122,11 +149,29 @@ Find the paper on <a class="reference external" href="https://arxiv.org/abs/2106
 <span class="n">df_test</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
+<section id="preprocessing">
+<h4>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline"></a></h4>
+<ol class="arabic simple">
+<li><p>The numerical columns are filled with zeros in case of missing values</p></li>
+<li><p>The categorical columns are filled with a new category with the value SAINT_NAN in case of missing values</p></li>
+<li><p>The numerical columns are scaled using a StandardScaler unless you specify a different scaler inside the SaintDataModule</p></li>
+<li><p>The columns that are of type [“object”, “category”] are considered categorical</p></li>
+<li><p>The columns that are of type [“int64”, “float64”, “int32”, “float32”] are considered numerical</p></li>
+<li><p>All the columns that have a type different from the one specified before aren’t used inside the model</p></li>
+<li><p>During the pretraining the rows that have the target column with nan value are used, instead are dropped before start the training</p></li>
+</ol>
+<p>Some suggestions are:</p>
+<ul class="simple">
+<li><p>If you want to fill the columns in a different way from the default one you need to do it before to use in the SaintDataModule</p></li>
+<li><p>If you want to use columns that contains datetime, you need to extract some features (i.e day of week) or convert them in epoch</p></li>
+<li><p>If you have a classification problem the column that contain the target must be of type “object” or “category”</p></li>
+</ul>
+</section>
 </section>
 <section id="how-to-generate-yaml">
 <h3>How to Generate Yaml<a class="headerlink" href="#how-to-generate-yaml" title="Permalink to this headline"></a></h3>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lit_saint</span> <span class="k">import</span> <span class="n">SaintConfig</span>
-<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="k">import</span> <span class="n">OmegaConf</span>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lit_saint</span> <span class="kn">import</span> <span class="n">SaintConfig</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">OmegaConf</span>
 
 
 <span class="n">conf</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">SaintConfig</span><span class="p">)</span>
@@ -160,6 +205,26 @@ Find the paper on <a class="reference external" href="https://arxiv.org/abs/2106
 </li>
 <li class="toctree-l1"><a class="reference internal" href="uncertainty.html">Uncertainty Estimation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="uncertainty.html#monte-carlo-dropout">Monte Carlo Dropout</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example_classification.html">Example Classification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="example_classification.html#Import-libraries">Import libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_classification.html#Download-Data">Download Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_classification.html#Configure-lit-saint">Configure lit-saint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_classification.html#Prepare-Data">Prepare Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_classification.html#Fit-the-model">Fit the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_classification.html#Make-predictions">Make predictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_classification.html#Uncertainty-Estimation">Uncertainty Estimation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example_regression.html">Example Regression</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="example_regression.html#Import-libraries">Import libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_regression.html#Download-Data">Download Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_regression.html#Configure-lit-saint">Configure lit-saint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_regression.html#Prepare-Data">Prepare Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_regression.html#Fit-the-model">Fit the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_regression.html#Make-predictions">Make predictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_regression.html#Uncertainty-Estimation">Uncertainty Estimation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="_generated/lit_saint.html">lit_saint package</a><ul>

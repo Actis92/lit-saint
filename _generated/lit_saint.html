@@ -15,10 +15,11 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Uncertainty Estimation" href="../uncertainty.html" /> 
+    <link rel="prev" title="Example Regression" href="../example_regression.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,6 +45,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../architecture.html">Network Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../augmentations.html">Data Augmentation Techniques</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../uncertainty.html">Uncertainty Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_classification.html">Example Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_regression.html">Example Regression</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">lit_saint package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lit_saint.augmentations">lit_saint.augmentations module</a></li>
@@ -83,7 +86,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="lit-saint-package">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="lit-saint-package">
 <h1>lit_saint package<a class="headerlink" href="#lit-saint-package" title="Permalink to this headline"></a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
@@ -297,9 +324,15 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.NetworkConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">NetworkConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">transformer=TransformerConfig(depth=3</span></em>, <em class="sig-param"><span class="pre">heads=1</span></em>, <em class="sig-param"><span class="pre">dropout=0.0</span></em>, <em class="sig-param"><span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;</span></em>, <em class="sig-param"><span class="pre">dim_head=64</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_col=4</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_row=4)</span></em>, <em class="sig-param"><span class="pre">num_workers=0</span></em>, <em class="sig-param"><span class="pre">embedding_size=10</span></em>, <em class="sig-param"><span class="pre">internal_dimension_embed_continuous=100</span></em>, <em class="sig-param"><span class="pre">dropout_embed_continuous=0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#NetworkConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.NetworkConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">NetworkConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">transformer=TransformerConfig(depth=3</span></em>, <em class="sig-param"><span class="pre">heads=1</span></em>, <em class="sig-param"><span class="pre">dropout=0.1</span></em>, <em class="sig-param"><span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;</span></em>, <em class="sig-param"><span class="pre">dim_head=64</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_col=4</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_row=4)</span></em>, <em class="sig-param"><span class="pre">num_workers=0</span></em>, <em class="sig-param"><span class="pre">embedding_size=10</span></em>, <em class="sig-param"><span class="pre">internal_dimension_embed_continuous=100</span></em>, <em class="sig-param"><span class="pre">dropout_embed_continuous=0.0</span></em>, <em class="sig-param"><span class="pre">batch_size=256</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#NetworkConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.NetworkConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define the neural network parameters</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.batch_size">
+<span class="sig-name descname"><span class="pre">batch_size</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">256</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.batch_size" title="Permalink to this definition"></a></dt>
+<dd><p>dimension of batches using by dataloaders</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.dropout_embed_continuous">
 <span class="sig-name descname"><span class="pre">dropout_embed_continuous</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.dropout_embed_continuous" title="Permalink to this definition"></a></dt>
@@ -326,7 +359,7 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.NetworkConfig.transformer">
-<span class="sig-name descname"><span class="pre">transformer</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.TransformerConfig" title="lit_saint.config.TransformerConfig"><span class="pre">lit_saint.config.TransformerConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">TransformerConfig(depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">dropout=0.0,</span> <span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;,</span> <span class="pre">dim_head=64,</span> <span class="pre">scale_dim_internal_col=4,</span> <span class="pre">scale_dim_internal_row=4)</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.transformer" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">transformer</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.TransformerConfig" title="lit_saint.config.TransformerConfig"><span class="pre">lit_saint.config.TransformerConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">TransformerConfig(depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">dropout=0.1,</span> <span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;,</span> <span class="pre">dim_head=64,</span> <span class="pre">scale_dim_internal_col=4,</span> <span class="pre">scale_dim_internal_row=4)</span></em><a class="headerlink" href="#lit_saint.config.NetworkConfig.transformer" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -414,12 +447,12 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.SaintConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">SaintConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">network=NetworkConfig(transformer=TransformerConfig(depth=3</span></em>, <em class="sig-param"><span class="pre">heads=1</span></em>, <em class="sig-param"><span class="pre">dropout=0.0</span></em>, <em class="sig-param"><span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;</span></em>, <em class="sig-param"><span class="pre">dim_head=64</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_col=4</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_row=4)</span></em>, <em class="sig-param"><span class="pre">num_workers=0</span></em>, <em class="sig-param"><span class="pre">embedding_size=10</span></em>, <em class="sig-param"><span class="pre">internal_dimension_embed_continuous=100</span></em>, <em class="sig-param"><span class="pre">dropout_embed_continuous=0.0)</span></em>, <em class="sig-param"><span class="pre">pretrain=PreTrainConfig(aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1)</span></em>, <em class="sig-param"><span class="pre">mixup=MixUpConfig(lam=0.1))</span></em>, <em class="sig-param"><span class="pre">task=PreTrainTaskConfig(contrastive=&lt;class</span> <span class="pre">'lit_saint.config.ConstrastiveConfig'&gt;</span></em>, <em class="sig-param"><span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5</span></em>, <em class="sig-param"><span class="pre">weight_mse=0.5</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_sepmlp=5</span></em>, <em class="sig-param"><span class="pre">dropout=0.0))</span></em>, <em class="sig-param"><span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001</span></em>, <em class="sig-param"><span class="pre">other_params={})</span></em>, <em class="sig-param"><span class="pre">epochs=2)</span></em>, <em class="sig-param"><span class="pre">train=TrainConfig(internal_dimension_output_layer=20</span></em>, <em class="sig-param"><span class="pre">mlpfory_dropout=0.0</span></em>, <em class="sig-param"><span class="pre">epochs=5</span></em>, <em class="sig-param"><span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001</span></em>, <em class="sig-param"><span class="pre">other_params={}))</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#SaintConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.SaintConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">SaintConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">network=NetworkConfig(transformer=TransformerConfig(depth=3</span></em>, <em class="sig-param"><span class="pre">heads=1</span></em>, <em class="sig-param"><span class="pre">dropout=0.1</span></em>, <em class="sig-param"><span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;</span></em>, <em class="sig-param"><span class="pre">dim_head=64</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_col=4</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_row=4)</span></em>, <em class="sig-param"><span class="pre">num_workers=0</span></em>, <em class="sig-param"><span class="pre">embedding_size=10</span></em>, <em class="sig-param"><span class="pre">internal_dimension_embed_continuous=100</span></em>, <em class="sig-param"><span class="pre">dropout_embed_continuous=0.0</span></em>, <em class="sig-param"><span class="pre">batch_size=256)</span></em>, <em class="sig-param"><span class="pre">pretrain=PreTrainConfig(aug=AugmentationConfig(cutmix=CutMixConfig(lam=0.1)</span></em>, <em class="sig-param"><span class="pre">mixup=MixUpConfig(lam=0.1))</span></em>, <em class="sig-param"><span class="pre">task=PreTrainTaskConfig(contrastive=&lt;class</span> <span class="pre">'lit_saint.config.ConstrastiveConfig'&gt;</span></em>, <em class="sig-param"><span class="pre">denoising=DenoisingConfig(weight_cross_entropy=0.5</span></em>, <em class="sig-param"><span class="pre">weight_mse=0.5</span></em>, <em class="sig-param"><span class="pre">scale_dim_internal_sepmlp=5</span></em>, <em class="sig-param"><span class="pre">dropout=0.0))</span></em>, <em class="sig-param"><span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001</span></em>, <em class="sig-param"><span class="pre">other_params={})</span></em>, <em class="sig-param"><span class="pre">epochs=2)</span></em>, <em class="sig-param"><span class="pre">train=TrainConfig(internal_dimension_output_layer=20</span></em>, <em class="sig-param"><span class="pre">mlpfory_dropout=0.0</span></em>, <em class="sig-param"><span class="pre">epochs=10</span></em>, <em class="sig-param"><span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001</span></em>, <em class="sig-param"><span class="pre">other_params={}))</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#SaintConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.SaintConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define all the parameters used in SAINT</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.SaintConfig.network">
-<span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.NetworkConfig" title="lit_saint.config.NetworkConfig"><span class="pre">lit_saint.config.NetworkConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">NetworkConfig(transformer=TransformerConfig(depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">dropout=0.0,</span> <span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;,</span> <span class="pre">dim_head=64,</span> <span class="pre">scale_dim_internal_col=4,</span> <span class="pre">scale_dim_internal_row=4),</span> <span class="pre">num_workers=0,</span> <span class="pre">embedding_size=10,</span> <span class="pre">internal_dimension_embed_continuous=100,</span> <span class="pre">dropout_embed_continuous=0.0)</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.network" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.NetworkConfig" title="lit_saint.config.NetworkConfig"><span class="pre">lit_saint.config.NetworkConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">NetworkConfig(transformer=TransformerConfig(depth=3,</span> <span class="pre">heads=1,</span> <span class="pre">dropout=0.1,</span> <span class="pre">attention_type=&lt;AttentionTypeEnum.col:</span> <span class="pre">'col'&gt;,</span> <span class="pre">dim_head=64,</span> <span class="pre">scale_dim_internal_col=4,</span> <span class="pre">scale_dim_internal_row=4),</span> <span class="pre">num_workers=0,</span> <span class="pre">embedding_size=10,</span> <span class="pre">internal_dimension_embed_continuous=100,</span> <span class="pre">dropout_embed_continuous=0.0,</span> <span class="pre">batch_size=256)</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.network" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -429,19 +462,19 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.SaintConfig.train">
-<span class="sig-name descname"><span class="pre">train</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.TrainConfig" title="lit_saint.config.TrainConfig"><span class="pre">lit_saint.config.TrainConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">TrainConfig(internal_dimension_output_layer=20,</span> <span class="pre">mlpfory_dropout=0.0,</span> <span class="pre">epochs=5,</span> <span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={}))</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.train" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">train</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="#lit_saint.config.TrainConfig" title="lit_saint.config.TrainConfig"><span class="pre">lit_saint.config.TrainConfig</span></a></em><em class="property"> <span class="pre">=</span> <span class="pre">TrainConfig(internal_dimension_output_layer=20,</span> <span class="pre">mlpfory_dropout=0.0,</span> <span class="pre">epochs=10,</span> <span class="pre">optimizer=OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={}))</span></em><a class="headerlink" href="#lit_saint.config.SaintConfig.train" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.TrainConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">TrainConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">internal_dimension_output_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlpfory_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#TrainConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.TrainConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">TrainConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">internal_dimension_output_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlpfory_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">OptimizerConfig(learning_rate=0.0001,</span> <span class="pre">other_params={})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#TrainConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.TrainConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Define parameters for the steps used during the training</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.TrainConfig.epochs">
-<span class="sig-name descname"><span class="pre">epochs</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">5</span></em><a class="headerlink" href="#lit_saint.config.TrainConfig.epochs" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">epochs</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><em class="property"> <span class="pre">=</span> <span class="pre">10</span></em><a class="headerlink" href="#lit_saint.config.TrainConfig.epochs" title="Permalink to this definition"></a></dt>
 <dd><p>number of epochs of training phase</p>
 </dd></dl>
 
@@ -466,7 +499,7 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.config.TransformerConfig">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">TransformerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">AttentionTypeEnum.col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#TransformerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.TransformerConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.config.</span></span><span class="sig-name descname"><span class="pre">TransformerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">AttentionTypeEnum.col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dim_internal_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/config.html#TransformerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.config.TransformerConfig" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.attention_type">
@@ -487,7 +520,7 @@ and some random element of the tensor taking random rows</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lit_saint.config.TransformerConfig.dropout">
-<span class="sig-name descname"><span class="pre">dropout</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.0</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.dropout" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">dropout</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><em class="property"> <span class="pre">=</span> <span class="pre">0.1</span></em><a class="headerlink" href="#lit_saint.config.TransformerConfig.dropout" title="Permalink to this definition"></a></dt>
 <dd><p>probability dropout in the transformer</p>
 </dd></dl>
 
@@ -715,11 +748,11 @@ The default configuration is shown below.</p>
     <span class="c1"># If set to `True`, will enforce that the value specified &#39;monitor&#39;</span>
     <span class="c1"># is available when the scheduler is updated, thus stopping</span>
     <span class="c1"># training if not found. If set to `False`, it will only produce a warning</span>
-    <span class="s2">&quot;strict&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="s2">&quot;strict&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="c1"># If using the `LearningRateMonitor` callback to monitor the</span>
     <span class="c1"># learning rate progress, this keyword can be used to specify</span>
     <span class="c1"># a custom logged name</span>
-    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1623,7 +1656,7 @@ This will call the model forward function to compute predictions.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../uncertainty.html" class="btn btn-neutral float-left" title="Uncertainty Estimation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../example_regression.html" class="btn btn-neutral float-left" title="Example Regression" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

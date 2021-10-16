@@ -14,6 +14,7 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -42,6 +43,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Network Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../augmentations.html">Data Augmentation Techniques</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../uncertainty.html">Uncertainty Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_classification.html">Example Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_regression.html">Example Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../_generated/lit_saint.html">lit_saint package</a></li>
 </ul>
 
@@ -70,18 +73,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lit_saint.model</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">f</span>
-<span class="kn">from</span> <span class="nn">einops</span> <span class="k">import</span> <span class="n">rearrange</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning.core</span> <span class="k">import</span> <span class="n">LightningModule</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning.core</span> <span class="kn">import</span> <span class="n">LightningModule</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">Tensor</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">lit_saint.config</span> <span class="k">import</span> <span class="n">SaintConfig</span>
-<span class="kn">from</span> <span class="nn">lit_saint.modules</span> <span class="k">import</span> <span class="n">SimpleMLP</span><span class="p">,</span> <span class="n">RowColTransformer</span><span class="p">,</span> <span class="n">SepMLP</span>
-<span class="kn">from</span> <span class="nn">lit_saint.augmentations</span> <span class="k">import</span> <span class="n">cutmix</span><span class="p">,</span> <span class="n">mixup</span><span class="p">,</span> <span class="n">get_random_index</span>
+<span class="kn">from</span> <span class="nn">lit_saint.config</span> <span class="kn">import</span> <span class="n">SaintConfig</span>
+<span class="kn">from</span> <span class="nn">lit_saint.modules</span> <span class="kn">import</span> <span class="n">SimpleMLP</span><span class="p">,</span> <span class="n">RowColTransformer</span><span class="p">,</span> <span class="n">SepMLP</span>
+<span class="kn">from</span> <span class="nn">lit_saint.augmentations</span> <span class="kn">import</span> <span class="n">cutmix</span><span class="p">,</span> <span class="n">mixup</span><span class="p">,</span> <span class="n">get_random_index</span>
 
 
 <div class="viewcode-block" id="Saint"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.model.Saint">[docs]</a><span class="k">class</span> <span class="nc">Saint</span><span class="p">(</span><span class="n">LightningModule</span><span class="p">):</span>
@@ -93,7 +96,7 @@
 <span class="sd">    :param dim_target: if categorical represent number of classes of the target otherwise is 1</span>
 <span class="sd">    :param config: configuration of the model</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">categories</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
             <span class="n">continuous</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>

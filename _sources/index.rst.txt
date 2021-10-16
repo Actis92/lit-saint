@@ -14,8 +14,9 @@ Welcome to SAINT Lightning's documentation!
    architecture.rst
    augmentations.rst
    uncertainty.rst
+   example_classification.ipynb
+   example_regression.ipynb
    _generated/lit_saint
-
 
 
 Indices and tables
