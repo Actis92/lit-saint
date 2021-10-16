@@ -59,6 +59,24 @@ How to Use it
     prediction = saint_trainer.predict(model=model, datamodule=data_module, df=df_to_predict)
     df_test["prediction"] = np.argmax(prediction, axis=1)
 
+Preprocessing
+^^^^^^^^^^^^^^
+
+1. The numerical columns are filled with zeros in case of missing values
+2. The categorical columns are filled with a new category with the value SAINT_NAN in case of missing values
+3. The numerical columns are scaled using a StandardScaler unless you specify a different scaler inside the SaintDataModule
+4. The columns that are of type ["object", "category"] are considered categorical
+5. The columns that are of type ["int64", "float64", "int32", "float32"] are considered numerical
+6. All the columns that have a type different from the one specified before aren't used inside the model
+7. During the pretraining the rows that have the target column with nan value are used, instead are dropped before start the training
+
+Some suggestions are:
+
+* If you want to fill the columns in a different way from the default one you need to do it before to use in the SaintDataModule
+* If you want to use columns that contains datetime, you need to extract some features (i.e day of week) or convert them in epoch
+* If you have a classification problem the column that contain the target must be of type "object" or "category"
+
+
 How to Generate Yaml
 --------------------
 .. code-block:: python3

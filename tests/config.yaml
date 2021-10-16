@@ -13,6 +13,7 @@ network:
   embedding_size: 10
   internal_dimension_embed_continuous: 100
   dropout_embed_continuous: 0.0
+  batch_size: 256
 pretrain:
   aug:
     cutmix:

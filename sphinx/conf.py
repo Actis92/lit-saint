@@ -43,7 +43,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'sphinx_autodoc_typehints',
-    'sphinx.ext.githubpages'
+    'sphinx.ext.githubpages',
+    'nbsphinx'
     ]
 
 # Add any paths that contain templates here, relative to this directory.
