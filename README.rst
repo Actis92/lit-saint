@@ -2,13 +2,16 @@
 Saint Lightning
 ===============
 
-This repository contains an implementation of SAINT using Pytorch-Lightning_ as a framework
+This repository contains an implementation of SAINT (Self-Attention and Intersample Attention Transformer) using Pytorch-Lightning_ as a framework
 and Hydra_ for the configuration.
 Find the paper on arxiv_
+
+Check the website_ for more information.
 
 .. _arxiv: https://arxiv.org/abs/2106.01342
 .. _Pytorch-Lightning: https://www.pytorchlightning.ai/
 .. _Hydra: https://hydra.cc/
+.. _website: https://actis92.github.io/lit-saint/
 
 How to install
 --------------
