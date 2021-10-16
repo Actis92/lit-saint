@@ -67,7 +67,7 @@ class AugmentationConfig:
 @dataclass
 class PreTrainTaskConfig:
     """Define the parameters used for pretraining tasks"""
-    contrastive: Optional[ConstrastiveConfig] = ConstrastiveConfig
+    contrastive: Optional[ConstrastiveConfig] = ConstrastiveConfig()
     denoising: Optional[DenoisingConfig] = DenoisingConfig()
 
 

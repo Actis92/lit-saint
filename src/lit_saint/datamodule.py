@@ -70,8 +70,6 @@ class SaintDatamodule(LightningDataModule):
                     df[col] = df[col].fillna(0)
                 if col != self.target:
                     self.numerical_columns.append(col)
-                else:
-                    df[col] = df[col]
             else:
                 col_not_to_use.append(col)
         if len(self.categorical_columns) == 0:
