@@ -22,7 +22,7 @@ jobs:
     - name: Test with tox
       run: tox
     - name: Update coverage file
-      run: sed -i 's/home\/runner\/work\/lit-saint\/lit-saint\/src/github\/workspace/src/' coverage.xml
+      run: sed -i 's/home\/runner\/work\/lit-saint\/lit-saint\/src/github\/workspace\/src/' coverage.xml
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
