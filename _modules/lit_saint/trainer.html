@@ -142,7 +142,7 @@
         <span class="k">if</span> <span class="n">mc_dropout_iterations</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">model</span><span class="o">.</span><span class="n">set_mcdropout</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">mc_predictions</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mc_dropout_iterations</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mc_dropout_iterations</span><span class="p">):</span>
                 <span class="n">prediction</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">))</span>
                 <span class="n">mc_predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
             <span class="n">model</span><span class="o">.</span><span class="n">set_mcdropout</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
