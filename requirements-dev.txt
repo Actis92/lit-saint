@@ -11,3 +11,4 @@ radon
 xenon
 bump2version
 nbsphinx
+pytest-cov

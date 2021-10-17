@@ -38,70 +38,75 @@ class SaintDatamodule(LightningDataModule):
         self.dict_label_encoder = {}
         self.predict_set = None
         self.scaler = scaler if scaler else StandardScaler()
-        self.prep(df, split_column)
+        self.split_column = split_column
+        self.prep(df)
 
-    def prep(self, df: pd.DataFrame, split_column: str) -> None:
+    def prep(self, df: pd.DataFrame) -> None:
         """It find the indexes for each categorical and continuous columns, and for each categorical it
             applies Label Encoding in order to convert them in integers and save the number of classes for each
             categorical column
 
         :param df: contains the data that need to be processed
-        :param split_column: name of column used to split the data
         """
         df = df.copy()
         col_not_to_use = []
         for col in df.columns:
             if df[col].dtypes.name in ["object", "category"]:
-                if df[col].isna().any():  # the columns contains nan
-                    df[col] = df[col].fillna(self.NAN_LABEL)
-                if col != split_column:
-                    l_enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=df[col].nunique())
-                    df[col] = l_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
-                    self.dict_label_encoder[col] = l_enc
-                    if col == self.target:
-                        self.dim_target = len(l_enc.categories_[0])
-                        self.target_nan_index = list(l_enc.categories_[0]).index(self.NAN_LABEL) \
-                            if self.NAN_LABEL in l_enc.categories_[0] else None
-                    else:
-                        self.categorical_columns.append(col)
-                        self.categorical_dims.append(len(l_enc.categories_[0]) + 1)
+                df = self.prep_categorical_columns(col=col, df=df)
             elif df[col].dtypes.name in ["int64", "float64", "int32", "float32"]:
-                if df[col].isna().any():  # the columns contains nan
-                    df[col] = df[col].fillna(0)
-                if col != self.target:
-                    self.numerical_columns.append(col)
-                else:
-                    df[col] = df[col]
+                df = self.prep_continuous_columns(col=col, df=df)
             else:
                 col_not_to_use.append(col)
         if len(self.categorical_columns) == 0:
             self.categorical_dims.append(1)
         print("The following cols will not be used because they have a not supported data type: ", col_not_to_use)
-        self._split_data(df=df, split_column=split_column)
-        self.scaler_continuous_columns(df=df, split_column=split_column)
+        self._split_data(df=df)
+        self.scaler_continuous_columns(df=df)
 
-    def scaler_continuous_columns(self, df: pd.DataFrame, split_column: str) -> None:
+    def prep_categorical_columns(self, col: str, df: pd.DataFrame) -> pd.DataFrame:
+        if df[col].isna().any():  # the columns contains nan
+            df[col] = df[col].fillna(self.NAN_LABEL)
+        if col != self.split_column:
+            l_enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=df[col].nunique())
+            df[col] = l_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
+            self.dict_label_encoder[col] = l_enc
+            if col == self.target:
+                self.dim_target = len(l_enc.categories_[0])
+                self.target_nan_index = list(l_enc.categories_[0]).index(self.NAN_LABEL) \
+                    if self.NAN_LABEL in l_enc.categories_[0] else None
+            else:
+                self.categorical_columns.append(col)
+                self.categorical_dims.append(len(l_enc.categories_[0]) + 1)
+        return df
+
+    def prep_continuous_columns(self, col: str, df: pd.DataFrame) -> pd.DataFrame:
+        if df[col].isna().any():  # the columns contains nan
+            df[col] = df[col].fillna(0)
+        if col != self.target:
+            self.numerical_columns.append(col)
+        return df
+
+    def scaler_continuous_columns(self, df: pd.DataFrame) -> None:
         """Fit a StandardScaler for each continuos columns on the training set
 
         :param df: contains the data that need to be processed
         :param split_column: name of column used to split the data
         """
-        df_train = df.loc[df[split_column] == "train"].loc[:, self.numerical_columns].values
+        df_train = df.loc[df[self.split_column] == "train"].loc[:, self.numerical_columns].values
         if len(self.numerical_columns) > 0:
             self.scaler.fit(df_train)
 
-    def _split_data(self, df: pd.DataFrame, split_column: str) -> None:
+    def _split_data(self, df: pd.DataFrame) -> None:
         """Split the Dataframe in train, validation and test, and drop the split column
 
         :param df: contains the data that need to be processed
-        :param split_column: name of column used to split the data
         """
-        self.train = df.loc[df[split_column] == "train"].reset_index(drop=True)
-        self.validation = df.loc[df[split_column] == "validation"].reset_index(drop=True)
-        self.test = df.loc[df[split_column] == "test"].reset_index(drop=True)
-        self.train.drop(split_column, axis=1, inplace=True)
-        self.validation.drop(split_column, axis=1, inplace=True)
-        self.test.drop(split_column, axis=1, inplace=True)
+        self.train = df.loc[df[self.split_column] == "train"].reset_index(drop=True)
+        self.validation = df.loc[df[self.split_column] == "validation"].reset_index(drop=True)
+        self.test = df.loc[df[self.split_column] == "test"].reset_index(drop=True)
+        self.train.drop(self.split_column, axis=1, inplace=True)
+        self.validation.drop(self.split_column, axis=1, inplace=True)
+        self.test.drop(self.split_column, axis=1, inplace=True)
 
     def set_predict_set(self, df) -> None:
         """Tranform the categorical columns using the OrdinalEncoders fitted before the training and

@@ -119,7 +119,6 @@ class Saint(LightningModule):
         x_cont_enc = torch.empty(n1, n2, self.config.network.embedding_size)
         for i in range(self.num_continuous):
             x_cont_enc[:, i, :] = self.embedding_continuos[i](x_cont[:, i])
-        x_cont_enc = x_cont_enc
 
         return x_categ_enc, x_cont_enc
 
