@@ -1,11 +1,14 @@
-from typing import List, Tuple, Optional, Callable
+import copy
+from typing import List, Tuple, Optional, Callable, Dict
 
 import torch
 import torch.nn.functional as f
+import torchmetrics
 from einops import rearrange
 from pytorch_lightning.core import LightningModule
 from torch import nn, Tensor
 import numpy as np
+from torchmetrics import Metric
 
 from lit_saint.config import SaintConfig
 from lit_saint.modules import SimpleMLP, RowColTransformer, SepMLP
@@ -27,8 +30,10 @@ class Saint(LightningModule):
             continuous: List[int],
             dim_target: int,
             config: SaintConfig,
+            metrics: Dict[str, Metric] = None,
+            metrics_single_class: bool = True,
             optimizer: Callable = torch.optim.Adam,
-            loss_fn: Callable = None
+            loss_fn: Callable = None,
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -47,6 +52,21 @@ class Saint(LightningModule):
         cat_mask_offset = f.pad(torch.tensor(categories), (1, 0), value=0)
         self.cat_mask_offset = cat_mask_offset.cumsum(dim=-1)[:-1]
         self._define_network_components(categories)
+        self.metrics_single_class = metrics_single_class
+        self.metrics = metrics if metrics else {}
+        self.train_metrics = self._define_metrics(self.metrics, metrics_single_class)
+        self.val_metrics = self._define_metrics(self.metrics, metrics_single_class)
+
+    def _define_metrics(self, metrics: Dict[str, Metric], metrics_single_class: bool):
+        metrics_step = {}
+        if metrics_single_class:
+            for key, value in metrics.items():
+                for i in range(self.dim_target):
+                    metrics_step[f"{key}_{i}"] = copy.deepcopy(value)
+        else:
+            for key, value in metrics.items():
+                metrics_step[key] = copy.deepcopy(value)
+        return metrics_step
 
     def _define_network_components(self, categories: List[int]) -> None:
         """Define the components for the neural network
@@ -266,37 +286,66 @@ class Saint(LightningModule):
             loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
         return loss
 
-    def shared_step(self, batch: Tuple[Tensor, Tensor, Tensor]) -> Tensor:
+    def shared_step(self, batch: Tuple[Tensor, Tensor, Tensor]) -> Tuple[Tensor, Tensor, Tensor]:
         """It define the commons step executed during training, validation and test
 
         :param batch: Contains a batch of data
         """
         x_categ, x_cont, target = batch
         if self.pretraining:
-            return self.pretraining_step(x_categ, x_cont)
+            return self.pretraining_step(x_categ, x_cont), torch.Tensor(), torch.Tensor()
         else:
             y_pred = self(x_categ, x_cont)
             if self.loss_fn:
-                return self.loss_fn(y_pred, target)
+                return self.loss_fn(y_pred, target), y_pred, target
             else:
                 if self.dim_target > 1:
                     loss = self._classification_loss(y_pred, target)
-                    return loss
+                    return loss, y_pred, target
                 else:
-                    return self._regression_loss(y_pred, target)
+                    return self._regression_loss(y_pred, target), y_pred, target
 
     def training_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
-        loss = self.shared_step(batch)
+        loss, y_pred, target = self.shared_step(batch)
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        if not self.pretraining:
+            if self.dim_target > 1:
+                pred = nn.Softmax(dim=-1)(y_pred)
+                for key, value in self.train_metrics.items():
+                    if self.metrics_single_class:
+                        index_class_metric = int(key.split("_")[-1])
+                        value(pred[target == index_class_metric], target[target == index_class_metric])
+                    else:
+                        value(pred, target)
+            else:
+                pred = y_pred.detach()
+                for key, value in self.train_metrics.items():
+                    value(pred, target)
+            if len(self.train_metrics) > 0:
+                self.log("train_metrics", self.train_metrics, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def validation_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
-        loss = self.shared_step(batch)
+        loss, y_pred, target = self.shared_step(batch)
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        if not self.pretraining:
+            if self.dim_target > 1:
+                pred = nn.Softmax(dim=-1)(y_pred)
+                for key, value in self.val_metrics.items():
+                    if self.metrics_single_class:
+                        index_class_metric = int(key.split("_")[-1])
+                        value(pred[target == index_class_metric], target[target == index_class_metric])
+                    else:
+                        value(pred, target)
+            else:
+                for key, value in self.val_metrics.items():
+                    value(y_pred, target)
+            if len(self.val_metrics) > 0:
+                self.log("val_metrics", self.val_metrics, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def test_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
-        loss = self.shared_step(batch)
+        loss, _, _ = self.shared_step(batch)
         self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
