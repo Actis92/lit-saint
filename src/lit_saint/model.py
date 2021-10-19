@@ -42,6 +42,7 @@ class Saint(LightningModule):
         self.num_categories = len(categories)
         self.num_unique_categories = sum(categories)
         self.num_continuous = len(continuous) if len(continuous) > 0 else 1
+        self.num_continuous = self.num_continuous + int(dim_target == 1)
         self.num_columns = self.num_continuous + self.num_categories
         # define offset in order to have unique value for each category
         cat_mask_offset = f.pad(torch.tensor(categories), (1, 0), value=0)
@@ -57,7 +58,7 @@ class Saint(LightningModule):
         self._define_transformer()
         self._define_mlp(categories)
         self._define_projection_head()
-        self.mlpfory = SimpleMLP(self.config.network.embedding_size * self.num_columns,
+        self.mlpfory = SimpleMLP(self.config.network.embedding_size,
                                  self.config.train.internal_dimension_output_layer, self.dim_target,
                                  dropout=self.config.train.mlpfory_dropout)
 
@@ -246,8 +247,12 @@ class Saint(LightningModule):
     def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
         x_categ_enc, x_cont_enc = self._embed_data(x_categ, x_cont)
         reps = self.transformer(x_categ_enc, x_cont_enc)
-        reps = rearrange(reps, 'b h n -> b (h n)')
-        y_outs = self.mlpfory(reps)
+        if self.dim_target > 1:
+            token_cls_index = self.num_categories - 1
+        else:
+            token_cls_index = -1
+        y_reps = reps[:, token_cls_index, :]
+        y_outs = self.mlpfory(y_reps)
         return y_outs
 
     def pretraining_step(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:

@@ -62,6 +62,7 @@ class SaintDatamodule(LightningDataModule):
                         self.dim_target = len(l_enc.categories_[0])
                         self.target_nan_index = list(l_enc.categories_[0]).index(self.NAN_LABEL) \
                             if self.NAN_LABEL in l_enc.categories_[0] else None
+                        self.categorical_dims.append(1)
                     else:
                         self.categorical_columns.append(col)
                         self.categorical_dims.append(len(l_enc.categories_[0]) + 1)

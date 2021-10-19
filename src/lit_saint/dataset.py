@@ -20,12 +20,21 @@ class SaintDataset(Dataset):
     """
     def __init__(self, data: pd.DataFrame, target: str, cat_cols: List[str],
                  con_cols: List[str], scaler: TransformerMixin, target_categorical: bool):
+        self.target_categorical = target_categorical
         self.X_categorical = self._define_tensor_features(data, cat_cols, torch.int64)
-        self.X_continuos = self._define_tensor_features(data, con_cols, torch.float32, scaler)
+        self.X_continuous = self._define_tensor_features(data, con_cols, torch.float32, scaler)
         self.y = self._define_tensor_target(data, target, target_categorical)
+        self.token_cls = self._define_token_cls(data, target_categorical)
 
     def __len__(self):
         return len(self.y)
+
+    @staticmethod
+    def _define_token_cls(df: pd.DataFrame, target_categorical: bool) -> Tensor:
+        if target_categorical:
+            return rearrange(torch.zeros(df.shape[0], dtype=torch.int64), 'n -> n 1')
+        else:
+            return rearrange(torch.zeros(df.shape[0], dtype=torch.float32), 'n -> n 1')
 
     @staticmethod
     def _define_tensor_features(df: pd.DataFrame, cols: List[str], dtype: torch.dtype,
@@ -69,4 +78,7 @@ class SaintDataset(Dataset):
 
         :param idx: numeric index of the data that we want to process
         """
-        return self.X_categorical[idx], self.X_continuos[idx], self.y[idx]
+        if self.target_categorical:
+            return torch.cat([self.X_categorical[idx], self.token_cls[idx]]), self.X_continuous[idx], self.y[idx]
+        else:
+            return self.X_categorical[idx], torch.cat([self.X_continuous[idx], self.token_cls[idx]]), self.y[idx]
