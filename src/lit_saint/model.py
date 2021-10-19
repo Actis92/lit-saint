@@ -23,6 +23,10 @@ class Saint(LightningModule):
     :param continuous: List of indices with continuous columns
     :param dim_target: if categorical represent number of classes of the target otherwise is 1
     :param config: configuration of the model
+    :param metrics: Dictionary containing custom metrics to compute during training loop
+    :param metrics_single_class: boolean flag, if True the metrics are computed separately for each class
+    :param optimizer: custom optimizer to compute gradient of the network
+    :param loss_fn: custom loss function to be optimized
     """
     def __init__(
             self,
@@ -57,7 +61,12 @@ class Saint(LightningModule):
         self.train_metrics = self._define_metrics(self.metrics, metrics_single_class)
         self.val_metrics = self._define_metrics(self.metrics, metrics_single_class)
 
-    def _define_metrics(self, metrics: Dict[str, Metric], metrics_single_class: bool):
+    def _define_metrics(self, metrics: Dict[str, Metric], metrics_single_class: bool) -> Dict[str, Metric]:
+        """Define custom metrics computed during training loop
+
+        :param metrics: Custom metrics to compute
+        :param metrics_single_class: boolean flag, if True the metrics are computed separately for each class
+        """
         metrics_step = {}
         if metrics_single_class:
             for key, value in metrics.items():
@@ -309,37 +318,33 @@ class Saint(LightningModule):
         loss, y_pred, target = self.shared_step(batch)
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         if not self.pretraining:
-            if self.dim_target > 1:
-                pred = nn.Softmax(dim=-1)(y_pred)
-                for key, value in self.train_metrics.items():
-                    if self.metrics_single_class:
-                        index_class_metric = int(key.split("_")[-1])
-                        value(pred[target == index_class_metric], target[target == index_class_metric])
-                    else:
-                        value(pred, target)
-            else:
-                pred = y_pred.detach()
-                for key, value in self.train_metrics.items():
-                    value(pred, target)
+            self.compute_metrics(metrics=self.train_metrics, y_pred=y_pred, target=target)
             if len(self.train_metrics) > 0:
                 self.log("train_metrics", self.train_metrics, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
+
+    def compute_metrics(self, metrics: Dict[str, Metric], y_pred: Tensor, target: Tensor) -> None:
+        """ Compute custom metrics during training loop
+
+        :param metrics: Metrics to compute
+        :param y_pred: predicted value
+        :param target: true value
+        """
+        pred = nn.Softmax(dim=-1)(y_pred) if self.dim_target > 1 else y_pred.detach()
+        for key, value in metrics.items():
+            if self.metrics_single_class:
+                index_class_metric = int(key.split("_")[-1])
+                target_single_class = target[target == index_class_metric]
+                if target_single_class.shape[0] > 0:
+                    value(pred[target == index_class_metric], target[target == index_class_metric])
+            else:
+                value(pred, target)
 
     def validation_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
         loss, y_pred, target = self.shared_step(batch)
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         if not self.pretraining:
-            if self.dim_target > 1:
-                pred = nn.Softmax(dim=-1)(y_pred)
-                for key, value in self.val_metrics.items():
-                    if self.metrics_single_class:
-                        index_class_metric = int(key.split("_")[-1])
-                        value(pred[target == index_class_metric], target[target == index_class_metric])
-                    else:
-                        value(pred, target)
-            else:
-                for key, value in self.val_metrics.items():
-                    value(y_pred, target)
+            self.compute_metrics(metrics=self.val_metrics, y_pred=y_pred, target=target)
             if len(self.val_metrics) > 0:
                 self.log("val_metrics", self.val_metrics, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
