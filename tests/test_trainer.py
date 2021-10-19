@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import torch
 import torchmetrics
@@ -181,3 +182,21 @@ def test_metrics_regression():
     trainer = Trainer(max_epochs=1, fast_dev_run=True)
     saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
     saint_trainer.fit(model, data_module, enable_pretraining=True)
+
+
+def test_mcdropout():
+    saint_cfg = SaintConfig()
+    df = pd.DataFrame({"target": ["0", "1", "1", "0"],
+                       "feat_cont": [2, 3, 1, 4], "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
+    model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                  config=saint_cfg, dim_target=data_module.dim_target)
+    trainer = Trainer(max_epochs=1, fast_dev_run=True)
+    saint_trainer = SaintTrainer(None, trainer=trainer)
+    saint_trainer.fit(model, data_module, enable_pretraining=False)
+    df_predict = df[[col for col in df.columns if col != "target"]]
+    prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict, mc_dropout_iterations=2)
+    var_prediction = np.var(prediction, axis=2)
+    assert prediction.shape[1] == 2
+    assert prediction.shape[2] == 2
+    assert var_prediction.min() > 0

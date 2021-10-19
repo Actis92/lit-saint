@@ -67,7 +67,7 @@ class SaintTrainer:
         if mc_dropout_iterations > 0:
             model.set_mcdropout(True)
             mc_predictions = []
-            for i in range(mc_dropout_iterations):
+            for _ in range(mc_dropout_iterations):
                 prediction = torch.cat(self.trainer.predict(model, datamodule=datamodule))
                 mc_predictions.append(prediction)
             model.set_mcdropout(False)
