@@ -713,7 +713,7 @@ save the dataframe in order to make the predictions</p>
 <span id="lit-saint-model-module"></span><h2>lit_saint.model module<a class="headerlink" href="#module-lit_saint.model" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="lit_saint.model.Saint">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.model.</span></span><span class="sig-name descname"><span class="pre">Saint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">categories</span></em>, <em class="sig-param"><span class="pre">continuous</span></em>, <em class="sig-param"><span class="pre">dim_target</span></em>, <em class="sig-param"><span class="pre">config</span></em>, <em class="sig-param"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></em>, <em class="sig-param"><span class="pre">loss_fn=None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lit_saint.model.</span></span><span class="sig-name descname"><span class="pre">Saint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">categories</span></em>, <em class="sig-param"><span class="pre">continuous</span></em>, <em class="sig-param"><span class="pre">dim_target</span></em>, <em class="sig-param"><span class="pre">config</span></em>, <em class="sig-param"><span class="pre">metrics=None</span></em>, <em class="sig-param"><span class="pre">metrics_single_class=True</span></em>, <em class="sig-param"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></em>, <em class="sig-param"><span class="pre">loss_fn=None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
 <p>Contains the definition of the network and how to execute the pretraining tasks, and how perform
 the training, validation and test steps</p>
@@ -724,9 +724,31 @@ the training, validation and test steps</p>
 <li><p><strong>continuous</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – List of indices with continuous columns</p></li>
 <li><p><strong>dim_target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – if categorical represent number of classes of the target otherwise is 1</p></li>
 <li><p><strong>config</strong> (<a class="reference internal" href="#lit_saint.config.SaintConfig" title="lit_saint.config.SaintConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SaintConfig</span></code></a>) – configuration of the model</p></li>
+<li><p><strong>metrics</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code>]]) – Dictionary containing custom metrics to compute during training loop</p></li>
+<li><p><strong>metrics_single_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – boolean flag, if True the metrics are computed separately for each class</p></li>
+<li><p><strong>optimizer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – custom optimizer to compute gradient of the network</p></li>
+<li><p><strong>loss_fn</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]) – custom loss function to be optimized</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lit_saint.model.Saint.compute_metrics">
+<span class="sig-name descname"><span class="pre">compute_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.compute_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.compute_metrics" title="Permalink to this definition"></a></dt>
+<dd><p>Compute custom metrics during training loop</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metrics</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code>]) – Metrics to compute</p></li>
+<li><p><strong>y_pred</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – predicted value</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – true value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="lit_saint.model.Saint.configure_optimizers">
 <span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lit_saint/model.html#Saint.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lit_saint.model.Saint.configure_optimizers" title="Permalink to this definition"></a></dt>
@@ -988,7 +1010,7 @@ dataloader_idx: Index of the current dataloader</p>
 <dd class="field-odd"><p><strong>batch</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>]) – Contains a batch of data</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
