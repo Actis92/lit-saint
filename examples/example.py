@@ -14,6 +14,7 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from hydra.utils import get_original_cwd
 from pytorch_lightning import Trainer, seed_everything
+import torchmetrics
 
 from lit_saint import Saint, SaintConfig, SaintDatamodule, SaintTrainer
 
@@ -35,7 +36,8 @@ def read_config(cfg: SaintConfig) -> None:
                                   num_workers=cfg.network.num_workers,
                                   data_loader_params={"batch_size": cfg.network.batch_size})
     model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                  config=cfg, dim_target=data_module.dim_target)
+                  config=cfg, dim_target=data_module.dim_target, metrics={"f1_score": torchmetrics.F1()},
+                  metrics_single_class=False)
     checkpoint_callback_pre = ModelCheckpoint(
         monitor="val_loss",
         dirpath=".",
@@ -51,7 +53,7 @@ def read_config(cfg: SaintConfig) -> None:
     early_stopping_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=3)
 
     pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback_pre, early_stopping_callback])
-    trainer = Trainer(max_epochs=2, callbacks=[checkpoint_callback, early_stopping_callback],
+    trainer = Trainer(max_epochs=5, callbacks=[],
                       deterministic=True)
     saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
     saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=True)

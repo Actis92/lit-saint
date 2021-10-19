@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import torch
+import torchmetrics
 from hydra import initialize, compose
 from hydra.core.config_store import ConfigStore
 from pytorch_lightning import Trainer
@@ -138,6 +139,49 @@ def test_multiclass():
         df_predict = df[[col for col in df.columns if col != "target"]]
         prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict)
         assert prediction.shape[1] == 3
+
+
+def test_metrics_single_class():
+    saint_cfg = SaintConfig()
+    df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
+                       "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
+    model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                  config=saint_cfg, dim_target=data_module.dim_target, metrics={"f1_score": torchmetrics.F1()},
+                  metrics_single_class=True)
+    pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
+    trainer = Trainer(max_epochs=1, fast_dev_run=True)
+    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
+    saint_trainer.fit(model, data_module, enable_pretraining=True)
+
+
+def test_metrics_global():
+    saint_cfg = SaintConfig()
+    df = pd.DataFrame({"target": ["0", "1", "1", "0"], "feat_cont": [2, 3, 1, 4],
+                       "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
+    model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                  config=saint_cfg, dim_target=data_module.dim_target, metrics={"f1_score": torchmetrics.F1()},
+                  metrics_single_class=False)
+    pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
+    trainer = Trainer(max_epochs=1, fast_dev_run=True)
+    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
+    saint_trainer.fit(model, data_module, enable_pretraining=True)
+
+
+def test_metrics_regression():
+    saint_cfg = SaintConfig()
+    df = pd.DataFrame({"target": [1, 2, 3, 4], "feat_cont": [2, 3, 1, 4],
+                       "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
+    model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                  config=saint_cfg, dim_target=data_module.dim_target,
+                  metrics={"mae_score": torchmetrics.MeanAbsoluteError()},
+                  metrics_single_class=False)
+    pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
+    trainer = Trainer(max_epochs=1, fast_dev_run=True)
+    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
+    saint_trainer.fit(model, data_module, enable_pretraining=True)
 
 
 def test_mcdropout():
