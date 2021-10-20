@@ -40,7 +40,7 @@ class Saint(LightningModule):
             loss_fn: Callable = None,
     ):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters("categories", "continuous", "dim_target", "config")
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
         self.loss_fn = loss_fn
         self.optimizer = optimizer
@@ -315,11 +315,11 @@ class Saint(LightningModule):
 
     def training_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
         loss, y_pred, target = self.shared_step(batch)
-        self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         if not self.pretraining:
             self.compute_metrics(metrics=self.train_metrics, y_pred=y_pred, target=target)
             if len(self.train_metrics) > 0:
-                self.log("train_metrics", self.train_metrics, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+                self.log("train_metrics", self.train_metrics, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def compute_metrics(self, metrics: Dict[str, Metric], y_pred: Tensor, target: Tensor) -> None:
@@ -341,16 +341,16 @@ class Saint(LightningModule):
 
     def validation_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
         loss, y_pred, target = self.shared_step(batch)
-        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         if not self.pretraining:
             self.compute_metrics(metrics=self.val_metrics, y_pred=y_pred, target=target)
             if len(self.val_metrics) > 0:
-                self.log("val_metrics", self.val_metrics, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+                self.log("val_metrics", self.val_metrics, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def test_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
         loss, _, _ = self.shared_step(batch)
-        self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("test_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def predict_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int,
