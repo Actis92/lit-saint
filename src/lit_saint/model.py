@@ -145,7 +145,7 @@ class Saint(LightningModule):
         x_categ_enc = self.embedding_categorical(x_categ)
         n1, n2 = x_cont.shape
         _, n3 = x_categ.shape
-        x_cont_enc = torch.empty(n1, n2, self.config.network.embedding_size)
+        x_cont_enc = torch.empty(n1, n2, self.config.network.embedding_size).to(x_categ_enc.device)
         for i in range(self.num_continuous):
             x_cont_enc[:, i, :] = self.embedding_continuos[i](x_cont[:, i])
 
@@ -220,7 +220,7 @@ class Saint(LightningModule):
         output_continuos = self.mlp2(embed_transformed_noised[:, self.num_categories:, :])
         output_continuos = torch.cat(output_continuos, dim=1)
         loss_continuos_columns = f.mse_loss(output_continuos, x_cont)
-        loss_categorical_columns = Tensor([0])
+        loss_categorical_columns = Tensor([0]).to(embed_transformed_noised.device)
         # for each categorical column we compute the cross_entropy where in x_categ
         # there is the index of the categorical value obtained using the Label Encoding
         for j in range(self.num_categories - 1):
@@ -284,8 +284,8 @@ class Saint(LightningModule):
         :param x_categ: values of categorical features
         :param x_cont: values of continuous features
         """
-        loss = Tensor([0])
         embed_categ, embed_cont = self._embed_data(x_categ, x_cont)
+        loss = Tensor([0]).to(embed_categ.device)
         embed_categ_noised, embed_cont_noised = self._pretraining_augmentation(x_categ, x_cont,
                                                                                embed_categ, embed_cont)
         loss += self._pretraining_contrastive(embed_categ, embed_cont,
