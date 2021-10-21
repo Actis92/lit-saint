@@ -10,11 +10,12 @@ import pandas as pd
 import hydra
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, f1_score
 from sklearn.model_selection import train_test_split
 from hydra.utils import get_original_cwd
 from pytorch_lightning import Trainer, seed_everything
 import torchmetrics
+from torch.utils.data import WeightedRandomSampler
 
 from lit_saint import Saint, SaintConfig, SaintDatamodule, SaintTrainer
 
@@ -37,7 +38,7 @@ def read_config(cfg: SaintConfig) -> None:
                                   data_loader_params={"batch_size": cfg.network.batch_size})
     model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, dim_target=data_module.dim_target, metrics={"f1_score": torchmetrics.F1()},
-                  metrics_single_class=False)
+                  metrics_single_class=True)
     checkpoint_callback_pre = ModelCheckpoint(
         monitor="val_loss",
         dirpath=".",
@@ -53,13 +54,14 @@ def read_config(cfg: SaintConfig) -> None:
     early_stopping_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=3)
 
     pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback_pre, early_stopping_callback])
-    trainer = Trainer(max_epochs=5, callbacks=[],
+    trainer = Trainer(max_epochs=cfg.train.epochs, callbacks=[],
                       deterministic=True)
     saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
-    saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=True)
+    saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=False)
     prediction = saint_trainer.predict(model=model, datamodule=data_module, df=df_test)
     df_test["prediction"] = np.argmax(prediction, axis=1)
     print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
+    return(f1_score(data_module.predict_set[df.columns[14]], df_test["prediction"]))
 
 
 if __name__ == "__main__":

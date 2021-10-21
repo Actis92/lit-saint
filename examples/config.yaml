@@ -1,5 +1,24 @@
 defaults:
   - base_config
+  - override hydra/sweeper: optuna
+
+hydra:
+  sweeper:
+    sampler:
+      seed: 123
+    direction: maximize
+    study_name: sphere
+    storage: null
+    n_trials: 2
+    n_jobs: 1
+
+    search_space:
+      train.epochs:
+        type: int
+        low: 1
+        high: 3
+        step: 1
+
 network:
   transformer:
     depth: 3
@@ -39,7 +58,7 @@ pretrain:
 train:
   internal_dimension_output_layer: 20
   mlpfory_dropout: 0.0
-  epochs: 5
+  epochs: 1
   optimizer:
     learning_rate: 0.0001
     other_params: {}
