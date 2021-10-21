@@ -19,10 +19,10 @@ setup(
     url='https://github.com/Actis92/lit-saint.git',
     download_url=f'https://github.com/Actis92/lit-saint.git/archive/{version}.tar.gz',
     keywords=['TABULAR', 'SELF SUPERVISED', 'PYTORCH LIGHTNING'],
-    install_requires=['pytorch-lightning>=1.3.8,<2',
+    install_requires=['pytorch-lightning>=1.3.0,<2',
                       'torch>=1.4',
                       'einops>=0.3.0',
-                      'pandas>=1.3',
+                      'pandas>=1.0',
                       'scikit-learn>=0.24.2',
                       'hydra-core>=1.1.0'
                       ],
