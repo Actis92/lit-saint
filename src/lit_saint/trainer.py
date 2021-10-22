@@ -73,4 +73,4 @@ class SaintTrainer:
             model.set_mcdropout(False)
             return torch.stack(mc_predictions, axis=2).numpy()
         prediction = self.trainer.predict(model, datamodule=datamodule)
-        return torch.cat(prediction).numpy()
+        return torch.cat(prediction).cpu().numpy()
