@@ -71,9 +71,12 @@ class SaintDatamodule(LightningDataModule):
             df[col] = l_enc.fit_transform(df[col].values.reshape(-1, 1)).astype(int)
             self.dict_label_encoder[col] = l_enc
             if col == self.target:
-                self.dim_target = len(l_enc.categories_[0])
-                self.target_nan_index = list(l_enc.categories_[0]).index(self.NAN_LABEL) \
-                    if self.NAN_LABEL in l_enc.categories_[0] else None
+                if self.NAN_LABEL in l_enc.categories_[0]:
+                    self.dim_target = len(l_enc.categories_[0]) - 1
+                    self.target_nan_index = list(l_enc.categories_[0]).index(self.NAN_LABEL)
+                else:
+                    self.dim_target = len(l_enc.categories_[0])
+                    self.target_nan_index = None
             else:
                 self.categorical_columns.append(col)
                 self.categorical_dims.append(len(l_enc.categories_[0]) + 1)

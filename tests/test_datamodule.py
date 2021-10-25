@@ -128,3 +128,21 @@ def test_fillnan():
     # the target is always the last column
     assert data_module.categorical_dims == [5]
     check_is_fitted(data_module.scaler)
+
+
+def test_targetnan():
+    df = pd.DataFrame({"target": [np.nan, "1", "1", "0"], "feat_cont": [2, np.nan, 1, 4],
+                       "feat_categ": ["a", "b", np.nan, "c"], "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split", num_workers=0)
+    expected_train = pd.DataFrame({"target": [2, 1], "feat_cont": [2., 0.], "feat_categ": [1, 2]})
+    expected_validation = pd.DataFrame({"target": [1], "feat_cont": [1.], "feat_categ": [0]})
+    expected_test = pd.DataFrame({"target": [0], "feat_cont": [4.], "feat_categ": [3]})
+    pd.testing.assert_frame_equal(data_module.train, expected_train)
+    pd.testing.assert_frame_equal(data_module.validation, expected_validation)
+    pd.testing.assert_frame_equal(data_module.test, expected_test)
+    assert data_module.categorical_columns == ["feat_categ"]
+    assert data_module.numerical_columns == ["feat_cont"]
+    # the target is always the last column
+    assert data_module.categorical_dims == [5]
+    check_is_fitted(data_module.scaler)
+    assert data_module.dim_target == 2
