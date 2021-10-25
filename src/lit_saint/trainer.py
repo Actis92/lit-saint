@@ -1,3 +1,5 @@
+from typing import Dict
+
 import numpy
 import torch
 from pandas import DataFrame
@@ -10,11 +12,16 @@ class SaintTrainer:
     """This class simplify how to train and make predictions using Saint
 
     :param pretrainer: The Trainer that will be used during the pretraining phase
-    :param trainer: The Trainer that will be used during the training and preciction phase
+    :param trainer: The Trainer that will be used during the training and prediction phase
+    :param train_loader_params: parameters used to configure the DataLoader during the training phase
+    :param pretrain_loader_params: parameters used to configure the DataLoader during the pretraining phase
     """
-    def __init__(self, pretrainer: Trainer = None, trainer: Trainer = None):
+    def __init__(self, pretrainer: Trainer = None, trainer: Trainer = None, train_loader_params: Dict = None,
+                 pretrain_loader_params: Dict = None):
         self.pretrainer = pretrainer
+        self.pretrain_loader_params = pretrain_loader_params if pretrain_loader_params else {"batch_size": 256}
         self.trainer = trainer
+        self.train_loader_params = train_loader_params if train_loader_params else {"batch_size": 256}
 
     def prefit(self, model: Saint, datamodule: SaintDatamodule) -> None:
         """Function that is used for the pretraining of the model
@@ -24,6 +31,7 @@ class SaintTrainer:
         """
         model.set_pretraining(True)
         datamodule.set_pretraining(True)
+        datamodule.set_data_loader_params(self.pretrain_loader_params)
         self.pretrainer.fit(model=model, datamodule=datamodule)
 
     def get_model_from_checkpoint(self, model: Saint, pretraining: bool) -> None:
@@ -49,6 +57,7 @@ class SaintTrainer:
             self.get_model_from_checkpoint(model, pretraining=True)
         model.set_pretraining(False)
         datamodule.set_pretraining(False)
+        datamodule.set_data_loader_params(self.train_loader_params)
         self.trainer.fit(model=model, datamodule=datamodule)
         self.get_model_from_checkpoint(model, pretraining=False)
 
@@ -71,6 +80,6 @@ class SaintTrainer:
                 prediction = torch.cat(self.trainer.predict(model, datamodule=datamodule))
                 mc_predictions.append(prediction)
             model.set_mcdropout(False)
-            return torch.stack(mc_predictions, axis=2).numpy()
+            return torch.stack(mc_predictions, axis=2).cpu().numpy()
         prediction = self.trainer.predict(model, datamodule=datamodule)
         return torch.cat(prediction).cpu().numpy()

@@ -78,6 +78,7 @@ class PreTrainConfig:
     task: PreTrainTaskConfig = PreTrainTaskConfig()
     optimizer: OptimizerConfig = OptimizerConfig()
     epochs: int = 2  #: number of epochs of training phase
+    batch_size: int = 256  #: dimension of batches using by dataloaders
 
 
 @dataclass
@@ -87,6 +88,7 @@ class TrainConfig:
     mlpfory_dropout: float = .0  #: probability dropout in the the MLP used for prediction
     epochs: int = 10  #: number of epochs of training phase
     optimizer: OptimizerConfig = OptimizerConfig()
+    batch_size: int = 32  #: dimension of batches using by dataloaders
 
 
 @dataclass
@@ -108,7 +110,6 @@ class NetworkConfig:
     embedding_size: int = 10  #: dimension of computed embeddings
     internal_dimension_embed_continuous: int = 100  #: internal dimension of the mlp used to project continuous columns
     dropout_embed_continuous: float = .0  #: dropout used to compute embedding continuous features
-    batch_size: int = 256  #: dimension of batches using by dataloaders
 
 
 @dataclass

@@ -16,20 +16,18 @@ class SaintDatamodule(LightningDataModule):
     """
     NAN_LABEL = "SAINT_NAN"
 
-    def __init__(self, df: pd.DataFrame, target: str, split_column: str, num_workers: int,
-                 data_loader_params: Dict = None,
-                 scaler: TransformerMixin = None):
+    def __init__(self, df: pd.DataFrame, target: str, split_column: str, scaler: TransformerMixin = None):
         """
         :param df: contains the data that will be used by the dataLoaders
         :param target: name of the target column
         :param split_column: name of the column used to split the data
-        :param data_loader_params: parameters used to configure the DataLoader
+        :param scaler: a scikit learn transformer in order to rescale the continuos variables, if not specified
+        it will use the StandardScaler
         """
         super().__init__()
-        self.num_workers = num_workers
         self.target: str = target
         self.pretraining = False
-        self.data_loader_params = data_loader_params if data_loader_params else {"batch_size": 256}
+        self.data_loader_params = {"batch_size": 256}
         self.categorical_columns = []
         self.categorical_dims = []
         self.numerical_columns = []
@@ -154,7 +152,6 @@ class SaintDatamodule(LightningDataModule):
         return DataLoader(
             dataset,
             **self.data_loader_params,
-            num_workers=self.num_workers
         )
 
     def train_dataloader(self) -> DataLoader:
@@ -173,5 +170,10 @@ class SaintDatamodule(LightningDataModule):
         """ Function that loads the dataset for the prediction. """
         return self._create_dataloader(self.predict_set)
 
-    def set_pretraining(self, pretraining: bool):
+    def set_pretraining(self, pretraining: bool) -> None:
+        """Function used to set the pretraining flag"""
         self.pretraining = pretraining
+
+    def set_data_loader_params(self, data_loader_params: Dict) -> None:
+        """Function used to set the parameters used by the DataLoader"""
+        self.data_loader_params = data_loader_params
