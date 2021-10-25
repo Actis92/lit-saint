@@ -152,7 +152,8 @@
     <span class="n">aug</span><span class="p">:</span> <span class="n">AugmentationConfig</span> <span class="o">=</span> <span class="n">AugmentationConfig</span><span class="p">()</span>
     <span class="n">task</span><span class="p">:</span> <span class="n">PreTrainTaskConfig</span> <span class="o">=</span> <span class="n">PreTrainTaskConfig</span><span class="p">()</span>
     <span class="n">optimizer</span><span class="p">:</span> <span class="n">OptimizerConfig</span> <span class="o">=</span> <span class="n">OptimizerConfig</span><span class="p">()</span>
-    <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1">#: number of epochs of training phase</span></div>
+    <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1">#: number of epochs of training phase</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>  <span class="c1">#: dimension of batches using by dataloaders</span></div>
 
 
 <div class="viewcode-block" id="TrainConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.TrainConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -161,7 +162,8 @@
     <span class="n">internal_dimension_output_layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1">#: internal dimension of the MLP that compute the output</span>
     <span class="n">mlpfory_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.0</span>  <span class="c1">#: probability dropout in the the MLP used for prediction</span>
     <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1">#: number of epochs of training phase</span>
-    <span class="n">optimizer</span><span class="p">:</span> <span class="n">OptimizerConfig</span> <span class="o">=</span> <span class="n">OptimizerConfig</span><span class="p">()</span></div>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">OptimizerConfig</span> <span class="o">=</span> <span class="n">OptimizerConfig</span><span class="p">()</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span>  <span class="c1">#: dimension of batches using by dataloaders</span></div>
 
 
 <div class="viewcode-block" id="TransformerConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.TransformerConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -182,8 +184,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1">#: number of cores to use</span>
     <span class="n">embedding_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1">#: dimension of computed embeddings</span>
     <span class="n">internal_dimension_embed_continuous</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1">#: internal dimension of the mlp used to project continuous columns</span>
-    <span class="n">dropout_embed_continuous</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.0</span>  <span class="c1">#: dropout used to compute embedding continuous features</span>
-    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>  <span class="c1">#: dimension of batches using by dataloaders</span></div>
+    <span class="n">dropout_embed_continuous</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.0</span>  <span class="c1">#: dropout used to compute embedding continuous features</span></div>
 
 
 <div class="viewcode-block" id="SaintConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.SaintConfig">[docs]</a><span class="nd">@dataclass</span>

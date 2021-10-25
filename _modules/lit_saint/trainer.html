@@ -73,7 +73,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lit_saint.trainer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 
@@ -85,11 +87,16 @@
     <span class="sd">&quot;&quot;&quot;This class simplify how to train and make predictions using Saint</span>
 
 <span class="sd">    :param pretrainer: The Trainer that will be used during the pretraining phase</span>
-<span class="sd">    :param trainer: The Trainer that will be used during the training and preciction phase</span>
+<span class="sd">    :param trainer: The Trainer that will be used during the training and prediction phase</span>
+<span class="sd">    :param train_loader_params: parameters used to configure the DataLoader during the training phase</span>
+<span class="sd">    :param pretrain_loader_params: parameters used to configure the DataLoader during the pretraining phase</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretrainer</span><span class="p">:</span> <span class="n">Trainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretrainer</span><span class="p">:</span> <span class="n">Trainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">train_loader_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">pretrain_loader_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pretrainer</span> <span class="o">=</span> <span class="n">pretrainer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pretrain_loader_params</span> <span class="o">=</span> <span class="n">pretrain_loader_params</span> <span class="k">if</span> <span class="n">pretrain_loader_params</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">trainer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_loader_params</span> <span class="o">=</span> <span class="n">train_loader_params</span> <span class="k">if</span> <span class="n">train_loader_params</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">}</span>
 
 <div class="viewcode-block" id="SaintTrainer.prefit"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.trainer.SaintTrainer.prefit">[docs]</a>    <span class="k">def</span> <span class="nf">prefit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Saint</span><span class="p">,</span> <span class="n">datamodule</span><span class="p">:</span> <span class="n">SaintDatamodule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Function that is used for the pretraining of the model</span>
@@ -99,6 +106,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">model</span><span class="o">.</span><span class="n">set_pretraining</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">datamodule</span><span class="o">.</span><span class="n">set_pretraining</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">datamodule</span><span class="o">.</span><span class="n">set_data_loader_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pretrain_loader_params</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pretrainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SaintTrainer.get_model_from_checkpoint"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.trainer.SaintTrainer.get_model_from_checkpoint">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_from_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Saint</span><span class="p">,</span> <span class="n">pretraining</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -124,6 +132,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">get_model_from_checkpoint</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pretraining</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">model</span><span class="o">.</span><span class="n">set_pretraining</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">datamodule</span><span class="o">.</span><span class="n">set_pretraining</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">datamodule</span><span class="o">.</span><span class="n">set_data_loader_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_loader_params</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_model_from_checkpoint</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pretraining</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
@@ -146,7 +155,7 @@
                 <span class="n">prediction</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">))</span>
                 <span class="n">mc_predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
             <span class="n">model</span><span class="o">.</span><span class="n">set_mcdropout</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">mc_predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">mc_predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="n">prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span></div></div>
 </pre></div>
