@@ -216,8 +216,7 @@ def test_custom_params_dataloader():
                                      pretrain_loader_params={"batch_size": saint_cfg.pretrain.batch_size,
                                                              "num_workers": 0},
                                      train_loader_params={"batch_size": saint_cfg.train.batch_size,
-                                                          "num_workers": 0}
-        )
+                                                          "num_workers": 0})
         saint_trainer.prefit(model, data_module)
         assert data_module.data_loader_params['batch_size'] == 256
         assert data_module.data_loader_params['num_workers'] == 0
