@@ -32,19 +32,11 @@ def read_config(cfg: SaintConfig) -> None:
     df_train["split"] = "train"
     df_val["split"] = "validation"
     df = pd.concat([df_train, df_val])
-    data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split",
-                                  num_workers=cfg.network.num_workers,
-                                  data_loader_params={"batch_size": cfg.network.batch_size})
+    data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split")
     model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=cfg, dim_target=data_module.dim_target, metrics={"f1_score": torchmetrics.F1()},
                   metrics_single_class=False)
     checkpoint_callback_pre = ModelCheckpoint(
-        monitor="val_loss",
-        dirpath=".",
-        filename="saint-{epoch:02d}-{val_loss:.2f}",
-        mode="min",
-    )
-    checkpoint_callback = ModelCheckpoint(
         monitor="val_loss",
         dirpath=".",
         filename="saint-{epoch:02d}-{val_loss:.2f}",
@@ -55,7 +47,12 @@ def read_config(cfg: SaintConfig) -> None:
     pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback_pre, early_stopping_callback])
     trainer = Trainer(max_epochs=5, callbacks=[],
                       deterministic=True)
-    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
+    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer,
+                                 pretrain_loader_params={"batch_size": cfg.pretrain.batch_size,
+                                                         "num_workers": cfg.network.num_workers},
+                                 train_loader_params={"batch_size": cfg.train.batch_size,
+                                                         "num_workers": cfg.network.num_workers}
+                                 )
     saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=True)
     prediction = saint_trainer.predict(model=model, datamodule=data_module, df=df_test)
     df_test["prediction"] = np.argmax(prediction, axis=1)

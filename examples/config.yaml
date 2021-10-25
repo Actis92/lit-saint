@@ -13,8 +13,8 @@ network:
   embedding_size: 10
   internal_dimension_embed_continuous: 100
   dropout_embed_continuous: 0.0
-  batch_size: 256
 pretrain:
+  batch_size: 256
   aug:
     cutmix:
       lam: 0.1
@@ -37,6 +37,7 @@ pretrain:
     other_params: {}
   epochs: 2
 train:
+  batch_size: 256
   internal_dimension_output_layer: 20
   mlpfory_dropout: 0.0
   epochs: 5
