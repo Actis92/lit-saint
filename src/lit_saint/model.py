@@ -336,7 +336,7 @@ class Saint(LightningModule):
                 metric_name = "_".join(key.split("_")[:-1])
                 metrics[key] = self.metrics[metric_name](pred, target)[index_class_metric]
             else:
-                metric_name = "_".join(key.split("_")[:-1])
+                metric_name = key
                 metrics[key] = self.metrics[metric_name](pred, target)
 
     def validation_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
