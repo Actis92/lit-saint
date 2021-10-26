@@ -61,7 +61,7 @@ class Saint(LightningModule):
         self.train_metrics = self._define_metrics(self.metrics, metrics_single_class)
         self.val_metrics = self._define_metrics(self.metrics, metrics_single_class)
 
-    def _define_metrics(self, metrics: Dict[str, Metric], metrics_single_class: bool) -> Dict[str, Metric]:
+    def _define_metrics(self, metrics: Dict[str, Metric], metrics_single_class: bool) -> Dict[str, float]:
         """Define custom metrics computed during training loop
 
         :param metrics: Custom metrics to compute
@@ -71,10 +71,10 @@ class Saint(LightningModule):
         if metrics_single_class:
             for key, value in metrics.items():
                 for i in range(self.dim_target):
-                    metrics_step[f"{key}_{i}"] = copy.deepcopy(value)
+                    metrics_step[f"{key}_{i}"] = 0
         else:
             for key, value in metrics.items():
-                metrics_step[key] = copy.deepcopy(value)
+                metrics_step[key] = 0
         return metrics_step
 
     def _define_network_components(self, categories: List[int]) -> None:
@@ -322,7 +322,7 @@ class Saint(LightningModule):
                 self.log("train_metrics", self.train_metrics, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
-    def compute_metrics(self, metrics: Dict[str, Metric], y_pred: Tensor, target: Tensor) -> None:
+    def compute_metrics(self, metrics: Dict[str, float], y_pred: Tensor, target: Tensor) -> None:
         """ Compute custom metrics during training loop
 
         :param metrics: Metrics to compute
@@ -333,11 +333,11 @@ class Saint(LightningModule):
         for key, value in metrics.items():
             if self.metrics_single_class:
                 index_class_metric = int(key.split("_")[-1])
-                target_single_class = target[target == index_class_metric]
-                if target_single_class.shape[0] > 0:
-                    value(pred[target == index_class_metric], target[target == index_class_metric])
+                metric_name = "_".join(key.split("_")[:-1])
+                metrics[key] = self.metrics[metric_name](pred, target)[index_class_metric]
             else:
-                value(pred, target)
+                metric_name = "_".join(key.split("_")[:-1])
+                metrics[key] = self.metrics[metric_name](pred, target)
 
     def validation_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int) -> Tensor:
         loss, y_pred, target = self.shared_step(batch)
