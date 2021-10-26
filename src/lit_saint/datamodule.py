@@ -133,13 +133,14 @@ class SaintDatamodule(LightningDataModule):
         df[self.target] = df[self.target].apply(lambda x: x if x < self.target_nan_index else x - 1)
         return df
 
-    def _create_dataloader(self, df) -> DataLoader:
+    def _create_dataloader(self, df, is_predict=False) -> DataLoader:
         """ Given a dataframe it return a dataloader and eventually without rows
         that have nan labels if not pretraining
 
         :param df: the dataframe that will be used inside the DataLoader
+        :param is_predict: flag that is true if we are executing a prediction
         """
-        if not self.pretraining and self.target_nan_index is not None:
+        if not self.pretraining and self.target_nan_index is not None and not is_predict:
             df = self._remove_rows_without_labels(df)
         dataset = SaintDataset(
             data=df,
@@ -168,7 +169,7 @@ class SaintDatamodule(LightningDataModule):
 
     def predict_dataloader(self) -> DataLoader:
         """ Function that loads the dataset for the prediction. """
-        return self._create_dataloader(self.predict_set)
+        return self._create_dataloader(self.predict_set, True)
 
     def set_pretraining(self, pretraining: bool) -> None:
         """Function used to set the pretraining flag"""
