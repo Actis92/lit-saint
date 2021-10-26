@@ -208,13 +208,14 @@
         <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_nan_index</span> <span class="k">else</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
-    <span class="k">def</span> <span class="nf">_create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">is_predict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot; Given a dataframe it return a dataloader and eventually without rows</span>
 <span class="sd">        that have nan labels if not pretraining</span>
 
 <span class="sd">        :param df: the dataframe that will be used inside the DataLoader</span>
+<span class="sd">        :param is_predict: flag that is true if we are executing a prediction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pretraining</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_nan_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pretraining</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_nan_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_predict</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_rows_without_labels</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">SaintDataset</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
@@ -243,7 +244,7 @@
 
 <div class="viewcode-block" id="SaintDatamodule.predict_dataloader"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.datamodule.SaintDatamodule.predict_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot; Function that loads the dataset for the prediction. &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predict_set</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predict_set</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SaintDatamodule.set_pretraining"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.datamodule.SaintDatamodule.set_pretraining">[docs]</a>    <span class="k">def</span> <span class="nf">set_pretraining</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretraining</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Function used to set the pretraining flag&quot;&quot;&quot;</span>
