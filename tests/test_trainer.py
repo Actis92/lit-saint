@@ -245,6 +245,7 @@ def test_contrastive_disabled():
 
 def test_denoising_disabled():
     saint_cfg = SaintConfig()
+    saint_cfg.pretrain.task.contrastive.contrastive_type = ContrastiveEnum.simsiam
     saint_cfg.pretrain.task.denoising.denoising_type = DenoisingEnum.disabled
     df = pd.DataFrame({"target": [1, 2, 3, 4], "feat_cont": [2, 3, 1, 4],
                        "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
