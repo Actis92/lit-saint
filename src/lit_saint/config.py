@@ -3,9 +3,15 @@ from typing import Optional, Dict
 from enum import Enum
 
 
-class ConstrativeEnum(Enum):
+class ContrastiveEnum(Enum):
     simsiam = 'simsiam'
     standard = 'standard'
+    disabled = 'disabled'
+
+
+class DenoisingEnum(Enum):
+    standard = 'standard'
+    disabled = 'disabled'
 
 
 class ProjectionHeadStyleEnum(Enum):
@@ -39,10 +45,10 @@ class MixUpConfig:
 
 
 @dataclass
-class ConstrastiveConfig:
+class ContrastiveConfig:
     """Define the parameters for Contrastive pretraining task"""
     dropout: float = .0  #: probability dropout in projection head
-    constrastive_type: ConstrativeEnum = ConstrativeEnum.simsiam
+    contrastive_type: ContrastiveEnum = ContrastiveEnum.simsiam  # type of contrastive task to apply
     projhead_style: ProjectionHeadStyleEnum = ProjectionHeadStyleEnum.different  #: it is used to project embeddings
     nce_temp: float = 0.5  #: temperature used for the logits in case of standard constrastive type
     weight: float = 0.1  #: weight of the loss for this pretraining task
@@ -51,6 +57,7 @@ class ConstrastiveConfig:
 @dataclass
 class DenoisingConfig:
     """Define the parameters for Denoising pretraining task"""
+    denoising_type: DenoisingEnum = DenoisingEnum.standard  # type of denoising task to apply
     weight_cross_entropy: float = 0.5  #: weight reconstruction loss for categorical features
     weight_mse: float = 0.5  #: weight reconstruction loss for continuous features
     scale_dim_internal_sepmlp: float = 5  # scale factor of the input dimension for the first linear layer
@@ -67,7 +74,7 @@ class AugmentationConfig:
 @dataclass
 class PreTrainTaskConfig:
     """Define the parameters used for pretraining tasks"""
-    contrastive: Optional[ConstrastiveConfig] = ConstrastiveConfig()
+    contrastive: Optional[ContrastiveConfig] = ContrastiveConfig()
     denoising: Optional[DenoisingConfig] = DenoisingConfig()
 
 

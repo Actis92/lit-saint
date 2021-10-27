@@ -1,9 +1,7 @@
-import copy
 from typing import List, Tuple, Optional, Callable, Dict
 
 import torch
 import torch.nn.functional as f
-import torchmetrics
 from einops import rearrange
 from pytorch_lightning.core import LightningModule
 from torch import nn, Tensor
@@ -238,7 +236,7 @@ class Saint(LightningModule):
         :param embed_categ_noised: embeddings categorical features after the augmentation
         :param embed_cont_noised: embeddings continuous features after the augmentation
         """
-        if self.config.pretrain.task.contrastive.constrastive_type.value == 'standard':
+        if self.config.pretrain.task.contrastive.contrastive_type.value == 'standard':
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
                 embed_categ, embed_cont, embed_categ_noised, embed_cont_noised,
                 self.config.pretrain.task.contrastive.projhead_style)
@@ -251,7 +249,7 @@ class Saint(LightningModule):
             loss_1 = f.cross_entropy(logits_1, targets)
             loss_2 = f.cross_entropy(logits_2, targets)
             return self.config.pretrain.task.contrastive.weight * (loss_1 + loss_2) / 2
-        elif self.config.pretrain.task.contrastive.constrastive_type.value == 'simsiam':
+        elif self.config.pretrain.task.contrastive.contrastive_type.value == 'simsiam':
             # it apply the concept of simsiam we want that the embedding minimize the cosine similarity
             # the idea is that we want on the diagonal all 1, it means they are equal /because normalized)
             embed_tranformed, embed_transformed_noised = self._embeddings_contrastive(
@@ -288,9 +286,10 @@ class Saint(LightningModule):
         loss = Tensor([0]).to(embed_categ.device)
         embed_categ_noised, embed_cont_noised = self._pretraining_augmentation(x_categ, x_cont,
                                                                                embed_categ, embed_cont)
-        loss += self._pretraining_contrastive(embed_categ, embed_cont,
-                                              embed_categ_noised, embed_cont_noised)
-        if self.config.pretrain.task.denoising:
+        if self.config.pretrain.task.contrastive.contrastive_type.value != 'disabled':
+            loss += self._pretraining_contrastive(embed_categ, embed_cont,
+                                                  embed_categ_noised, embed_cont_noised)
+        if self.config.pretrain.task.denoising.denoising_type.value != 'disabled':
             loss += self._pretraining_denoising(x_categ, x_cont, embed_categ_noised, embed_cont_noised)
         return loss
 

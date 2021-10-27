@@ -6,6 +6,7 @@ from hydra.core.config_store import ConfigStore
 from pytorch_lightning import Trainer
 
 from lit_saint import SaintDatamodule, Saint, SaintConfig, SaintTrainer
+from src.lit_saint.config import ContrastiveEnum, DenoisingEnum
 
 cs = ConfigStore.instance()
 cs.store(name="base_config", node=SaintConfig)
@@ -224,3 +225,35 @@ def test_custom_params_dataloader():
         saint_trainer.fit(model, data_module, enable_pretraining=False)
         assert data_module.data_loader_params['batch_size'] == 32
         assert data_module.data_loader_params['num_workers'] == 0
+
+
+def test_contrastive_disabled():
+    saint_cfg = SaintConfig()
+    saint_cfg.pretrain.task.contrastive.contrastive_type = ContrastiveEnum.disabled
+    df = pd.DataFrame({"target": [1, 2, 3, 4], "feat_cont": [2, 3, 1, 4],
+                       "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                  config=saint_cfg, dim_target=data_module.dim_target,
+                  metrics={"mae_score": torchmetrics.MeanAbsoluteError()},
+                  metrics_single_class=False)
+    pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
+    trainer = Trainer(max_epochs=1, fast_dev_run=True)
+    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
+    saint_trainer.fit(model, data_module, enable_pretraining=True)
+
+
+def test_denoising_disabled():
+    saint_cfg = SaintConfig()
+    saint_cfg.pretrain.task.denoising.denoising_type = DenoisingEnum.disabled
+    df = pd.DataFrame({"target": [1, 2, 3, 4], "feat_cont": [2, 3, 1, 4],
+                       "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
+    data_module = SaintDatamodule(df=df, target="target", split_column="split")
+    model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
+                  config=saint_cfg, dim_target=data_module.dim_target,
+                  metrics={"mae_score": torchmetrics.MeanAbsoluteError()},
+                  metrics_single_class=False)
+    pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
+    trainer = Trainer(max_epochs=1, fast_dev_run=True)
+    saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer)
+    saint_trainer.fit(model, data_module, enable_pretraining=True)

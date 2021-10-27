@@ -22,12 +22,13 @@ pretrain:
       lam: 0.1
   task:
     contrastive:
-      constrastive_type: simsiam
+      contrastive_type: standard
       projhead_style: different
       nce_temp: 0.5
       weight: 0.1
       dropout: 0.0
     denoising:
+      denoising_type: standard
       weight_cross_entropy: 0.5
       weight_mse: 0.5
       scale_dim_internal_sepmlp: 5.0
