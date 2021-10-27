@@ -78,9 +78,15 @@
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
 
-<div class="viewcode-block" id="ConstrativeEnum"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ConstrativeEnum">[docs]</a><span class="k">class</span> <span class="nc">ConstrativeEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="ContrastiveEnum"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ContrastiveEnum">[docs]</a><span class="k">class</span> <span class="nc">ContrastiveEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">simsiam</span> <span class="o">=</span> <span class="s1">&#39;simsiam&#39;</span>
-    <span class="n">standard</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span></div>
+    <span class="n">standard</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span>
+    <span class="n">disabled</span> <span class="o">=</span> <span class="s1">&#39;disabled&#39;</span></div>
+
+
+<div class="viewcode-block" id="DenoisingEnum"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.DenoisingEnum">[docs]</a><span class="k">class</span> <span class="nc">DenoisingEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">standard</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span>
+    <span class="n">disabled</span> <span class="o">=</span> <span class="s1">&#39;disabled&#39;</span></div>
 
 
 <div class="viewcode-block" id="ProjectionHeadStyleEnum"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ProjectionHeadStyleEnum">[docs]</a><span class="k">class</span> <span class="nc">ProjectionHeadStyleEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
@@ -113,11 +119,11 @@
     <span class="n">lam</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1">#: weight used for the linear combination</span></div>
 
 
-<div class="viewcode-block" id="ConstrastiveConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ConstrastiveConfig">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ConstrastiveConfig</span><span class="p">:</span>
+<div class="viewcode-block" id="ContrastiveConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.ContrastiveConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ContrastiveConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define the parameters for Contrastive pretraining task&quot;&quot;&quot;</span>
     <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.0</span>  <span class="c1">#: probability dropout in projection head</span>
-    <span class="n">constrastive_type</span><span class="p">:</span> <span class="n">ConstrativeEnum</span> <span class="o">=</span> <span class="n">ConstrativeEnum</span><span class="o">.</span><span class="n">simsiam</span>
+    <span class="n">contrastive_type</span><span class="p">:</span> <span class="n">ContrastiveEnum</span> <span class="o">=</span> <span class="n">ContrastiveEnum</span><span class="o">.</span><span class="n">simsiam</span>  <span class="c1"># type of contrastive task to apply</span>
     <span class="n">projhead_style</span><span class="p">:</span> <span class="n">ProjectionHeadStyleEnum</span> <span class="o">=</span> <span class="n">ProjectionHeadStyleEnum</span><span class="o">.</span><span class="n">different</span>  <span class="c1">#: it is used to project embeddings</span>
     <span class="n">nce_temp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: temperature used for the logits in case of standard constrastive type</span>
     <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1">#: weight of the loss for this pretraining task</span></div>
@@ -126,6 +132,7 @@
 <div class="viewcode-block" id="DenoisingConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.DenoisingConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">DenoisingConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define the parameters for Denoising pretraining task&quot;&quot;&quot;</span>
+    <span class="n">denoising_type</span><span class="p">:</span> <span class="n">DenoisingEnum</span> <span class="o">=</span> <span class="n">DenoisingEnum</span><span class="o">.</span><span class="n">standard</span>  <span class="c1"># type of denoising task to apply</span>
     <span class="n">weight_cross_entropy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: weight reconstruction loss for categorical features</span>
     <span class="n">weight_mse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1">#: weight reconstruction loss for continuous features</span>
     <span class="n">scale_dim_internal_sepmlp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># scale factor of the input dimension for the first linear layer</span>
@@ -142,7 +149,7 @@
 <div class="viewcode-block" id="PreTrainTaskConfig"><a class="viewcode-back" href="../../_generated/lit_saint.html#lit_saint.config.PreTrainTaskConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">PreTrainTaskConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Define the parameters used for pretraining tasks&quot;&quot;&quot;</span>
-    <span class="n">contrastive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstrastiveConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConstrastiveConfig</span><span class="p">()</span>
+    <span class="n">contrastive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ContrastiveConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">ContrastiveConfig</span><span class="p">()</span>
     <span class="n">denoising</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DenoisingConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">DenoisingConfig</span><span class="p">()</span></div>
 
 

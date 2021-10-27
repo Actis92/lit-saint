@@ -137,15 +137,15 @@
 </li>
       <li><a href="_generated/lit_saint.html#lit_saint.model.Saint.configure_optimizers">configure_optimizers() (lit_saint.model.Saint method)</a>
 </li>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrastiveConfig.constrastive_type">constrastive_type (lit_saint.config.ConstrastiveConfig attribute)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.PreTrainTaskConfig.contrastive">contrastive (lit_saint.config.PreTrainTaskConfig attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrastiveConfig">ConstrastiveConfig (class in lit_saint.config)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveConfig.contrastive_type">contrastive_type (lit_saint.config.ContrastiveConfig attribute)</a>
 </li>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrativeEnum">ConstrativeEnum (class in lit_saint.config)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveConfig">ContrastiveConfig (class in lit_saint.config)</a>
 </li>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.PreTrainTaskConfig.contrastive">contrastive (lit_saint.config.PreTrainTaskConfig attribute)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveEnum">ContrastiveEnum (class in lit_saint.config)</a>
 </li>
       <li><a href="_generated/lit_saint.html#lit_saint.config.AugmentationConfig.cutmix">cutmix (lit_saint.config.AugmentationConfig attribute)</a>
 </li>
@@ -161,7 +161,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_generated/lit_saint.html#lit_saint.config.PreTrainTaskConfig.denoising">denoising (lit_saint.config.PreTrainTaskConfig attribute)</a>
 </li>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.DenoisingConfig.denoising_type">denoising_type (lit_saint.config.DenoisingConfig attribute)</a>
+</li>
       <li><a href="_generated/lit_saint.html#lit_saint.config.DenoisingConfig">DenoisingConfig (class in lit_saint.config)</a>
+</li>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.DenoisingEnum">DenoisingEnum (class in lit_saint.config)</a>
 </li>
       <li><a href="_generated/lit_saint.html#lit_saint.config.TransformerConfig.depth">depth (lit_saint.config.TransformerConfig attribute)</a>
 </li>
@@ -171,7 +175,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_generated/lit_saint.html#lit_saint.config.TransformerConfig.dim_head">dim_head (lit_saint.config.TransformerConfig attribute)</a>
 </li>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrastiveConfig.dropout">dropout (lit_saint.config.ConstrastiveConfig attribute)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveEnum.disabled">disabled (lit_saint.config.ContrastiveEnum attribute)</a>
+
+      <ul>
+        <li><a href="_generated/lit_saint.html#lit_saint.config.DenoisingEnum.disabled">(lit_saint.config.DenoisingEnum attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveConfig.dropout">dropout (lit_saint.config.ContrastiveConfig attribute)</a>
 
       <ul>
         <li><a href="_generated/lit_saint.html#lit_saint.config.DenoisingConfig.dropout">(lit_saint.config.DenoisingConfig attribute)</a>
@@ -387,7 +397,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_generated/lit_saint.html#lit_saint.datamodule.SaintDatamodule.NAN_LABEL">NAN_LABEL (lit_saint.datamodule.SaintDatamodule attribute)</a>
 </li>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrastiveConfig.nce_temp">nce_temp (lit_saint.config.ConstrastiveConfig attribute)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveConfig.nce_temp">nce_temp (lit_saint.config.ContrastiveConfig attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -449,7 +459,7 @@
 </li>
       <li><a href="_generated/lit_saint.html#lit_saint.config.ProjectionHeadStyleEnum">ProjectionHeadStyleEnum (class in lit_saint.config)</a>
 </li>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrastiveConfig.projhead_style">projhead_style (lit_saint.config.ConstrastiveConfig attribute)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveConfig.projhead_style">projhead_style (lit_saint.config.ContrastiveConfig attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -511,10 +521,14 @@
 </li>
       <li><a href="_generated/lit_saint.html#lit_saint.modules.SimpleMLP">SimpleMLP (class in lit_saint.modules)</a>
 </li>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrativeEnum.simsiam">simsiam (lit_saint.config.ConstrativeEnum attribute)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveEnum.simsiam">simsiam (lit_saint.config.ContrastiveEnum attribute)</a>
 </li>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrativeEnum.standard">standard (lit_saint.config.ConstrativeEnum attribute)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveEnum.standard">standard (lit_saint.config.ContrastiveEnum attribute)</a>
+
+      <ul>
+        <li><a href="_generated/lit_saint.html#lit_saint.config.DenoisingEnum.standard">(lit_saint.config.DenoisingEnum attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -577,7 +591,7 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_generated/lit_saint.html#lit_saint.config.ConstrastiveConfig.weight">weight (lit_saint.config.ConstrastiveConfig attribute)</a>
+      <li><a href="_generated/lit_saint.html#lit_saint.config.ContrastiveConfig.weight">weight (lit_saint.config.ContrastiveConfig attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
