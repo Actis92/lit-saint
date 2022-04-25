@@ -62,24 +62,35 @@ class SaintTrainer:
         self.get_model_from_checkpoint(model, pretraining=False)
 
     def predict(self, model: Saint, datamodule: SaintDatamodule, df: DataFrame,
-                mc_dropout_iterations: int = 0) -> numpy.ndarray:
+                mc_dropout_iterations: int = 0, feature_importance: bool = False) -> Dict:
         """Separates from fit to make sure you never run on your predictions set until you want to.
         This will call the model forward function to compute predictions.
 
         :param model: model used for the prediction
         :param datamodule: the datamodule that will preprocess the data before prediction
-        :param df: the data taht will be used for prediction
+        :param df: the data that will be used for prediction
         :param mc_dropout_iterations: number of iterations used for mcdropout estimation, if 0 it will not use
         mcdropout
         """
         datamodule.set_predict_set(df)
+        model.compute_feature_importance = feature_importance
         if mc_dropout_iterations > 0:
             model.set_mcdropout(True)
             mc_predictions = []
             for _ in range(mc_dropout_iterations):
-                prediction = torch.cat(self.trainer.predict(model, datamodule=datamodule))
+                output = self.trainer.predict(model, datamodule=datamodule)
+                prediction = torch.cat([o[0] for o in output])
                 mc_predictions.append(prediction)
             model.set_mcdropout(False)
-            return torch.stack(mc_predictions, axis=2).cpu().numpy()
-        prediction = self.trainer.predict(model, datamodule=datamodule)
-        return torch.cat(prediction).cpu().numpy()
+            return {"prediction": torch.stack(mc_predictions, axis=2).cpu().numpy()}
+        output = self.trainer.predict(model, datamodule=datamodule)
+        prediction = torch.cat([o[0] for o in output]).cpu().numpy()
+        df_importance = None
+        if output[0][1] is not None:
+            importance = torch.cat([o[1] for o in output]).cpu().numpy()
+            df_importance = DataFrame(
+                importance,
+                columns=datamodule.categorical_columns + datamodule.numerical_columns,
+            )
+        return {"prediction": prediction,
+                "importance": df_importance}

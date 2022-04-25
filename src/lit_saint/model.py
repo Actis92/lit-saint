@@ -36,10 +36,12 @@ class Saint(LightningModule):
             metrics_single_class: bool = True,
             optimizer: Callable = torch.optim.Adam,
             loss_fn: Callable = None,
+            compute_feature_importance: bool = False
     ):
         super().__init__()
         self.save_hyperparameters("categories", "continuous", "dim_target", "config")
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
+        self.compute_feature_importance = compute_feature_importance
         self.loss_fn = loss_fn
         self.optimizer = optimizer
         self.mc_dropout = False
@@ -99,7 +101,7 @@ class Saint(LightningModule):
             ff_dropout=self.config.network.transformer.dropout,
             style=self.config.network.transformer.attention_type.value,
             scale_dim_internal_col=self.config.network.transformer.scale_dim_internal_col,
-            scale_dim_internal_row=self.config.network.transformer.scale_dim_internal_row
+            scale_dim_internal_row=self.config.network.transformer.scale_dim_internal_row,
         )
 
     def _define_embedding_layers(self) -> None:
@@ -269,12 +271,15 @@ class Saint(LightningModule):
         optimizer = self.optimizer(self.parameters(), lr=lr, **other_params)
         return optimizer
 
-    def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
+    def forward(self, x_categ: Tensor, x_cont: Tensor) -> Tuple[Tensor, Tensor]:
         x_categ_enc, x_cont_enc = self._embed_data(x_categ, x_cont)
         reps = self.transformer(x_categ_enc, x_cont_enc)
+        importance = None
+        if self.compute_feature_importance:
+            importance = self.transformer.compute_feature_importance()
         reps = rearrange(reps, 'b h n -> b (h n)')
         y_outs = self.mlpfory(reps)
-        return y_outs
+        return y_outs, importance
 
     def pretraining_step(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
         """Defines all the step that must be sued in the pretraing step and return the computed loss
@@ -302,7 +307,7 @@ class Saint(LightningModule):
         if self.pretraining:
             return self.pretraining_step(x_categ, x_cont), torch.Tensor(), torch.Tensor()
         else:
-            y_pred = self(x_categ, x_cont)
+            y_pred, _ = self(x_categ, x_cont)
             if self.loss_fn:
                 return self.loss_fn(y_pred, target), y_pred, target
             else:
@@ -353,17 +358,17 @@ class Saint(LightningModule):
         return loss
 
     def predict_step(self, batch: Tuple[Tensor, Tensor, Tensor], batch_idx: int,
-                     dataloader_idx: Optional[int] = None) -> Tensor:
+                     dataloader_idx: Optional[int] = None) -> Tuple[Tensor, Tensor]:
         if self.mc_dropout:
             for m in self.modules():
                 if m.__class__.__name__.startswith('Dropout'):
                     m.train()
         x_categ, x_cont, _ = batch
-        y_pred = self(x_categ, x_cont)
+        y_pred, importance = self(x_categ, x_cont)
         if self.dim_target > 1:
-            return nn.Softmax(dim=-1)(y_pred)
+            return nn.Softmax(dim=-1)(y_pred), importance
         else:
-            return y_pred
+            return y_pred, importance
 
     @staticmethod
     def _classification_loss(y_pred: Tensor, target: Tensor) -> Tensor:

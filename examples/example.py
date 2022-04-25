@@ -34,7 +34,7 @@ def read_config(cfg: SaintConfig) -> None:
     df = pd.concat([df_train, df_val])
     data_module = SaintDatamodule(df=df, target=df.columns[14], split_column="split")
     model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                  config=cfg, dim_target=data_module.dim_target, metrics={"f1_score": torchmetrics.F1()},
+                  config=cfg, dim_target=data_module.dim_target,
                   metrics_single_class=False)
     checkpoint_callback_pre = ModelCheckpoint(
         monitor="val_loss",
@@ -45,7 +45,7 @@ def read_config(cfg: SaintConfig) -> None:
     early_stopping_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=3)
 
     pretrainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback_pre, early_stopping_callback])
-    trainer = Trainer(max_epochs=5, callbacks=[],
+    trainer = Trainer(max_epochs=3, callbacks=[],
                       deterministic=True)
     saint_trainer = SaintTrainer(pretrainer=pretrainer, trainer=trainer,
                                  pretrain_loader_params={"batch_size": cfg.pretrain.batch_size,
@@ -53,10 +53,14 @@ def read_config(cfg: SaintConfig) -> None:
                                  train_loader_params={"batch_size": cfg.train.batch_size,
                                                          "num_workers": cfg.network.num_workers}
                                  )
-    saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=True)
-    prediction = saint_trainer.predict(model=model, datamodule=data_module, df=df_test)
+    saint_trainer.fit(model=model, datamodule=data_module, enable_pretraining=False)
+    output = saint_trainer.predict(model=model, datamodule=data_module, df=df_test,
+                                   feature_importance=True)
+    prediction = output["prediction"]
+    feature_importance = output["importance"]
     df_test["prediction"] = np.argmax(prediction, axis=1)
     print(classification_report(data_module.predict_set[df.columns[14]], df_test["prediction"]))
+    print(feature_importance)
 
 
 if __name__ == "__main__":
