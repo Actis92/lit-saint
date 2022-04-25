@@ -58,6 +58,7 @@ class Attention(nn.Module):
 
         self.to_qkv = nn.Linear(dim, inner_dim * 3, bias=False)
         self.to_out = nn.Linear(inner_dim, dim)
+        self.attn = None
 
     def forward(self, x: Tensor) -> Tensor:
         # create query, key value from x
@@ -66,8 +67,9 @@ class Attention(nn.Module):
         q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h=self.heads), (q, k, v))
         # product matrix between q and k transposed
         logits = einsum('b h i d, b h j d -> b h i j', q, k) * self.scale
-        attn = logits.softmax(dim=-1)
-        out = einsum('b h i j, b h j d -> b h i d', attn, v)
+        self.attn = logits.softmax(dim=-1)
+
+        out = einsum('b h i j, b h j d -> b h i d', self.attn, v)
         # concatenate result obtained by different heads
         out = rearrange(out, 'b h n d -> b n (h d)', h=self.heads)
         return self.to_out(out)
@@ -108,6 +110,7 @@ class RowColTransformer(nn.Module):
                                                              int(dim * nfeats * scale_dim_internal_row),
                                                              dim * nfeats, GEGLU(), dropout=ff_dropout))),
                 ]))
+        self.feature_importance = None
 
     @staticmethod
     def forward_col(x: Tensor, attn: nn.Module, ff: nn.Module) -> Tensor:
@@ -139,6 +142,18 @@ class RowColTransformer(nn.Module):
             for attn, ff in self.layers:
                 x = self.forward_col(x, attn, ff)
         return x
+
+    def compute_feature_importance(self):
+        n, h, f, _ = self.layers[0][0].fn.fn.attn.shape
+        feature_importance = torch.zeros((n, f))
+        if self.style == 'colrow':
+            pass
+        elif self.style == "col":
+            for attn, _ in self.layers:
+                feature_importance += attn.fn.fn.attn[:, :, :, -1].sum(dim=1)
+            l = len(self.layers)
+            feature_importance = (1 / (h * l)) * feature_importance
+        return feature_importance
 
 
 class SimpleMLP(nn.Module):
