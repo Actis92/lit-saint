@@ -82,7 +82,7 @@ class SaintTrainer:
                 prediction = torch.cat([o[0] for o in output])
                 mc_predictions.append(prediction)
             model.set_mcdropout(False)
-            return torch.stack(mc_predictions, axis=2).cpu().numpy()
+            return {"prediction": torch.stack(mc_predictions, axis=2).cpu().numpy()}
         output = self.trainer.predict(model, datamodule=datamodule)
         prediction = torch.cat([o[0] for o in output]).cpu().numpy()
         df_importance = None

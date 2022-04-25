@@ -71,7 +71,7 @@ def test_predict():
         saint_trainer.fit(model, data_module, enable_pretraining=False)
         df_predict = df[[col for col in df.columns if col != "target"]]
         prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict)
-        assert prediction.shape[1] == 2
+        assert prediction["prediction"].shape[1] == 2
 
 
 def test_predict_unknown_categ():
@@ -89,7 +89,7 @@ def test_predict_unknown_categ():
         saint_trainer = SaintTrainer(None, trainer=trainer)
         saint_trainer.fit(model, data_module, enable_pretraining=False)
         prediction = saint_trainer.predict(model, datamodule=data_module, df=df_test)
-        assert prediction.shape[1] == 2
+        assert prediction["prediction"].shape[1] == 2
 
 
 def test_regression():
@@ -107,7 +107,7 @@ def test_regression():
         saint_trainer.fit(model, data_module, enable_pretraining=True)
         df_predict = df[[col for col in df.columns if col != "target"]]
         prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict)
-        assert prediction.shape[1] == 1
+        assert prediction["prediction"].shape[1] == 1
 
 
 def test_train_default_value_config():
@@ -138,7 +138,7 @@ def test_multiclass():
         saint_trainer.fit(model, data_module, enable_pretraining=False)
         df_predict = df[[col for col in df.columns if col != "target"]]
         prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict)
-        assert prediction.shape[1] == 3
+        assert prediction["prediction"].shape[1] == 3
 
 
 def test_metrics_single_class():
@@ -197,9 +197,9 @@ def test_mcdropout():
     saint_trainer.fit(model, data_module, enable_pretraining=False)
     df_predict = df[[col for col in df.columns if col != "target"]]
     prediction = saint_trainer.predict(model, datamodule=data_module, df=df_predict, mc_dropout_iterations=2)
-    var_prediction = np.var(prediction, axis=2)
-    assert prediction.shape[1] == 2
-    assert prediction.shape[2] == 2
+    var_prediction = np.var(prediction["prediction"], axis=2)
+    assert prediction["prediction"].shape[1] == 2
+    assert prediction["prediction"].shape[2] == 2
     assert var_prediction.min() > 0
 
 

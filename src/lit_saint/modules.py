@@ -151,8 +151,8 @@ class RowColTransformer(nn.Module):
         elif self.style == "col":
             for attn, _ in self.layers:
                 feature_importance += attn.fn.fn.attn[:, :, :, -1].sum(dim=1)
-            l = len(self.layers)
-            feature_importance = (1 / (h * l)) * feature_importance
+            n_layers = len(self.layers)
+            feature_importance = (1 / (h * n_layers)) * feature_importance
         return feature_importance
 
 
