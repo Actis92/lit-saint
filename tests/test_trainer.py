@@ -148,7 +148,7 @@ def test_metrics_single_class():
     data_module = SaintDatamodule(df=df, target="target", split_column="split")
     model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
                   config=saint_cfg, dim_target=data_module.dim_target,
-                  metrics={"f1_score": torchmetrics.F1(num_classes=2, average=None)},
+                  metrics={"f1_score": torchmetrics.F1Score(num_classes=2, average=None)},
                   metrics_single_class=True)
     pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
     trainer = Trainer(max_epochs=1, fast_dev_run=True)
@@ -162,7 +162,7 @@ def test_metrics_global():
                        "feat_categ": ["a", "b", "a", "c"], "split": ["train", "train", "validation", "test"]})
     data_module = SaintDatamodule(df=df, target="target", split_column="split")
     model = Saint(categories=data_module.categorical_dims, continuous=data_module.numerical_columns,
-                  config=saint_cfg, dim_target=data_module.dim_target, metrics={"f1_score": torchmetrics.F1()},
+                  config=saint_cfg, dim_target=data_module.dim_target, metrics={"f1_score": torchmetrics.F1Score()},
                   metrics_single_class=False)
     pretrainer = Trainer(max_epochs=1, fast_dev_run=True)
     trainer = Trainer(max_epochs=1, fast_dev_run=True)
