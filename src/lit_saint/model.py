@@ -2,7 +2,6 @@ from typing import List, Tuple, Optional, Callable, Dict
 
 import torch
 import torch.nn.functional as f
-from einops import rearrange
 from pytorch_lightning.core import LightningModule
 from torch import nn, Tensor
 import numpy as np
@@ -51,6 +50,7 @@ class Saint(LightningModule):
         self.num_categories = len(categories)
         self.num_unique_categories = sum(categories)
         self.num_continuous = len(continuous) if len(continuous) > 0 else 1
+        self.num_continuous += 1
         self.num_columns = self.num_continuous + self.num_categories
         # define offset in order to have unique value for each category
         cat_mask_offset = f.pad(torch.tensor(categories), (1, 0), value=0)
@@ -86,7 +86,7 @@ class Saint(LightningModule):
         self._define_transformer()
         self._define_mlp(categories)
         self._define_projection_head()
-        self.mlpfory = SimpleMLP(self.config.network.embedding_size * self.num_columns,
+        self.mlpfory = SimpleMLP(self.config.network.embedding_size,
                                  self.config.train.internal_dimension_output_layer, self.dim_target,
                                  dropout=self.config.train.mlpfory_dropout)
 
@@ -277,8 +277,8 @@ class Saint(LightningModule):
         importance = None
         if self.compute_feature_importance:
             importance = self.transformer.compute_feature_importance()
-        reps = rearrange(reps, 'b h n -> b (h n)')
-        y_outs = self.mlpfory(reps)
+        y_reps = reps[:, -1, :]
+        y_outs = self.mlpfory(y_reps)
         return y_outs, importance
 
     def pretraining_step(self, x_categ: Tensor, x_cont: Tensor) -> Tensor:
