@@ -4,6 +4,7 @@ import torch
 import torch.nn.functional as f
 from einops import rearrange
 from torch import nn, einsum, Tensor
+from torch.nn import Softmax
 
 
 class Residual(nn.Module):
@@ -145,14 +146,12 @@ class RowColTransformer(nn.Module):
 
     def compute_feature_importance(self):
         n, h, f, _ = self.layers[0][0].fn.fn.attn.shape
-        feature_importance = torch.zeros((n, f))
+        feature_importance = torch.zeros((n, f - 1))
         if self.style == 'colrow':
             pass
         elif self.style == "col":
             for attn, _ in self.layers:
-                feature_importance += attn.fn.fn.attn[:, :, :, -1].sum(dim=1)
-            n_layers = len(self.layers)
-            feature_importance = (1 / (h * n_layers)) * feature_importance
+                feature_importance += attn.fn.fn.attn[:, :, :-1, -1].sum(dim=1)
         return feature_importance
 
 

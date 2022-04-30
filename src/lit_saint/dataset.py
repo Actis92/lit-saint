@@ -23,6 +23,7 @@ class SaintDataset(Dataset):
         self.X_categorical = self._define_tensor_features(data, cat_cols, torch.int64)
         self.X_continuos = self._define_tensor_features(data, con_cols, torch.float32, scaler)
         self.y = self._define_tensor_target(data, target, target_categorical)
+        self.prediction_column: Tensor = rearrange(torch.zeros(data.shape[0], dtype=torch.float32), 'n -> n 1')
 
     def __len__(self):
         return len(self.y)
@@ -69,4 +70,4 @@ class SaintDataset(Dataset):
 
         :param idx: numeric index of the data that we want to process
         """
-        return self.X_categorical[idx], self.X_continuos[idx], self.y[idx]
+        return self.X_categorical[idx], torch.cat([self.X_continuos[idx], self.prediction_column[idx]]), self.y[idx]
